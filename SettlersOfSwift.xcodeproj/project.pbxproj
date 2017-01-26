@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C1D1ECD1E3A6FD30009018C /* MultipeerNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D1ECC1E3A6FD30009018C /* MultipeerNetworkManager.swift */; };
+		6C1D1ECF1E3A7F800009018C /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D1ECE1E3A7F800009018C /* TableViewController.swift */; };
 		6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */; };
 		6CCF9F671E395DF900AAEB79 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F661E395DF900AAEB79 /* GameScene.sks */; };
 		6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F681E395DF900AAEB79 /* Actions.sks */; };
@@ -18,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C1D1ECC1E3A6FD30009018C /* MultipeerNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerNetworkManager.swift; sourceTree = "<group>"; };
+		6C1D1ECE1E3A7F800009018C /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		6CCF9F611E395DF900AAEB79 /* SettlersOfSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettlersOfSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6CCF9F661E395DF900AAEB79 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -69,6 +73,8 @@
 				6CCF9F711E395DF900AAEB79 /* Assets.xcassets */,
 				6CCF9F731E395DF900AAEB79 /* LaunchScreen.storyboard */,
 				6CCF9F761E395DF900AAEB79 /* Info.plist */,
+				6C1D1ECC1E3A6FD30009018C /* MultipeerNetworkManager.swift */,
+				6C1D1ECE1E3A7F800009018C /* TableViewController.swift */,
 			);
 			path = SettlersOfSwift;
 			sourceTree = "<group>";
@@ -148,8 +154,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C1D1ECD1E3A6FD30009018C /* MultipeerNetworkManager.swift in Sources */,
 				6CCF9F6B1E395DF900AAEB79 /* GameScene.swift in Sources */,
 				6CCF9F6D1E395DF900AAEB79 /* GameViewController.swift in Sources */,
+				6C1D1ECF1E3A7F800009018C /* TableViewController.swift in Sources */,
 				6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -314,6 +322,7 @@
 				6CCF9F7B1E395DF900AAEB79 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -5,7 +5,6 @@
 //  Created by Riley Goldman on 1/25/17.
 //  Copyright © 2017 Comp361. All rights reserved.
 //
-
 import SpriteKit
 import GameplayKit
 
@@ -19,7 +18,7 @@ class GameScene: SKScene {
     private var spinnyNode : SKShapeNode?
     
     override func sceneDidLoad() {
-
+        
         self.lastUpdateTime = 0
         
         // Get label node from scene and store it for use later
