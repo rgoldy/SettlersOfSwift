@@ -12,18 +12,19 @@ import GameplayKit
 
 class GameScene: SKScene {
     
-    // touch location
-    //var targetLocation: CGPoint = .zero
-    
     //init scene nodes
     var cam:SKCameraNode!
     var waterBackground:SKTileMapNode!
     var landBackground:SKTileMapNode!
+    var Numbers:SKTileMapNode!
     var terrainTiles:SKTileSet!
+    var numberTiles:SKTileSet!
     let NumRows = 9
+    var landHexArray = [LandHex]()
     
     //init initial tile values
     var tileValues : Dictionary<String, Int> = [:]
+    var numberTileValues : Dictionary<String, Int> = [:]
     
     override func didMove(to view: SKView) {
         //load tiles
@@ -81,6 +82,18 @@ class GameScene: SKScene {
         }
         self.waterBackground = waterBackground
         
+        guard let Numbers = childNode(withName: "Numbers")
+            as? SKTileMapNode else {
+                fatalError("Numbers node not loaded")
+        }
+        self.Numbers = Numbers
+        
+        //load terrainTiles tile set
+        guard let numberTiles = SKTileSet(named: "Number Values") else {
+            fatalError("numberTiles node not loaded")
+        }
+        self.numberTiles = numberTiles
+        
         initTiles(filename: "3player")
     }
     
@@ -98,6 +111,20 @@ class GameScene: SKScene {
         tileValues["stone"] = (dictionary["stone"] as? Int)!
         tileValues["gold"] = (dictionary["gold"] as? Int)!
         
+        //fill numberTileValue dictionary
+        numberTileValues = Dictionary<String, Int>()
+        numberTileValues["2"] = (dictionary["2"] as? Int)!
+        numberTileValues["3"] = (dictionary["3"] as? Int)!
+        numberTileValues["4"] = (dictionary["4"] as? Int)!
+        numberTileValues["5"] = (dictionary["5"] as? Int)!
+        numberTileValues["6"] = (dictionary["6"] as? Int)!
+        numberTileValues["8"] = (dictionary["8"] as? Int)!
+        numberTileValues["9"] = (dictionary["9"] as? Int)!
+        numberTileValues["10"] = (dictionary["10"] as? Int)!
+        numberTileValues["11"] = (dictionary["11"] as? Int)!
+        numberTileValues["12"] = (dictionary["12"] as? Int)!
+
+        
         //get tile layout
         guard let tilesArray = dictionary["tiles"] as? [[Int]] else { return }
         
@@ -108,6 +135,25 @@ class GameScene: SKScene {
                 if value == 1 {
                     let currTile = getValidTileGroup()
                     landBackground.setTileGroup(currTile, forColumn: column, row: tileRow)
+                    let currNumberTile = getValidNumberTileGroup()
+                    Numbers.setTileGroup(currNumberTile, forColumn: column, row: tileRow)
+                    let hex = LandHex(column: column, row: tileRow, tile: landBackground.tileDefinition(atColumn: column, row: tileRow)!, number: Int(Numbers.tileDefinition(atColumn: column, row: tileRow)!.name!)!)
+                    landHexArray.append(hex)
+                }
+            }
+        }
+        
+        //neighbouring array coords difference
+        let xChange = [0, 1, 1, 0, -1, -1]
+        let yChange = [1, 0, -1, -1, -1, 0]
+        
+        //set neighbouring tiles in every hex
+        for hex in landHexArray {
+            for i in 0...5 {
+                if let neighbour = landHexArray.first(where: {$0.column == hex.column + yChange[i] && $0.row == hex.row + xChange[i]}) {
+                    hex.neighbouringTiles.append(neighbour)
+                } else {
+                    hex.neighbouringTiles.append(nil)
                 }
             }
         }
@@ -127,6 +173,24 @@ class GameScene: SKScene {
         //get tile and decrement value by 1
         let tile = terrainTiles.tileGroups[random]
         tileValues[name] = tileValues[name]!-1
+        
+        return tile
+    }
+    
+    //get a valid number tile to put in game
+    func getValidNumberTileGroup() -> SKTileGroup {
+        var random:Int
+        var name:String
+        
+        //keep randomizing if all tiles of one type already used up
+        repeat {
+            random = Int(arc4random_uniform(10))
+            name = numberTiles.tileGroups[random].name!
+        } while (numberTileValues[name] == 0)
+        
+        //get tile and decrement value by 1
+        let tile = numberTiles.tileGroups[random]
+        numberTileValues[name] = numberTileValues[name]!-1
         
         return tile
     }
@@ -184,7 +248,6 @@ class GameScene: SKScene {
 //        targetLocation = touch.location(in: self)
 //    }
 //    
-    override func update(_ currentTime: TimeInterval) {
-    }
-    
+//    override func update(_ currentTime: TimeInterval) {
+//    }    
 }
