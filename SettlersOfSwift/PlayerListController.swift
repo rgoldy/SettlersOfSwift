@@ -9,15 +9,19 @@
 import UIKit
 import MultipeerConnectivity
 
-class TableViewController: UITableViewController, NetworkDelegate {
+class NetworkConnection: UITableViewController, NetworkDelegate {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    //var myTableView: UITableView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         appDelegate.networkManager.delegate = self
         appDelegate.networkManager.serviceBrowser.startBrowsingForPeers()
+        
+        //myTableView.dataSource = appDelegate.networkManager.getNearbyUsers()
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false

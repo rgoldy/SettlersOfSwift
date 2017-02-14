@@ -22,7 +22,7 @@ class MultipeerNetworkManager : NSObject {
     private var myServiceType = "settlersofswift"
     
     // List of all users you can see
-    private var nearbyUsers = [MCPeerID]()
+    var nearbyUsers = [MCPeerID]()
     var delegate: NetworkDelegate?
     
     private var myPeerId : MCPeerID!
@@ -51,6 +51,14 @@ class MultipeerNetworkManager : NSObject {
         self.serviceBrowser.stopBrowsingForPeers()
     }
     
+    func getNearbyUsers() -> [String] {
+        var users = [String]()
+        for (_, peer) in nearbyUsers.enumerated() {
+            users.append(peer.displayName)
+        }
+        return users
+    }
+    
     lazy var session : MCSession = {
         let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.required)
         session.delegate = self
@@ -70,6 +78,15 @@ class MultipeerNetworkManager : NSObject {
         }
     }
     
+    func setVisible()
+    {
+        self.serviceAdvertiser.startAdvertisingPeer()
+    }
+    func setInvisible()
+    {
+        self.serviceAdvertiser.stopAdvertisingPeer()
+    }
+    
     func countNearbyUsers() -> Int {
         return nearbyUsers.count
     }
@@ -82,7 +99,7 @@ class MultipeerNetworkManager : NSObject {
 
 extension MultipeerNetworkManager : MCNearbyServiceAdvertiserDelegate {
     
-    func advertiser(advertiser: MCNearbyServiceAdvertiser!, didNotStartAdvertisingPeer error: NSError!) {
+    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
         NSLog("%@", "didNotStartAdvertisingPeer: \(error)")
     }
     
@@ -102,7 +119,7 @@ extension MultipeerNetworkManager : MCNearbyServiceBrowserDelegate {
     }
 
     
-    func browser(_: MCNearbyServiceBrowser!, didNotStartBrowsingForPeers error: Error!) {
+    func browser(_: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
         NSLog("%@", "didNotStartBrowsingForPeers: \(error)")
     }
     
@@ -123,7 +140,6 @@ extension MCSessionState {
         case .notConnected: return "NotConnected"
         case .connecting: return "Connecting"
         case .connected: return "Connected"
-        default: return "Unknown"
         }
     }
     
