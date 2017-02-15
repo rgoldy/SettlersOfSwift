@@ -54,7 +54,6 @@ class NewGameController: UITableViewController, NetworkDelegate {
         alert.addAction(acceptAction)
         alert.addAction(declineAction)
         
-        self.present(alert, animated: true, completion: nil)
         OperationQueue.main.addOperation { () -> Void in
             self.present(alert, animated: true, completion: nil)
         }
@@ -63,11 +62,6 @@ class NewGameController: UITableViewController, NetworkDelegate {
     // Connected with a peer
     func connectedWithPeer(peerID: MCPeerID) {
         tblView.reloadData()
-    
-//        OperationQueue.main.addOperation { () -> Void in
-//            self.performSegue(withIdentifier: "idSegueChat", sender: self)
-//        }
-
     }
     
     override func didReceiveMemoryWarning() {

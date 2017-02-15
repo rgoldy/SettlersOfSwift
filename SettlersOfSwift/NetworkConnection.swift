@@ -16,7 +16,7 @@ protocol NetworkDelegate {
     func connectedWithPeer(peerID: MCPeerID)
 }
 
-class MultipeerNetworkManager : NSObject {
+class NetworkConnection : NSObject {
     
     // Identifies who is using the game
     private var myServiceType = "settlersofswift"
@@ -28,6 +28,7 @@ class MultipeerNetworkManager : NSObject {
     private var myPeerId : MCPeerID!
     var serviceAdvertiser : MCNearbyServiceAdvertiser!
     var serviceBrowser : MCNearbyServiceBrowser!
+    var invitationHandler: ((Bool, MCSession?)->Void)!
     
     init(username: String) {
         myPeerId = MCPeerID(displayName: username)
@@ -51,16 +52,8 @@ class MultipeerNetworkManager : NSObject {
         self.serviceBrowser.stopBrowsingForPeers()
     }
     
-    func getNearbyUsers() -> [String] {
-        var users = [String]()
-        for (_, peer) in nearbyUsers.enumerated() {
-            users.append(peer.displayName)
-        }
-        return users
-    }
-    
     lazy var session : MCSession = {
-        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.required)
+        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.optional)
         session.delegate = self
         return session
     }()
@@ -78,26 +71,71 @@ class MultipeerNetworkManager : NSObject {
         }
     }
     
+    // SET SELF TO BE DISCOVERABLE BY OTHERS
     func setVisible()
     {
         self.serviceAdvertiser.startAdvertisingPeer()
     }
+    // SET SELF TO BE INVISIBLE TO OTHERS
     func setInvisible()
     {
         self.serviceAdvertiser.stopAdvertisingPeer()
     }
     
-    func countNearbyUsers() -> Int {
-        return nearbyUsers.count
+    // START LOOKING FOR OTHERS
+    func startBrowsing()
+    {
+        self.serviceBrowser.startBrowsingForPeers()
+    }
+    // STOP LOOKING FOR OTHERS
+    func stopBrowsing()
+    {
+        self.serviceBrowser.stopBrowsingForPeers()
     }
     
-    func getNearbyPeer(index: Int) -> String {
-        return nearbyUsers[index].displayName
+    // DISCONNECT FROM THE SESSION
+    func disconnect() {
+        self.session.disconnect()
     }
     
+    // When an invitation is recieved
+    func advertiser(advertiser: MCNearbyServiceAdvertiser!, didReceiveInvitationFromPeer peerID: MCPeerID!, withContext context: NSData!, invitationHandler: ((Bool, MCSession?) -> Void)!) {
+        self.invitationHandler = invitationHandler
+        
+        delegate?.invitationWasReceived(fromPeer: peerID.displayName)
+    }
+    
+    // Tell the delegate of a connection
+    func session(session: MCSession, peer peerID: MCPeerID, didChangeState state: MCSessionState) {
+        switch state{
+        case MCSessionState.connected:
+            print("Connected to session: \(session)")
+            NSLog("%@", "CONNECTED WITH \(peerID.displayName)")
+            delegate?.connectedWithPeer(peerID: peerID)
+            
+        case MCSessionState.connecting:
+            print("Connecting to session: \(session)")
+            
+        default:
+            print("Did not connect to session: \(session)")
+        }
+    }
+    
+    // SEND DATA to a peer
+    /*func sendData(dictionaryWithData dictionary: Dictionary<String, String>, toPeer targetPeer: MCPeerID) -> Bool {
+        let dataToSend = NSKeyedArchiver.archivedData(withRootObject: dictionary)
+        let peersArray = NSArray(object: targetPeer)
+        //var error: NSError?
+        
+        if !session.send(dataToSend, toPeers: peersArray as! [MCPeerID], with: MCSessionSendDataMode.Reliable) {
+            return false
+        }
+        
+        return true
+    }*/
 }
 
-extension MultipeerNetworkManager : MCNearbyServiceAdvertiserDelegate {
+extension NetworkConnection : MCNearbyServiceAdvertiserDelegate {
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
         NSLog("%@", "didNotStartAdvertisingPeer: \(error)")
@@ -105,10 +143,13 @@ extension MultipeerNetworkManager : MCNearbyServiceAdvertiserDelegate {
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping ((Bool, MCSession?) -> Void)) {
         NSLog("%@", "didReceiveInvitationFromPeer \(peerID)")
+        
+        self.invitationHandler = invitationHandler
+        delegate?.invitationWasReceived(fromPeer: peerID.displayName)
     }
 }
 
-extension MultipeerNetworkManager : MCNearbyServiceBrowserDelegate {
+extension NetworkConnection : MCNearbyServiceBrowserDelegate {
     @available(iOS 7.0, *)
     public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         NSLog("%@", "foundPeer: \(peerID)")
@@ -145,7 +186,7 @@ extension MCSessionState {
     
 }
 
-extension MultipeerNetworkManager : MCSessionDelegate {
+extension NetworkConnection : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         NSLog("%@", "peer \(peerID) didChangeState: \(state.stringValue())")

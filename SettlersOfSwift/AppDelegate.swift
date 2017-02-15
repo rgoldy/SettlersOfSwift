@@ -12,12 +12,11 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var networkManager: MultipeerNetworkManager!
+    var networkManager: NetworkConnection!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        networkManager = MultipeerNetworkManager()
+        networkManager = NetworkConnection()
         
         return true
     }

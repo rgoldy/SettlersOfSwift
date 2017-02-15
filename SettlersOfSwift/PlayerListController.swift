@@ -9,31 +9,38 @@
 import UIKit
 import MultipeerConnectivity
 
-class NetworkConnection: UITableViewController, NetworkDelegate {
+class PlayerListController: UITableViewController, NetworkDelegate {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    //var myTableView: UITableView!
     
+    @IBOutlet var tblView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         appDelegate.networkManager.delegate = self
-        appDelegate.networkManager.serviceBrowser.startBrowsingForPeers()
         
-        //myTableView.dataSource = appDelegate.networkManager.getNearbyUsers()
+        appDelegate.networkManager.setInvisible()
+        appDelegate.networkManager.startBrowsing()
+        
+        tblView.dataSource = self
+        tblView.delegate = self
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
-    func foundPeer() { self.tableView.reloadData() }
-    func lostPeer() { self.tableView.reloadData() }
-    func invitationWasReceived(fromPeer: String) {}
-    func connectedWithPeer(peerID: MCPeerID) {}
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        appDelegate.networkManager.setInvisible()
+        appDelegate.networkManager.startBrowsing()
+        
+        appDelegate.networkManager.delegate = self
+    }
+    
+    func foundPeer() { tblView.reloadData() }
+    func lostPeer() { tblView.reloadData() }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -42,26 +49,72 @@ class NetworkConnection: UITableViewController, NetworkDelegate {
 
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
+    // Only use 1 section, always
+    override func numberOfSections(in tableView: UITableView) -> Int
+    {
         return 1
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return appDelegate.networkManager.countNearbyUsers()
+    // Sets length of list to number of found users
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+    {
+        return appDelegate.networkManager.nearbyUsers.count
     }
 
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
+    // Adds found users to list
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
+    {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "idCellPeer")! as UITableViewCell
+        
         // Configure the cell...
-        cell.textLabel?.text = appDelegate.networkManager.getNearbyPeer(index: indexPath.row)
+        cell.textLabel?.text = appDelegate.networkManager.nearbyUsers[indexPath.row].displayName
 
         return cell
     }
+
+    // Sets row height
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 60.0
+    }
     
+
+    // Table cell selected -> ask to connect with user
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("Selection Detected.")
+        let selectedPeer = appDelegate.networkManager.nearbyUsers[indexPath.row] as MCPeerID
+        
+        appDelegate.networkManager.serviceBrowser.invitePeer(selectedPeer, to: appDelegate.networkManager.session, withContext: nil, timeout: 20)
+        
+        print("Invited peer: \(selectedPeer.displayName).")
+    }
+    
+    // Invitation recieved
+    func invitationWasReceived(fromPeer: String) {
+        let alert = UIAlertController(title: "", message: "\(fromPeer) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let acceptAction: UIAlertAction = UIAlertAction(title: "Accept", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+            self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
+        }
+        
+        let declineAction = UIAlertAction(title: "Decline", style: UIAlertActionStyle.cancel) { (alertAction) -> Void in
+            self.appDelegate.networkManager.invitationHandler(false, nil)
+        }
+        
+        alert.addAction(acceptAction)
+        alert.addAction(declineAction)
+        
+        OperationQueue.main.addOperation { () -> Void in
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    // Connected with a peer
+    func connectedWithPeer(peerID: MCPeerID) {
+        print("Connected to \(peerID.displayName)")
+//        OperationQueue.main.addOperation { () -> Void in
+//            self.performSegue(withIdentifier: "idSegueChat", sender: self)
+//        }
+    }
 
     /*
     // Override to support conditional editing of the table view.
