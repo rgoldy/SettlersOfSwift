@@ -83,14 +83,14 @@ class PlayerListController: UITableViewController, NetworkDelegate {
         print("Selection Detected.")
         let selectedPeer = appDelegate.networkManager.nearbyUsers[indexPath.row] as MCPeerID
         
-        appDelegate.networkManager.serviceBrowser.invitePeer(selectedPeer, to: appDelegate.networkManager.session, withContext: nil, timeout: 20)
+        appDelegate.networkManager.serviceBrowser.invitePeer(selectedPeer, to: self.appDelegate.networkManager.session, withContext: nil, timeout: 20)
         
         print("Invited peer: \(selectedPeer.displayName).")
     }
     
     // Invitation recieved
-    func invitationWasReceived(fromPeer: String) {
-        let alert = UIAlertController(title: "", message: "\(fromPeer) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
+    func invitationWasReceived(fromPeer: MCPeerID) {
+        let alert = UIAlertController(title: "", message: "\(fromPeer.displayName) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
         
         let acceptAction: UIAlertAction = UIAlertAction(title: "Accept", style: UIAlertActionStyle.default) { (alertAction) -> Void in
             self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
@@ -114,6 +114,11 @@ class PlayerListController: UITableViewController, NetworkDelegate {
 //        OperationQueue.main.addOperation { () -> Void in
 //            self.performSegue(withIdentifier: "idSegueChat", sender: self)
 //        }
+    }
+    
+    func lostConnectionWith(peerID: MCPeerID)
+    {
+        tblView.reloadData()
     }
 
     /*

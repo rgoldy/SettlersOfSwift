@@ -12,8 +12,9 @@ import MultipeerConnectivity
 protocol NetworkDelegate {
     func foundPeer()
     func lostPeer()
-    func invitationWasReceived(fromPeer: String)
+    func invitationWasReceived(fromPeer: MCPeerID)
     func connectedWithPeer(peerID: MCPeerID)
+    func lostConnectionWith(peerID: MCPeerID)
 }
 
 class NetworkConnection : NSObject {
@@ -27,15 +28,24 @@ class NetworkConnection : NSObject {
     
     private var myPeerId : MCPeerID!
     var serviceAdvertiser : MCNearbyServiceAdvertiser!
+    var advertiser : MCAdvertiserAssistant!
     var serviceBrowser : MCNearbyServiceBrowser!
     var invitationHandler: ((Bool, MCSession?)->Void)!
+    var session : MCSession!
     
     init(username: String) {
-        myPeerId = MCPeerID(displayName: username)
-        self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: myServiceType)
-        self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: myServiceType)
-        
         super.init()
+        
+        self.myPeerId = MCPeerID(displayName: username)
+        
+        self.session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.optional)
+        
+        self.session.delegate = self
+        
+        self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: self.myPeerId, discoveryInfo: nil, serviceType: myServiceType)
+        self.serviceBrowser = MCNearbyServiceBrowser(peer: self.myPeerId, serviceType: myServiceType)
+        
+        //self.advertiser = MCAdvertiserAssistant(serviceType: myServiceType, discoveryInfo: nil, session: self.session)
         
         self.serviceAdvertiser.delegate = self
         self.serviceAdvertiser.startAdvertisingPeer()
@@ -51,12 +61,6 @@ class NetworkConnection : NSObject {
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
     }
-    
-    lazy var session : MCSession = {
-        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.optional)
-        session.delegate = self
-        return session
-    }()
     
     func peerFound(peer: MCPeerID) {
         nearbyUsers.append(peer)
@@ -100,39 +104,60 @@ class NetworkConnection : NSObject {
     
     // When an invitation is recieved
     func advertiser(advertiser: MCNearbyServiceAdvertiser!, didReceiveInvitationFromPeer peerID: MCPeerID!, withContext context: NSData!, invitationHandler: ((Bool, MCSession?) -> Void)!) {
-        self.invitationHandler = invitationHandler
+        print("INVITE FROM \(peerID.displayName)")
         
-        delegate?.invitationWasReceived(fromPeer: peerID.displayName)
-    }
-    
-    // Tell the delegate of a connection
-    func session(session: MCSession, peer peerID: MCPeerID, didChangeState state: MCSessionState) {
-        switch state{
-        case MCSessionState.connected:
-            print("Connected to session: \(session)")
-            NSLog("%@", "CONNECTED WITH \(peerID.displayName)")
-            delegate?.connectedWithPeer(peerID: peerID)
-            
-        case MCSessionState.connecting:
-            print("Connecting to session: \(session)")
-            
-        default:
-            print("Did not connect to session: \(session)")
-        }
+        self.invitationHandler = invitationHandler
+        delegate?.invitationWasReceived(fromPeer: peerID)
     }
     
     // SEND DATA to a peer
-    /*func sendData(dictionaryWithData dictionary: Dictionary<String, String>, toPeer targetPeer: MCPeerID) -> Bool {
-        let dataToSend = NSKeyedArchiver.archivedData(withRootObject: dictionary)
-        let peersArray = NSArray(object: targetPeer)
-        //var error: NSError?
-        
-        if !session.send(dataToSend, toPeers: peersArray as! [MCPeerID], with: MCSessionSendDataMode.Reliable) {
+//    func sendData(dictionaryWithData dictionary: Dictionary<String, String>, toPeer targetPeer: MCPeerID) -> Bool {
+//        let dataToSend = NSKeyedArchiver.archivedData(withRootObject: dictionary)
+//        let peersArray = NSArray(object: targetPeer)
+//        //var error: NSError?
+//        
+//        if !session.send(dataToSend, toPeers: peersArray as! [MCPeerID], with: MCSessionSendDataMode.Reliable) {
+//            return false
+//        }
+//        
+//        return true
+//    }
+    
+    func sendData(data: String) -> Bool
+    {
+        do {
+            let c_data = data.data(using: .utf8, allowLossyConversion: true)
+            if (c_data == nil) {
+                print("DATA UNINITIALIZED")
+                return false
+            }
+            
+            try self.session.send(c_data! as Data, toPeers: self.session.connectedPeers, with: MCSessionSendDataMode.reliable)
+        }
+        catch {
             return false
         }
-        
         return true
-    }*/
+    }
+    
+    func sendDataTo(data: String, player: MCPeerID) -> Bool
+    {
+        do {
+            let c_data = data.data(using: .utf8, allowLossyConversion: true)
+            if (c_data == nil) {
+                print("DATA UNINITIALIZED")
+                return false
+            }
+            
+            try self.session.send(c_data! as Data, toPeers: [player], with: MCSessionSendDataMode.reliable)
+        }
+        catch {
+            return false
+        }
+        return true
+
+    }
+
 }
 
 extension NetworkConnection : MCNearbyServiceAdvertiserDelegate {
@@ -144,8 +169,9 @@ extension NetworkConnection : MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping ((Bool, MCSession?) -> Void)) {
         NSLog("%@", "didReceiveInvitationFromPeer \(peerID)")
         
+        print("Invite from \(peerID.displayName)");
         self.invitationHandler = invitationHandler
-        delegate?.invitationWasReceived(fromPeer: peerID.displayName)
+        delegate?.invitationWasReceived(fromPeer: peerID)
     }
 }
 
@@ -190,6 +216,19 @@ extension NetworkConnection : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         NSLog("%@", "peer \(peerID) didChangeState: \(state.stringValue())")
+        switch state{
+        case MCSessionState.connected:
+            print("Connected to session: \(session)")
+            NSLog("%@", "CONNECTED WITH \(peerID.displayName)")
+            delegate?.connectedWithPeer(peerID: peerID)
+            
+        case MCSessionState.connecting:
+            print("Connecting to session: \(session)")
+            
+        default:
+            print("Did not connect to session: \(session)")
+            delegate?.lostConnectionWith(peerID: peerID);
+        }
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
@@ -207,6 +246,12 @@ extension NetworkConnection : MCSessionDelegate {
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
         NSLog("%@", "didStartReceivingResourceWithName")
     }
+    
+    func session(_ session: MCSession, didReceiveCertificate certificate: [Any]?, fromPeer peerID: MCPeerID, certificateHandler: @escaping (Bool) -> Void)
+    {
+        certificateHandler(true)
+    }
+    
 }
 /*
  *

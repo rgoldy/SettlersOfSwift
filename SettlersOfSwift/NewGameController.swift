@@ -21,7 +21,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
         appDelegate.networkManager.delegate = self
         
         appDelegate.networkManager.setVisible()
-        appDelegate.networkManager.stopBrowsing()
+        appDelegate.networkManager.startBrowsing()
         
         tblView.dataSource = self
         tblView.delegate = self
@@ -31,7 +31,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
         super.viewWillAppear(animated)
         
         appDelegate.networkManager.setVisible()
-        appDelegate.networkManager.stopBrowsing()
+        appDelegate.networkManager.startBrowsing()
         
         appDelegate.networkManager.delegate = self
     }
@@ -40,11 +40,12 @@ class NewGameController: UITableViewController, NetworkDelegate {
     func lostPeer() { tblView.reloadData() }
     
     // Invitation recieved
-    func invitationWasReceived(fromPeer: String) {
-        let alert = UIAlertController(title: "", message: "\(fromPeer) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
+    func invitationWasReceived(fromPeer: MCPeerID) {
+        let alert = UIAlertController(title: "", message: "\(fromPeer.displayName) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
         
         let acceptAction: UIAlertAction = UIAlertAction(title: "Accept", style: UIAlertActionStyle.default) { (alertAction) -> Void in
             self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
+            //self.appDelegate.networkManager.serviceBrowser.invitePeer(fromPeer, to: self.appDelegate.networkManager.session, withContext: nil, timeout: 10)
         }
         
         let declineAction = UIAlertAction(title: "Decline", style: UIAlertActionStyle.cancel) { (alertAction) -> Void in
@@ -61,6 +62,10 @@ class NewGameController: UITableViewController, NetworkDelegate {
     
     // Connected with a peer
     func connectedWithPeer(peerID: MCPeerID) {
+        tblView.reloadData()
+    }
+    
+    func lostConnectionWith(peerID: MCPeerID) {
         tblView.reloadData()
     }
     
@@ -109,10 +114,13 @@ class NewGameController: UITableViewController, NetworkDelegate {
     
     // Row selected -> connect to user
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Selection Detected.")
-        let selectedPeer = appDelegate.networkManager.nearbyUsers[indexPath.row] as MCPeerID
+        print("Selection Detected at \(indexPath.row).")
+        let selectedPeer = appDelegate.networkManager.session.connectedPeers[indexPath.row] as MCPeerID
+        let success = appDelegate.networkManager.sendDataTo(data: "Hello World!", player: selectedPeer)
         
-        print("Invited peer: \(selectedPeer.displayName).")
+        if (success) {
+            print("Message Sent To: \(selectedPeer.displayName).")
+        }
     }
 
 }
