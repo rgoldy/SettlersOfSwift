@@ -14,17 +14,9 @@ class GameScene: SKScene {
     
     //init scene nodes
     var cam:SKCameraNode!
-    var waterBackground:SKTileMapNode!
-    var landBackground:SKTileMapNode!
-    var Numbers:SKTileMapNode!
-    var terrainTiles:SKTileSet!
-    var numberTiles:SKTileSet!
-    let NumRows = 9
-    var landHexArray = [LandHex]()
     
-    //init initial tile values
-    var tileValues : Dictionary<String, Int> = [:]
-    var numberTileValues : Dictionary<String, Int> = [:]
+    //init tile handler
+    var handler : tileHandler!
     
     override func didMove(to view: SKView) {
         //load tiles
@@ -40,13 +32,13 @@ class GameScene: SKScene {
         
         cam.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         
-        let verticalConstraint = SKConstraint.positionY(SKRange(lowerLimit: waterBackground.frame.minY, upperLimit: waterBackground.frame.maxY))
-        let horizontalConstraint = SKConstraint.positionX(SKRange(lowerLimit: waterBackground.frame.minX, upperLimit: waterBackground.frame.maxX))
+        let verticalConstraint = SKConstraint.positionY(SKRange(lowerLimit: handler.waterBackground.frame.minY, upperLimit: handler.waterBackground.frame.maxY))
+        let horizontalConstraint = SKConstraint.positionX(SKRange(lowerLimit: handler.waterBackground.frame.minX, upperLimit: handler.waterBackground.frame.maxX))
         
         verticalConstraint.enabled = true
         horizontalConstraint.enabled = true
-        verticalConstraint.referenceNode = waterBackground
-        horizontalConstraint.referenceNode = waterBackground
+        verticalConstraint.referenceNode = handler.waterBackground
+        horizontalConstraint.referenceNode = handler.waterBackground
         
         cam.constraints = [horizontalConstraint, verticalConstraint]
         
@@ -57,8 +49,6 @@ class GameScene: SKScene {
         
         let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(self.handlePinch(recognizer:)))
         view.addGestureRecognizer(pinchGestureRecognizer)
-        
-        //physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
     }
     
     func loadSceneNodes() {
@@ -67,134 +57,40 @@ class GameScene: SKScene {
             as? SKTileMapNode else {
                 fatalError("LandBackground node not loaded")
         }
-        self.landBackground = landBackground
         
         //load terrainTiles tile set
         guard let terrainTiles = SKTileSet(named: "Terrain Tiles") else {
             fatalError("terrainTiles node not loaded")
         }
-        self.terrainTiles = terrainTiles
         
         //load waterBackground tiles
         guard let waterBackground = childNode(withName: "WaterBackground")
             as? SKTileMapNode else {
                 fatalError("WaterBackground node not loaded")
         }
-        self.waterBackground = waterBackground
         
+        //load Numbers tiles
         guard let Numbers = childNode(withName: "Numbers")
             as? SKTileMapNode else {
                 fatalError("Numbers node not loaded")
         }
-        self.Numbers = Numbers
         
         //load terrainTiles tile set
         guard let numberTiles = SKTileSet(named: "Number Values") else {
             fatalError("numberTiles node not loaded")
         }
-        self.numberTiles = numberTiles
         
-        initTiles(filename: "3player")
-    }
-    
-    //function to read layout from json files and place correct amount of tiles
-    func initTiles(filename: String) {
-        
-        guard let dictionary = Dictionary<String, AnyObject>.loadJSONFromBundle(filename: filename) else { return }
-
-        //fill tileValue dictionary
-        tileValues = Dictionary<String, Int>()
-        tileValues["brick"] = (dictionary["brick"] as? Int)!
-        tileValues["wheat"] = (dictionary["wheat"] as? Int)!
-        tileValues["wood"] = (dictionary["wood"] as? Int)!
-        tileValues["sheep"] = (dictionary["sheep"] as? Int)!
-        tileValues["stone"] = (dictionary["stone"] as? Int)!
-        tileValues["gold"] = (dictionary["gold"] as? Int)!
-        
-        //fill numberTileValue dictionary
-        numberTileValues = Dictionary<String, Int>()
-        numberTileValues["2"] = (dictionary["2"] as? Int)!
-        numberTileValues["3"] = (dictionary["3"] as? Int)!
-        numberTileValues["4"] = (dictionary["4"] as? Int)!
-        numberTileValues["5"] = (dictionary["5"] as? Int)!
-        numberTileValues["6"] = (dictionary["6"] as? Int)!
-        numberTileValues["8"] = (dictionary["8"] as? Int)!
-        numberTileValues["9"] = (dictionary["9"] as? Int)!
-        numberTileValues["10"] = (dictionary["10"] as? Int)!
-        numberTileValues["11"] = (dictionary["11"] as? Int)!
-        numberTileValues["12"] = (dictionary["12"] as? Int)!
-
-        
-        //get tile layout
-        guard let tilesArray = dictionary["tiles"] as? [[Int]] else { return }
-        
-        //place tiles
-        for (row, rowArray) in tilesArray.enumerated() {
-            let tileRow = NumRows - row - 1
-            for (column, value) in rowArray.enumerated() {
-                if value == 1 {
-                    let currTile = getValidTileGroup()
-                    landBackground.setTileGroup(currTile, forColumn: column, row: tileRow)
-                    let currNumberTile = getValidNumberTileGroup()
-                    Numbers.setTileGroup(currNumberTile, forColumn: column, row: tileRow)
-                    let hex = LandHex(column: column, row: tileRow, tile: landBackground.tileDefinition(atColumn: column, row: tileRow)!, number: Int(Numbers.tileDefinition(atColumn: column, row: tileRow)!.name!)!)
-                    landHexArray.append(hex)
-                }
-            }
+        //load Vertices tiles
+        guard let Vertices = childNode(withName: "Numbers")
+            as? SKTileMapNode else {
+                fatalError("Numbers node not loaded")
         }
         
-        //neighbouring array coords difference
-        let xChange = [0, 1, 1, 0, -1, -1]
-        let yChange = [1, 0, -1, -1, -1, 0]
+        //init handler
+        handler = tileHandler(waterBackground : waterBackground, landBackground: landBackground, Numbers : Numbers, Vertices : Vertices, terrainTiles : terrainTiles, numberTiles : numberTiles);
         
-        //set neighbouring tiles in every hex
-        for hex in landHexArray {
-            for i in 0...5 {
-                if let neighbour = landHexArray.first(where: {$0.column == hex.column + yChange[i] && $0.row == hex.row + xChange[i]}) {
-                    hex.neighbouringTiles.append(neighbour)
-                } else {
-                    hex.neighbouringTiles.append(nil)
-                }
-            }
-        }
+        handler.initTiles(filename: "3player")
     }
-    
-    //get a valid tile to put in game
-    func getValidTileGroup() -> SKTileGroup {
-        var random:Int
-        var name:String
-        
-        //keep randomizing if all tiles of one type already used up
-        repeat {
-            random = Int(arc4random_uniform(6)) + 1
-            name = terrainTiles.tileGroups[random].name!
-        } while (tileValues[name] == 0)
-        
-        //get tile and decrement value by 1
-        let tile = terrainTiles.tileGroups[random]
-        tileValues[name] = tileValues[name]!-1
-        
-        return tile
-    }
-    
-    //get a valid number tile to put in game
-    func getValidNumberTileGroup() -> SKTileGroup {
-        var random:Int
-        var name:String
-        
-        //keep randomizing if all tiles of one type already used up
-        repeat {
-            random = Int(arc4random_uniform(10))
-            name = numberTiles.tileGroups[random].name!
-        } while (numberTileValues[name] == 0)
-        
-        //get tile and decrement value by 1
-        let tile = numberTiles.tileGroups[random]
-        numberTileValues[name] = numberTileValues[name]!-1
-        
-        return tile
-    }
-    
     
     //function to handle pan gestures for camera movement
     func handlePanFrom(recognizer: UIPanGestureRecognizer) {

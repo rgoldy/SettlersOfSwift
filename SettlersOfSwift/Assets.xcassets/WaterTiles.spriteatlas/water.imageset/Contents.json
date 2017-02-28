@@ -2,7 +2,7 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "Water_Hex.png",
+      "filename" : "waterTile.png",
       "scale" : "1x"
     },
     {
