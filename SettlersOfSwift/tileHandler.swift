@@ -171,5 +171,26 @@ class tileHandler {
         
         return tile
     }
+    
+    //returns true if number tiles are valid, else returns false
+    func checkBoardIsValid() -> Bool {
+        for row in 0...NumRows-1 {
+            for col in 0...NumRows-1 {
+                let currName = Numbers.tileGroup(atColumn: col, row: row)?.name!
+                if ( currName == "6" || currName == "8") {
+                    if ( neighbourContainsRedNumber(col: col, row: row) ) { return false }
+                }
+            }
+        }
+        return true
+    }
 
+    //returns true if a neighbouring number is 6 or 8
+    func neighbourContainsRedNumber(col : Int, row : Int) -> Bool {
+        for i in 0...5 {
+            let neighbourName = Numbers.tileGroup(atColumn: col + yChange[i], row: row + xChange[i])?.name!
+            if (neighbourName == "6" || neighbourName == "8") { return true }
+        }
+        return false
+    }
 }

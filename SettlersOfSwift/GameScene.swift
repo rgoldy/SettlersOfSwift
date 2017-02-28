@@ -89,7 +89,10 @@ class GameScene: SKScene {
         //init handler
         handler = tileHandler(waterBackground : waterBackground, landBackground: landBackground, Numbers : Numbers, Vertices : Vertices, terrainTiles : terrainTiles, numberTiles : numberTiles);
         
-        handler.initTiles(filename: "3player")
+        //init tiles until a valid board is made
+        repeat {
+            handler.initTiles(filename: "3player")
+        } while (!handler.checkBoardIsValid())
     }
     
     //function to handle pan gestures for camera movement
