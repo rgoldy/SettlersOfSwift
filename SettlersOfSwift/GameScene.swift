@@ -81,18 +81,32 @@ class GameScene: SKScene {
         }
         
         //load Vertices tiles
-        guard let Vertices = childNode(withName: "Numbers")
+        guard let Vertices = childNode(withName: "Vertices")
             as? SKTileMapNode else {
-                fatalError("Numbers node not loaded")
+                fatalError("Vertices node not loaded")
+        }
+        
+        //load terrainTiles tile set
+        guard let verticesTiles = SKTileSet(named: "Vertices") else {
+            fatalError("Vertices tile set node not loaded")
+        }
+        
+        //load Edges tiles
+        guard let Edges = childNode(withName: "Edges")
+            as? SKTileMapNode else {
+                fatalError("Edges node not loaded")
+        }
+        
+        //load terrainTiles tile set
+        guard let edgesTiles = SKTileSet(named: "Edges") else {
+            fatalError("Edges tile set node not loaded")
         }
         
         //init handler
-        handler = tileHandler(waterBackground : waterBackground, landBackground: landBackground, Numbers : Numbers, Vertices : Vertices, terrainTiles : terrainTiles, numberTiles : numberTiles);
+        handler = tileHandler(waterBackground : waterBackground, landBackground: landBackground, Numbers : Numbers, Vertices : Vertices, terrainTiles : terrainTiles, numberTiles : numberTiles, verticesTiles : verticesTiles, Edges : Edges, edgesTiles : edgesTiles);
         
-        //init tiles until a valid board is made
-        repeat {
-            handler.initTiles(filename: "3player")
-        } while (!handler.checkBoardIsValid())
+        //init tiles
+        handler.initTiles(filename: "3player")
     }
     
     //function to handle pan gestures for camera movement

@@ -12,10 +12,10 @@
 		6CCF9F6B1E395DF900AAEB79 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F6A1E395DF900AAEB79 /* GameScene.swift */; };
 		6CCF9F6D1E395DF900AAEB79 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F6C1E395DF900AAEB79 /* GameViewController.swift */; };
 		6CCF9F701E395DF900AAEB79 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F6E1E395DF900AAEB79 /* Main.storyboard */; };
-		6CCF9F721E395DF900AAEB79 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F711E395DF900AAEB79 /* Assets.xcassets */; };
 		6CCF9F751E395DF900AAEB79 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F731E395DF900AAEB79 /* LaunchScreen.storyboard */; };
 		AC0830CE1E4A3F9100ACE1B1 /* LandHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0830CD1E4A3F9100ACE1B1 /* LandHex.swift */; };
 		AC1FDC361E65115A00CD0723 /* tileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1FDC351E65115A00CD0723 /* tileHandler.swift */; };
+		AC1FDC381E65386A00CD0723 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC1FDC371E65386A00CD0723 /* Assets.xcassets */; };
 		AC3F4B4F1E4C830B0000E5F6 /* LandHexVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3F4B4E1E4C830B0000E5F6 /* LandHexVertex.swift */; };
 		AC3F4B511E4C831A0000E5F6 /* LandHexEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3F4B501E4C831A0000E5F6 /* LandHexEdge.swift */; };
 		AC648A511E6281B700E4BEA0 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = AC648A501E6281B700E4BEA0 /* GameScene.sks */; };
@@ -31,11 +31,11 @@
 		6CCF9F6A1E395DF900AAEB79 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		6CCF9F6C1E395DF900AAEB79 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		6CCF9F6F1E395DF900AAEB79 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		6CCF9F711E395DF900AAEB79 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6CCF9F741E395DF900AAEB79 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6CCF9F761E395DF900AAEB79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC0830CD1E4A3F9100ACE1B1 /* LandHex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandHex.swift; sourceTree = "<group>"; };
 		AC1FDC351E65115A00CD0723 /* tileHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = tileHandler.swift; sourceTree = "<group>"; };
+		AC1FDC371E65386A00CD0723 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AC3F4B4E1E4C830B0000E5F6 /* LandHexVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandHexVertex.swift; sourceTree = "<group>"; };
 		AC3F4B501E4C831A0000E5F6 /* LandHexEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandHexEdge.swift; sourceTree = "<group>"; };
 		AC648A501E6281B700E4BEA0 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -78,7 +78,7 @@
 				AC50757A1E3960B500DB5229 /* GameScene */,
 				6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */,
 				6CCF9F6E1E395DF900AAEB79 /* Main.storyboard */,
-				6CCF9F711E395DF900AAEB79 /* Assets.xcassets */,
+				AC1FDC371E65386A00CD0723 /* Assets.xcassets */,
 				ACCBA9AD1E3B1BA900DE13FD /* map layouts */,
 				6CCF9F731E395DF900AAEB79 /* LaunchScreen.storyboard */,
 				6CCF9F761E395DF900AAEB79 /* Info.plist */,
@@ -180,9 +180,9 @@
 			files = (
 				ACCBA9AF1E3B1BC700DE13FD /* 3player.json in Resources */,
 				6CCF9F701E395DF900AAEB79 /* Main.storyboard in Resources */,
-				6CCF9F721E395DF900AAEB79 /* Assets.xcassets in Resources */,
 				ACB54A331E3A9E920042461A /* Tiles.sks in Resources */,
 				AC648A511E6281B700E4BEA0 /* GameScene.sks in Resources */,
+				AC1FDC381E65386A00CD0723 /* Assets.xcassets in Resources */,
 				6CCF9F751E395DF900AAEB79 /* LaunchScreen.storyboard in Resources */,
 				6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */,
 			);
