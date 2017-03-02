@@ -22,17 +22,20 @@ class tileHandler {
     var Edges:SKTileMapNode!
     var edgesTiles:SKTileSet!
     var landHexArray:[LandHex] = []
+    var landHexVertexArray : [LandHexVertex] = []
+    var landHexEdgeArray : [LandHexEdge] = []
     var landHexDictionary : Dictionary <Int, [(Int,Int)]> = [:] //dictionary with key number and value (col, row) of hex with that number
     let NumRows = 9
 
-    //neighbouring array coords difference
+    //landhex neighbouring array coords difference
     let xOffset = [0, 1, 1, 0, -1, -1]
     let yEvenOffset = [1, 0, -1, -1, -1, 0]
     let yOddOffset = [1, 1, 0, -1, 0, 1]
     
-    //neighbouring vertex array coords
-    let xChangeVertex = [-1, 0, 1, 0, -1, -1]
-    let yChangeVertex = [-1, -1, 0, 1, 1, 0]
+    //vertex center's neighbour array coords
+    let xEvenOffsetV = [-1, 0, 1, 0, -1, -1]
+    let xOddOffsetV = [0, 1, 1, 1, 0, -1]
+    let yOffsetV = [1, 1, 0, -1, -1, 0]
     
     //init initial tile values
     var tileValues : Dictionary<String, Int> = [:]
@@ -130,34 +133,8 @@ class tileHandler {
             }
         }
         
-//        for entry in landHexDictionary {
-//            print ("\(entry.key) -   \(entry.value)")
-//        }
-        
-        //set neighbouring tiles in every hex
-        for hex in landHexArray {
-            for i in 0...5 {
-                if(hex.column % 2 == 0) {
-                    if let neighbour = landHexArray.first(where: {$0.column == hex.column + xOffset[i] && $0.row == hex.row + yEvenOffset[i]}) {
-                        hex.neighbouringTiles.append(neighbour)
-                    } else {
-                        hex.neighbouringTiles.append(nil)
-                    }
-                } else {
-                    if let neighbour = landHexArray.first(where: {$0.column == hex.column + xOffset[i] && $0.row == hex.row + yOddOffset[i]}) {
-                        hex.neighbouringTiles.append(neighbour)
-                    } else {
-                        hex.neighbouringTiles.append(nil)
-                    }
-                }
-            }
-        }
-        
-        //init hex vertices
-        
-        //init hex
-        
-       
+        //init all hex attributes
+        initHexAttributes()
     }
     
     //takes in a 2d int tile array and initialises and places the tile in landBackground with a valid tile type
@@ -168,7 +145,7 @@ class tileHandler {
                 if value == 1 {
                     let currTile = getValidTileGroup()
                     landBackground.setTileGroup(currTile, forColumn: column, row: tileRow)
-                    let hex = LandHex(column: column, row: tileRow, tile: landBackground.tileDefinition(atColumn: column, row: tileRow)!)
+                    let hex = LandHex(column: column, row: tileRow, type : currTile.name!)
                     landHexArray.append(hex)
                 }
             }
@@ -275,5 +252,151 @@ class tileHandler {
             if (neighbourName == "6" || neighbourName == "8") { return true }
         }
         return false
+    }
+    
+    //function that will initialize every hex's neighbours, corners and edges and init the corner and edge arrays in tileHandler
+    func initHexAttributes() {
+        
+        //set neighbouring tiles in every hex
+        for hex in landHexArray {
+            for i in 0...5 {
+                if(hex.column % 2 == 0) {
+                    if let neighbour = landHexArray.first(where: {$0.column == hex.column + xOffset[i] && $0.row == hex.row + yEvenOffset[i]}) {
+                        hex.neighbouringTiles.append(neighbour)
+                    } else {
+                        hex.neighbouringTiles.append(nil)
+                    }
+                } else {
+                    if let neighbour = landHexArray.first(where: {$0.column == hex.column + xOffset[i] && $0.row == hex.row + yOddOffset[i]}) {
+                        hex.neighbouringTiles.append(neighbour)
+                    } else {
+                        hex.neighbouringTiles.append(nil)
+                    }
+                }
+            }
+        }
+        
+        //init hex vertices
+        for hex in landHexArray {
+            let currPosition = landBackground.centerOfTile(atColumn: hex.column, row: hex.row)
+            let centerVertexCol = Vertices.tileColumnIndex(fromPosition: currPosition) - 2 //need to subtract 2 from col for some reason. NOTED
+            let centerVertexRow = Vertices.tileRowIndex(fromPosition: currPosition)
+            
+            var vertex : LandHexVertex
+            for i in 0...5 {
+                if (centerVertexRow % 2 == 0) {
+                    if let neighbour = landHexVertexArray.first(where: {$0.column == centerVertexCol + xEvenOffsetV[i] && $0.row == centerVertexRow + yOffsetV[i]}) {
+                        hex.corners.append(neighbour)
+                        neighbour.addTile(landHex: hex)
+                    } else {
+                        vertex = LandHexVertex(tile1: hex, column: centerVertexCol + xEvenOffsetV[i], row: centerVertexRow + yOffsetV[i])
+                        hex.corners.append(vertex)
+                        landHexVertexArray.append(vertex)
+                    }
+                } else {
+                    if let neighbour = landHexVertexArray.first(where: {$0.column == centerVertexCol + xOddOffsetV[i] && $0.row == centerVertexRow + yOffsetV[i]}) {
+                        hex.corners.append(neighbour)
+                        neighbour.addTile(landHex: hex)
+                    } else {
+                        vertex = LandHexVertex(tile1: hex, column: centerVertexCol + xOddOffsetV[i], row: centerVertexRow + yOffsetV[i])
+                        hex.corners.append(vertex)
+                        landHexVertexArray.append(vertex)
+                    }
+                }
+            }
+        }
+        
+        //init hex edges
+        for hex in landHexArray {
+            let currPosition = landBackground.centerOfTile(atColumn: hex.column, row: hex.row)
+            let centerEdgeCol = Edges.tileColumnIndex(fromPosition: currPosition)
+            let centerEdgeRow = Edges.tileRowIndex(fromPosition: currPosition)
+            
+            var edge : LandHexEdge
+            for i in 0...5 {
+                if (centerEdgeCol % 2 == 0) {
+                    if let neighbour = landHexEdgeArray.first(where: {$0.column == centerEdgeCol + xOffset[i] && $0.row == centerEdgeRow + yEvenOffset[i]}) {
+                        hex.edges.append(neighbour)
+                        neighbour.addTile(landHex: hex)
+                    } else {
+                        switch i {
+                        case 0: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.flat, neighbour1: hex.corners[0], neighbour2: hex.corners[1])
+                        case 2: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.rDiagonal, neighbour1: hex.corners[2], neighbour2: hex.corners[3])
+                        //4
+                        default: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[4], neighbour2: hex.corners[5])
+                        }
+                        hex.edges.append(edge)
+                        landHexEdgeArray.append(edge)
+                    }
+                } else {
+                    if let neighbour = landHexEdgeArray.first(where: {$0.column == centerEdgeCol + xOffset[i] && $0.row == centerEdgeRow + yOddOffset[i]}) {
+                        hex.edges.append(neighbour)
+                        neighbour.addTile(landHex: hex)
+                    } else {
+                        switch i {
+                        case 1: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[1], neighbour2: hex.corners[2])
+                        case 3: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.flat, neighbour1: hex.corners[3], neighbour2: hex.corners[4])
+                        //5
+                        default: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.rDiagonal, neighbour1: hex.corners[5], neighbour2: hex.corners[0])
+                        }
+                        hex.edges.append(edge)
+                        landHexEdgeArray.append(edge)
+                    }
+                }
+            }
+        }
+        
+        //init vertex neighbourEdges and neighbourVertices
+        for hex in landHexArray {
+            for i in 0...5 {
+                let vertex = hex.corners[i]
+                if( vertex.neighbourVertices.count == 3 && vertex.neighbourEdges.count == 3) {continue}
+                switch i {
+                case 0:
+                    vertex.neighbourVertices.append(hex.corners[5])
+                    vertex.neighbourEdges.append(hex.edges[5])
+                    vertex.neighbourVertices.append(hex.neighbouringTiles[5]?.corners[1])
+                    vertex.neighbourEdges.append(hex.neighbouringTiles[5]?.edges[1])
+                    vertex.neighbourVertices.append(hex.corners[1])
+                    vertex.neighbourEdges.append(hex.edges[0])
+                case 1:
+                    vertex.neighbourVertices.append(hex.corners[0])
+                    vertex.neighbourEdges.append(hex.edges[0])
+                    vertex.neighbourVertices.append(hex.neighbouringTiles[0]?.corners[2])
+                    vertex.neighbourEdges.append(hex.edges[2])
+                    vertex.neighbourVertices.append(hex.corners[2])
+                    vertex.neighbourEdges.append(hex.edges[1])
+                case 2:
+                    vertex.neighbourVertices.append(hex.corners[3])
+                    vertex.neighbourEdges.append(hex.edges[2])
+                    vertex.neighbourVertices.append(hex.corners[1])
+                    vertex.neighbourEdges.append(hex.edges[1])
+                    vertex.neighbourVertices.append(hex.neighbouringTiles[2]?.corners[1])
+                    vertex.neighbourEdges.append(hex.neighbouringTiles[2]?.edges[0])
+                case 3:
+                    vertex.neighbourVertices.append(hex.corners[4])
+                    vertex.neighbourEdges.append(hex.edges[3])
+                    vertex.neighbourVertices.append(hex.corners[2])
+                    vertex.neighbourEdges.append(hex.edges[2])
+                    vertex.neighbourVertices.append(hex.neighbouringTiles[2]?.corners[4])
+                    vertex.neighbourEdges.append(hex.neighbouringTiles[2]?.edges[4])
+                case 4:
+                    vertex.neighbourVertices.append(hex.neighbouringTiles[4]?.corners[3])
+                    vertex.neighbourEdges.append(hex.neighbouringTiles[4]?.edges[2])
+                    vertex.neighbourVertices.append(hex.corners[5])
+                    vertex.neighbourEdges.append(hex.edges[4])
+                    vertex.neighbourVertices.append(hex.corners[3])
+                    vertex.neighbourEdges.append(hex.edges[3])
+                default: //5
+                    vertex.neighbourVertices.append(hex.neighbouringTiles[4]?.corners[0])
+                    vertex.neighbourEdges.append(hex.neighbouringTiles[4]?.edges[0])
+                    vertex.neighbourVertices.append(hex.corners[0])
+                    vertex.neighbourEdges.append(hex.edges[5])
+                    vertex.neighbourVertices.append(hex.corners[4])
+                    vertex.neighbourEdges.append(hex.edges[4])
+                }
+            }
+        }
+        
     }
 }

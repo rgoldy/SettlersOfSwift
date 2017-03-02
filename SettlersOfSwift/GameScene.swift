@@ -10,10 +10,19 @@
 import SpriteKit
 import GameplayKit
 
+enum GamePhase {
+    case Setup
+    case p1Turn
+    case p2Turn
+    case p3Turn
+}
+
 class GameScene: SKScene {
     
     //init scene nodes
     var cam:SKCameraNode!
+    var currGamePhase = GamePhase.Setup
+    let dice = Dice()
     
     //init tile handler
     var handler : tileHandler!
@@ -148,9 +157,15 @@ class GameScene: SKScene {
     
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }
-//        targetLocation = touch.location(in: self)
+//        let targetLocation = touch.location(in: self)
+//        
+//        let centerVertexCol = handler.Edges.tileColumnIndex(fromPosition: targetLocation)
+//        let centerVertexRow = handler.Edges.tileRowIndex(fromPosition: targetLocation)
+//        handler.Edges.setTileGroup(handler.edgesTiles.tileGroups[0], forColumn: centerVertexCol, row: centerVertexRow)
+//
 //    }
 //    
+//
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }
 //        targetLocation = touch.location(in: self)

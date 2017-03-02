@@ -19,6 +19,10 @@
 		AC3F4B4F1E4C830B0000E5F6 /* LandHexVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3F4B4E1E4C830B0000E5F6 /* LandHexVertex.swift */; };
 		AC3F4B511E4C831A0000E5F6 /* LandHexEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3F4B501E4C831A0000E5F6 /* LandHexEdge.swift */; };
 		AC648A511E6281B700E4BEA0 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = AC648A501E6281B700E4BEA0 /* GameScene.sks */; };
+		AC9D04491E67B43300DBCA42 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9D04481E67B43300DBCA42 /* Player.swift */; };
+		AC9D044B1E67D37300DBCA42 /* Dice.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9D044A1E67D37300DBCA42 /* Dice.swift */; };
+		AC9D044D1E67D6F700DBCA42 /* cornerObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9D044C1E67D6F700DBCA42 /* cornerObject.swift */; };
+		AC9D044F1E67D70300DBCA42 /* edgeObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9D044E1E67D70300DBCA42 /* edgeObject.swift */; };
 		ACB54A331E3A9E920042461A /* Tiles.sks in Resources */ = {isa = PBXBuildFile; fileRef = ACB54A311E3A9E920042461A /* Tiles.sks */; };
 		ACCBA9AC1E3B189800DE13FD /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCBA9AB1E3B189800DE13FD /* Extensions.swift */; };
 		ACCBA9AF1E3B1BC700DE13FD /* 3player.json in Resources */ = {isa = PBXBuildFile; fileRef = ACCBA9AE1E3B1BC700DE13FD /* 3player.json */; };
@@ -39,6 +43,10 @@
 		AC3F4B4E1E4C830B0000E5F6 /* LandHexVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandHexVertex.swift; sourceTree = "<group>"; };
 		AC3F4B501E4C831A0000E5F6 /* LandHexEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LandHexEdge.swift; sourceTree = "<group>"; };
 		AC648A501E6281B700E4BEA0 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		AC9D04481E67B43300DBCA42 /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		AC9D044A1E67D37300DBCA42 /* Dice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dice.swift; sourceTree = "<group>"; };
+		AC9D044C1E67D6F700DBCA42 /* cornerObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = cornerObject.swift; sourceTree = "<group>"; };
+		AC9D044E1E67D70300DBCA42 /* edgeObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = edgeObject.swift; sourceTree = "<group>"; };
 		ACB54A311E3A9E920042461A /* Tiles.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = Tiles.sks; path = ../Tiles.sks; sourceTree = "<group>"; };
 		ACCBA9AB1E3B189800DE13FD /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		ACCBA9AE1E3B1BC700DE13FD /* 3player.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 3player.json; sourceTree = "<group>"; };
@@ -93,6 +101,10 @@
 				AC3F4B4E1E4C830B0000E5F6 /* LandHexVertex.swift */,
 				AC3F4B501E4C831A0000E5F6 /* LandHexEdge.swift */,
 				AC1FDC351E65115A00CD0723 /* tileHandler.swift */,
+				AC9D04481E67B43300DBCA42 /* Player.swift */,
+				AC9D044A1E67D37300DBCA42 /* Dice.swift */,
+				AC9D044C1E67D6F700DBCA42 /* cornerObject.swift */,
+				AC9D044E1E67D70300DBCA42 /* edgeObject.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -197,11 +209,15 @@
 			files = (
 				AC1FDC361E65115A00CD0723 /* tileHandler.swift in Sources */,
 				AC3F4B511E4C831A0000E5F6 /* LandHexEdge.swift in Sources */,
+				AC9D044B1E67D37300DBCA42 /* Dice.swift in Sources */,
 				AC3F4B4F1E4C830B0000E5F6 /* LandHexVertex.swift in Sources */,
 				6CCF9F6B1E395DF900AAEB79 /* GameScene.swift in Sources */,
 				AC0830CE1E4A3F9100ACE1B1 /* LandHex.swift in Sources */,
 				6CCF9F6D1E395DF900AAEB79 /* GameViewController.swift in Sources */,
+				AC9D044F1E67D70300DBCA42 /* edgeObject.swift in Sources */,
 				6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */,
+				AC9D044D1E67D6F700DBCA42 /* cornerObject.swift in Sources */,
+				AC9D04491E67B43300DBCA42 /* Player.swift in Sources */,
 				ACCBA9AC1E3B189800DE13FD /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
