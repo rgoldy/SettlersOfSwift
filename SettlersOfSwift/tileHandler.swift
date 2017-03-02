@@ -321,9 +321,12 @@ class tileHandler {
                     } else {
                         switch i {
                         case 0: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.flat, neighbour1: hex.corners[0], neighbour2: hex.corners[1])
+                        case 1: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[1], neighbour2: hex.corners[2])
                         case 2: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.rDiagonal, neighbour1: hex.corners[2], neighbour2: hex.corners[3])
-                        //4
-                        default: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[4], neighbour2: hex.corners[5])
+                        case 3: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.flat, neighbour1: hex.corners[3], neighbour2: hex.corners[4])
+                        case 4: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[4], neighbour2: hex.corners[5])
+                        //5
+                        default: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yEvenOffset[i], direction: directionType.rDiagonal, neighbour1: hex.corners[5], neighbour2: hex.corners[0])
                         }
                         hex.edges.append(edge)
                         landHexEdgeArray.append(edge)
@@ -334,8 +337,12 @@ class tileHandler {
                         neighbour.addTile(landHex: hex)
                     } else {
                         switch i {
+                        case 0: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.flat, neighbour1: hex.corners[0], neighbour2: hex.corners[1])
                         case 1: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[1], neighbour2: hex.corners[2])
+                        
+                        case 2: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.rDiagonal, neighbour1: hex.corners[2], neighbour2: hex.corners[3])
                         case 3: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.flat, neighbour1: hex.corners[3], neighbour2: hex.corners[4])
+                        case 4: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.lDiagonal, neighbour1: hex.corners[4], neighbour2: hex.corners[5])
                         //5
                         default: edge = LandHexEdge(tile1: hex, column: centerEdgeCol + xOffset[i], row: centerEdgeRow + yOddOffset[i], direction: directionType.rDiagonal, neighbour1: hex.corners[5], neighbour2: hex.corners[0])
                         }
