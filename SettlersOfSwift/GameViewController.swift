@@ -67,7 +67,7 @@ class GameViewController: UIViewController, NetworkDelegate {
     func syncBoard() {
         if (appDelegate.networkManager.isHost) {
             // Wait for all players to be ready
-            while (readyPlayers < 1) { /* wait */}
+            while (readyPlayers < appDelegate.networkManager.session.connectedPeers.count) { /* wait */}
             
             // Distribute board layout to others
             let boardEncoding = scenePort.getBoardLayout()

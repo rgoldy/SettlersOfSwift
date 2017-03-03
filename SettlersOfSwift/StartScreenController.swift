@@ -26,7 +26,7 @@ class StartScreenController: UIViewController {
         appDelegate.networkManager.setInvisible()
         appDelegate.networkManager.stopBrowsing()
         appDelegate.networkManager.nearbyUsers.removeAll()
-        
+        self.navigationController?.navigationBar.isHidden = false;
         appDelegate.networkManager.disconnect()
         appDelegate.networkManager.delegate = nil
     }
