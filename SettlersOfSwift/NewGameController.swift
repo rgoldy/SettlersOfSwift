@@ -12,6 +12,7 @@ import MultipeerConnectivity
 class NewGameController: UITableViewController, NetworkDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    let numberOfPlayers = 2
     
     @IBOutlet var tblView: UITableView!
     
@@ -25,6 +26,11 @@ class NewGameController: UITableViewController, NetworkDelegate {
         
         tblView.dataSource = self
         tblView.delegate = self
+        
+        if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
+        {
+            startGame()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,10 +69,19 @@ class NewGameController: UITableViewController, NetworkDelegate {
     // Connected with a peer
     func connectedWithPeer(peerID: MCPeerID) {
         tblView.reloadData()
+        
+        if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
+        {
+            startGame()
+        }
     }
     
     func lostConnectionWith(peerID: MCPeerID) {
         tblView.reloadData()
+    }
+    
+    func recievedData(data: String) {
+        print("Received: \(data)")
     }
     
     override func didReceiveMemoryWarning() {
@@ -93,7 +108,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
     // Sets length of list to number of found users
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
-        return appDelegate.networkManager.session.connectedPeers.count
+        return appDelegate.networkManager.session.connectedPeers.count + 1
     }
     
     // Adds found users to list
@@ -102,7 +117,12 @@ class NewGameController: UITableViewController, NetworkDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "idCellPeer2")! as UITableViewCell
         
         // Configure the cell...
-        cell.textLabel?.text = appDelegate.networkManager.session.connectedPeers[indexPath.row].displayName
+        if (indexPath.row == 0) {
+            cell.textLabel?.text = appDelegate.networkManager.getName()
+        }
+        else {
+            cell.textLabel?.text = appDelegate.networkManager.session.connectedPeers[indexPath.row-1].displayName
+        }
         
         return cell
     }
@@ -115,11 +135,20 @@ class NewGameController: UITableViewController, NetworkDelegate {
     // Row selected -> connect to user
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Selection Detected at \(indexPath.row).")
-        let selectedPeer = appDelegate.networkManager.session.connectedPeers[indexPath.row] as MCPeerID
-        let success = appDelegate.networkManager.sendDataTo(data: "Hello World!", player: selectedPeer)
         
-        if (success) {
-            print("Message Sent To: \(selectedPeer.displayName).")
+        if (indexPath.row == 0){
+            return
+        }
+        
+        let selectedPeer = appDelegate.networkManager.session.connectedPeers[indexPath.row-1] as MCPeerID
+        //appDelegate.networkManager.sendDataTo(data: "Hello World!", player: selectedPeer)
+        print("Selected: \(selectedPeer.displayName)")
+    }
+    
+    func startGame()
+    {
+        OperationQueue.main.addOperation { () -> Void in
+            self.performSegue(withIdentifier: "startGame", sender: self)
         }
     }
 

@@ -155,6 +155,78 @@ class GameScene: SKScene {
         recognizer.scale = 1
     }
     
+    // Added by Riley
+    func getBoardLayout() -> String {
+        // Data identifier
+        var board = "boardLayout."
+        
+        // Obtain hex info
+        for hex in handler.landHexArray {
+            var value = 0
+            searching: for j in 2...12 {
+                let positions = handler.landHexDictionary[j]
+                if (positions == nil) { continue }
+                for (col, rw) in positions! {
+                    if (col == hex.column && rw == hex.row) {
+                        value = j
+                        break searching
+                    }
+                }
+            }
+            if (value == 0) {
+                print("Unable to locate hex. <GameScene.swift - getBoardLayout()>")
+            }
+            
+            var type: Int!
+            switch hex.type! {
+            case .wood: type = 0
+            case .wheat: type = 1
+            case .stone: type = 2
+            case .sheep: type = 3
+            case .brick: type = 4
+            case .gold: type = 5
+            }
+            board.append("\(hex.column),\(hex.row),\(type!),\(value);")
+        }
+        return board
+    }
+    
+    // Added by Riley
+    func setBoardLayout(encoding: String) {
+        // Reset hex values
+        handler.landHexDictionary.removeAll()
+        
+        // Obtain hex types and values
+        let hexDataArray = encoding.components(separatedBy: ";").dropLast()
+        for hexData in hexDataArray {
+            let hexInfo = hexData.components(separatedBy: ",")
+            let column = Int(hexInfo[0])
+            let row = Int(hexInfo[1])
+            let value = Int(hexInfo[3])!
+            var type: hexType!
+            switch hexInfo[2] {
+                case "0": type = .wood
+                case "1": type = .wheat
+                case "2": type = .stone
+                case "3": type = .sheep
+                case "4": type = .brick
+                case "5": type = .gold
+                default: type = .wood
+            }
+            
+            // Set hex types and values
+            for hex in handler.landHexArray {
+                if (hex.row == row && hex.column == column) {
+                    hex.type = type
+                    
+                    if(handler.landHexDictionary[value] == nil) { handler.landHexDictionary[value] = [] }
+                    handler.landHexDictionary[value]!.append((column!, row!))
+                    break
+                }
+            }
+        }
+    }
+    
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }
 //        let targetLocation = touch.location(in: self)

@@ -20,6 +20,7 @@ class PlayerListController: UITableViewController, NetworkDelegate {
         
         appDelegate.networkManager.delegate = self
         
+        appDelegate.networkManager.disconnect()
         appDelegate.networkManager.setInvisible()
         appDelegate.networkManager.startBrowsing()
         
@@ -33,6 +34,7 @@ class PlayerListController: UITableViewController, NetworkDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        appDelegate.networkManager.disconnect()
         appDelegate.networkManager.setInvisible()
         appDelegate.networkManager.startBrowsing()
         
@@ -111,9 +113,14 @@ class PlayerListController: UITableViewController, NetworkDelegate {
     // Connected with a peer
     func connectedWithPeer(peerID: MCPeerID) {
         print("Connected to \(peerID.displayName)")
-//        OperationQueue.main.addOperation { () -> Void in
-//            self.performSegue(withIdentifier: "idSegueChat", sender: self)
-//        }
+        appDelegate.networkManager.isHost = false
+        OperationQueue.main.addOperation { () -> Void in
+            self.performSegue(withIdentifier: "goToLobby", sender: self)
+        }
+    }
+    
+    func recievedData(data: String) {
+        // do nothing
     }
     
     func lostConnectionWith(peerID: MCPeerID)

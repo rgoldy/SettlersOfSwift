@@ -66,7 +66,7 @@
         <!--Game Lobby-->
         <scene sceneID="XqV-uZ-0P9">
             <objects>
-                <tableViewController id="e7x-EC-9xm" customClass="NewGameController" customModule="SettlersOfSwift" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController restorationIdentifier="gameLobby" storyboardIdentifier="gameLobby" id="e7x-EC-9xm" customClass="NewGameController" customModule="SettlersOfSwift" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="rLp-gt-pZ5">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -76,7 +76,7 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lxU-Ds-JK5" id="Zxp-fP-kBT">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -91,11 +91,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="tblView" destination="rLp-gt-pZ5" id="As2-gW-ib2"/>
+                        <segue destination="nnZ-Iz-im3" kind="push" identifier="startGame" id="ZIx-nh-oTu"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CL7-X4-jJv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-213" y="-203"/>
+            <point key="canvasLocation" x="-205" y="272"/>
         </scene>
         <!--NearbyPlayer-->
         <scene sceneID="2EP-0w-mvp">
@@ -110,7 +111,7 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="60"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="I84-z0-T3v" id="b44-CW-rRj">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="59.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="59"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -121,11 +122,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="tblView" destination="Aen-Cv-pMp" id="uz5-NS-7dc"/>
+                        <segue destination="e7x-EC-9xm" kind="push" identifier="goToLobby" id="Ktz-tz-Ggo"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wkH-Na-el4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-212.5" y="601.5"/>
+            <point key="canvasLocation" x="-204" y="-564"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="cfV-ar-3Or">
@@ -169,4 +171,8 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination" type="retina4_7.fullscreen"/>
     </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="Ktz-tz-Ggo"/>
+        <segue reference="ZIx-nh-oTu"/>
+    </inferredMetricsTieBreakers>
 </document>

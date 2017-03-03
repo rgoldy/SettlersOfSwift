@@ -15,12 +15,15 @@ protocol NetworkDelegate {
     func invitationWasReceived(fromPeer: MCPeerID)
     func connectedWithPeer(peerID: MCPeerID)
     func lostConnectionWith(peerID: MCPeerID)
+    func recievedData(data: String)
 }
 
 class NetworkConnection : NSObject {
     
     // Identifies who is using the game
     private var myServiceType = "settlersofswift"
+    
+    public var isHost: Bool
     
     // List of all users you can see
     var nearbyUsers = [MCPeerID]()
@@ -34,6 +37,7 @@ class NetworkConnection : NSObject {
     var session : MCSession!
     
     init(username: String) {
+        isHost = true
         super.init()
         
         self.myPeerId = MCPeerID(displayName: username)
@@ -110,23 +114,15 @@ class NetworkConnection : NSObject {
         delegate?.invitationWasReceived(fromPeer: peerID)
     }
     
-    // SEND DATA to a peer
-//    func sendData(dictionaryWithData dictionary: Dictionary<String, String>, toPeer targetPeer: MCPeerID) -> Bool {
-//        let dataToSend = NSKeyedArchiver.archivedData(withRootObject: dictionary)
-//        let peersArray = NSArray(object: targetPeer)
-//        //var error: NSError?
-//        
-//        if !session.send(dataToSend, toPeers: peersArray as! [MCPeerID], with: MCSessionSendDataMode.Reliable) {
-//            return false
-//        }
-//        
-//        return true
-//    }
+    func getName() -> String
+    {
+        return myPeerId.displayName
+    }
     
     func sendData(data: String) -> Bool
     {
         do {
-            let c_data = data.data(using: .utf8, allowLossyConversion: true)
+            let c_data = data.data(using: .utf8, allowLossyConversion: false)
             if (c_data == nil) {
                 print("DATA UNINITIALIZED")
                 return false
@@ -143,7 +139,7 @@ class NetworkConnection : NSObject {
     func sendDataTo(data: String, player: MCPeerID) -> Bool
     {
         do {
-            let c_data = data.data(using: .utf8, allowLossyConversion: true)
+            let c_data = data.data(using: .utf8, allowLossyConversion: false)
             if (c_data == nil) {
                 print("DATA UNINITIALIZED")
                 return false
@@ -233,6 +229,8 @@ extension NetworkConnection : MCSessionDelegate {
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         NSLog("%@", "didReceiveData: \(data)")
+        let datastring = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
+        delegate?.recievedData(data: datastring as! String)
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
