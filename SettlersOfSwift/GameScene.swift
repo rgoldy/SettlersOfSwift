@@ -23,9 +23,13 @@ class GameScene: SKScene {
     var cam:SKCameraNode!
     var currGamePhase = GamePhase.Setup
     let dice = Dice()
+    var players: [Player] = []
     
     //init tile handler
     var handler : tileHandler!
+    
+    // Access to network manager
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     override func didMove(to view: SKView) {
         //load tiles
@@ -118,43 +122,6 @@ class GameScene: SKScene {
         handler.initTiles(filename: "3player")
     }
     
-    //function to handle pan gestures for camera movement
-    func handlePanFrom(recognizer: UIPanGestureRecognizer) {
-        if recognizer.state != .changed {
-            return
-        }
-        
-        //get translation amount
-        let translation = recognizer.translation(in: recognizer.view!)
-        
-        //move cam
-        cam.position.x -= translation.x
-        cam.position.y += translation.y
-        
-        //reset tranlation
-        recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
-    }
-    
-    //function to handle pinch gestures for camera scaling
-    func handlePinch(recognizer : UIPinchGestureRecognizer) {
-        if recognizer.state != .changed {
-            return
-        }
-        
-        //scale cam
-        cam.xScale *= 1/recognizer.scale
-        cam.yScale *= 1/recognizer.scale
-        
-        //clamp cam
-        if (cam.xScale > 0.9) {cam.xScale = 0.9}
-        if (cam.xScale < 0.35) {cam.xScale = 0.35}
-        if (cam.yScale > 0.9) {cam.yScale = 0.9}
-        if (cam.yScale < 0.35) {cam.yScale = 0.35}
-        
-        //reset scale
-        recognizer.scale = 1
-    }
-    
     // Added by Riley
     func getBoardLayout() -> String {
         // Data identifier
@@ -226,6 +193,76 @@ class GameScene: SKScene {
             }
         }
     }
+    
+    func initPlayers() {
+        let p1 = Player(name: appDelegate.networkManager.getName(), playerNumber: 0)
+        players.append(p1)
+        var playerInfo = "playerData.\(appDelegate.networkManager.getName()),\(0);"
+        
+        for i in 0...appDelegate.networkManager.session.connectedPeers.count-1 {
+            let p = Player(name: appDelegate.networkManager.session.connectedPeers[i].displayName, playerNumber: i+1)
+            players.append(p)
+            playerInfo.append("\(appDelegate.networkManager.session.connectedPeers[i].displayName),\(i+1);")
+        }
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: playerInfo)
+        if (!sent) {
+            print ("failed to sync player info")
+        }
+        else {
+            print ("successful sync player info")
+        }
+    }
+    
+    func setPlayers(info: String) {
+        players.removeAll()
+        let playersDataArray = info.components(separatedBy: ";").dropLast()
+        for playersData in playersDataArray {
+            let playerInfo = playersData.components(separatedBy: ",")
+            let pName = playerInfo[0]
+            let pNumb = Int(playerInfo[1])!
+            players.append(Player(name: pName, playerNumber: pNumb))
+        }
+    }
+    
+    //function to handle pan gestures for camera movement
+    func handlePanFrom(recognizer: UIPanGestureRecognizer) {
+        if recognizer.state != .changed {
+            return
+        }
+        
+        //get translation amount
+        let translation = recognizer.translation(in: recognizer.view!)
+        
+        //move cam
+        cam.position.x -= translation.x
+        cam.position.y += translation.y
+        
+        //reset tranlation
+        recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
+    }
+    
+    //function to handle pinch gestures for camera scaling
+    func handlePinch(recognizer : UIPinchGestureRecognizer) {
+        if recognizer.state != .changed {
+            return
+        }
+        
+        //scale cam
+        cam.xScale *= 1/recognizer.scale
+        cam.yScale *= 1/recognizer.scale
+        
+        //clamp cam
+        if (cam.xScale > 0.9) {cam.xScale = 0.9}
+        if (cam.xScale < 0.35) {cam.xScale = 0.35}
+        if (cam.yScale > 0.9) {cam.yScale = 0.9}
+        if (cam.yScale < 0.35) {cam.yScale = 0.35}
+        
+        //reset scale
+        recognizer.scale = 1
+    }
+
     
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }

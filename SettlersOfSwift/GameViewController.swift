@@ -74,6 +74,9 @@ class GameViewController: UIViewController, NetworkDelegate {
             else {
                 print("Board Sync Data Sent")
             }
+            
+            // Create player objects and send to non-hosts
+            scenePort.initPlayers()
         }
         else
         {
@@ -85,7 +88,6 @@ class GameViewController: UIViewController, NetworkDelegate {
                 print ("Players notified of status")
             }
         }
-
     }
 
     func recievedData(data: String) {
@@ -103,6 +105,9 @@ class GameViewController: UIViewController, NetworkDelegate {
                 else {
                     readyPlayers -= 1
                 }
+            case "playerData": // data represents players' information
+                scenePort.setPlayers(info: message[1])
+                print ("Updated Players")
             default:
                 print("Unknown message")
         }
