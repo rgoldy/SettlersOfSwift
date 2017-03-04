@@ -59,6 +59,7 @@ class GameViewController: UIViewController, NetworkDelegate {
         return true
     }
     
+    
     func syncBoard() {
         if (appDelegate.networkManager.isHost) {
             // Wait for all players to be ready
@@ -93,6 +94,7 @@ class GameViewController: UIViewController, NetworkDelegate {
         switch(message[0]) {
             case "boardLayout": // data represents board layout
                 scenePort.setBoardLayout(encoding: message[1])
+                scenePort.handler.updateGUI()
                 print("Updated Scene")
             case "readyToPlay": // data informs others whether player is ready
                 if (message[1] == "true") {

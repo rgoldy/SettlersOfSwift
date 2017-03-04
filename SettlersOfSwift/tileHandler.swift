@@ -404,6 +404,18 @@ class tileHandler {
                 }
             }
         }
-        
+    }
+    
+    //function that will redraw landBackground and Numbers using new landHexArray and landHexDictionary
+    func updateGUI() {
+        for entry in landHexDictionary {
+            for (column, tileRow) in entry.value {
+                let numberTile = numberTiles.tileGroups.first(where: {$0.name == "\(entry.key)"})
+                Numbers.setTileGroup(numberTile, forColumn: column, row: tileRow)
+                let terrainType = landHexArray.first(where: {$0.column == column && $0.row == tileRow})?.type?.rawValue
+                let terrainTile = terrainTiles.tileGroups.first(where: {$0.name == terrainType})
+                landBackground.setTileGroup(terrainTile, forColumn: column, row: tileRow)
+            }
+        }
     }
 }
