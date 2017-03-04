@@ -59,10 +59,6 @@ class GameViewController: UIViewController, NetworkDelegate {
         return true
     }
     
-    // Added by Riley...
-    func updateGUI() {
-        
-    }
     
     func syncBoard() {
         if (appDelegate.networkManager.isHost) {
@@ -98,7 +94,7 @@ class GameViewController: UIViewController, NetworkDelegate {
         switch(message[0]) {
             case "boardLayout": // data represents board layout
                 scenePort.setBoardLayout(encoding: message[1])
-                updateGUI()
+                scenePort.handler.updateGUI()
                 print("Updated Scene")
             case "readyToPlay":
                 readyPlayers += 1
