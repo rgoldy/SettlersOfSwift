@@ -8,9 +8,9 @@
 
 //color enum
 enum playerColor:String {
-    case red
-    case blue
-    case orange
+    case Red
+    case Blue
+    case Orange
 }
 
 //class which represents each player and it's respective attributes
@@ -31,11 +31,11 @@ class Player {
         self.name = name
         switch playerNumber {
         case 1:
-            color = playerColor.blue
+            color = playerColor.Blue
         case 2:
-            color = playerColor.orange
+            color = playerColor.Orange
         default:
-            color = playerColor.red
+            color = playerColor.Red
         }
     }
 }

@@ -6,7 +6,7 @@
 //  Copyright © 2017 Comp361. All rights reserved.
 //
 
-enum cornerType {
+enum cornerType : String {
     case Settlement
     case City
 }

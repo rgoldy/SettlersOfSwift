@@ -6,7 +6,7 @@
 //  Copyright © 2017 Comp361. All rights reserved.
 //
 
-enum edgeType {
+enum edgeType : String {
     case Road
     case Boat
 }
@@ -15,8 +15,10 @@ enum edgeType {
 class edgeObject {
     var name : String = ""
     var type : edgeType
+    var direction : directionType
     
-    init (edgeType : edgeType) {
+    init (edgeType : edgeType, directionType : directionType) {
         type = edgeType
+        direction = directionType
     }
 }
