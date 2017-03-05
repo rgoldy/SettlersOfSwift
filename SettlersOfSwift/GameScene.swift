@@ -490,19 +490,39 @@ class GameScene: SKScene {
     func distributeResources(dice: Int) {
         let producingCoords = handler.landHexDictionary[dice]
         for (col, row) in producingCoords! {
-            for playerIndex in 0...players.count-1 {
-                for vertex in players[playerIndex].ownedCorners {
-                    if (vertex.column == col && vertex.row == row) {
-                        let resources = [vertex.tile1.type, vertex.tile2?.type, vertex.tile3?.type]
-                        for resource in resources {
-                            switch resource! {
+            for playerIndex in 0...players.count-1 { // for each player...
+                for vertex in players[playerIndex].ownedCorners { // distribute resources if vertex touches hex
+                    if (vertex.tile1.column == col && vertex.tile1.row == row) {
+                        // Distribute resources of type tile1.type
+                        switch vertex.tile1.type! {
                             case .wood: players[playerIndex].wood += 1
                             case .wheat: players[playerIndex].wheat += 1
                             case .stone: players[playerIndex].stone += 1
                             case .sheep: players[playerIndex].sheep += 1
                             case .brick: players[playerIndex].brick += 1
                             case .gold: players[playerIndex].gold += 1
-                            }
+                        }
+                    }
+                    if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
+                        // Distribute resources of type tile1.type
+                        switch vertex.tile2!.type! {
+                            case .wood: players[playerIndex].wood += 1
+                            case .wheat: players[playerIndex].wheat += 1
+                            case .stone: players[playerIndex].stone += 1
+                            case .sheep: players[playerIndex].sheep += 1
+                            case .brick: players[playerIndex].brick += 1
+                            case .gold: players[playerIndex].gold += 1
+                        }
+                    }
+                    if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
+                        // Distribute resources of type tile1.type
+                        switch vertex.tile3!.type! {
+                        case .wood: players[playerIndex].wood += 1
+                        case .wheat: players[playerIndex].wheat += 1
+                        case .stone: players[playerIndex].stone += 1
+                        case .sheep: players[playerIndex].sheep += 1
+                        case .brick: players[playerIndex].brick += 1
+                        case .gold: players[playerIndex].gold += 1
                         }
                     }
                 }
