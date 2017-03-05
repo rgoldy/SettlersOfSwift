@@ -32,6 +32,9 @@ class GameScene: SKScene {
     var currentPlayer = 0
     var myPlayerIndex = -1
     
+    // GUI elements
+    
+    
     //init tile handler
     var handler : tileHandler!
     
@@ -471,13 +474,13 @@ class GameScene: SKScene {
     // function that rolls the dice
     func rollDice() {
         let values = dice.rollDice()
-        let diceSum = "diceRoll.\(values[0])"
+        let diceData = "diceRoll.\(values[0]),\(values[1])"
         
-        // distribute resources to self
-        distributeResources(dice: values[0])
+        // distribute resources on own device
+        distributeResources(dice: values[0] + values[1])
         
-        // distribute resources to other players
-        let sent = appDelegate.networkManager.sendData(data: diceSum)
+        // distribute resources on other players' devices
+        let sent = appDelegate.networkManager.sendData(data: diceData)
         if (!sent) {
             print ("failed to distribute resources to all players")
         }
@@ -517,12 +520,12 @@ class GameScene: SKScene {
                     if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
-                        case .wood: players[playerIndex].wood += 1
-                        case .wheat: players[playerIndex].wheat += 1
-                        case .stone: players[playerIndex].stone += 1
-                        case .sheep: players[playerIndex].sheep += 1
-                        case .brick: players[playerIndex].brick += 1
-                        case .gold: players[playerIndex].gold += 1
+                            case .wood: players[playerIndex].wood += 1
+                            case .wheat: players[playerIndex].wheat += 1
+                            case .stone: players[playerIndex].stone += 1
+                            case .sheep: players[playerIndex].sheep += 1
+                            case .brick: players[playerIndex].brick += 1
+                            case .gold: players[playerIndex].gold += 1
                         }
                     }
                 }

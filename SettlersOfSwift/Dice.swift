@@ -24,8 +24,8 @@ class Dice {
         yellowValue = yellow.nextInt()
         // eventValue = event.nextInt()
         
-        return [redValue + yellowValue]
-        // return [redValue + yellowValue, eventValue]
+        return [redValue, yellowValue]
+        // return [redValue, yellowValue, eventValue]
     }
     
 }
