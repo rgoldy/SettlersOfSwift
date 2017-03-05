@@ -120,6 +120,8 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "gamePhaseData":
                 scenePort.setNewGamePhase(info: message[1])
                 print("Updated currGamePhase")
+            case "diceRoll":
+                scenePort.distributeResources(dice: Int(message[1])!)
             default:
                 print("Unknown message")
         }

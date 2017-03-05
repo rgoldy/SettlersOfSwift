@@ -30,6 +30,7 @@ class GameScene: SKScene {
     let dice = Dice()
     var players: [Player] = []
     var currentPlayer = 0
+    var myPlayerIndex = -1
     
     //init tile handler
     var handler : tileHandler!
@@ -204,6 +205,7 @@ class GameScene: SKScene {
         let p1 = Player(name: appDelegate.networkManager.getName(), playerNumber: 0)
         players.append(p1)
         var playerInfo = "playerData.\(appDelegate.networkManager.getName()),\(0);"
+        myPlayerIndex = 0
         
         for i in 0...appDelegate.networkManager.session.connectedPeers.count-1 {
             let p = Player(name: appDelegate.networkManager.session.connectedPeers[i].displayName, playerNumber: i+1)
@@ -230,6 +232,11 @@ class GameScene: SKScene {
             let pName = playerInfo[0]
             let pNumb = Int(playerInfo[1])!
             players.append(Player(name: pName, playerNumber: pNumb))
+        }
+        for i in 1...players.count-1 {
+            if (players[i].name == appDelegate.networkManager.getName()) {
+                myPlayerIndex = i
+            }
         }
         currGamePhase = GamePhase.placeFirstSettlement
     }
@@ -459,6 +466,48 @@ class GameScene: SKScene {
         players[currPlayerNumber].ownedEdges.append(edge!)
         let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currPlayerNumber].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
         handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+    }
+    
+    // function that rolls the dice
+    func rollDice() {
+        let values = dice.rollDice()
+        let diceSum = "diceRoll.\(values[0])"
+        
+        // distribute resources to self
+        distributeResources(dice: values[0])
+        
+        // distribute resources to other players
+        let sent = appDelegate.networkManager.sendData(data: diceSum)
+        if (!sent) {
+            print ("failed to distribute resources to all players")
+        }
+        else {
+            print ("successfully distributed resources to all players")
+        }
+    }
+    
+    // function that will distribute resources to all players
+    func distributeResources(dice: Int) {
+        let producingCoords = handler.landHexDictionary[dice]
+        for (col, row) in producingCoords! {
+            for playerIndex in 0...players.count-1 {
+                for vertex in players[playerIndex].ownedCorners {
+                    if (vertex.column == col && vertex.row == row) {
+                        let resources = [vertex.tile1.type, vertex.tile2?.type, vertex.tile3?.type]
+                        for resource in resources {
+                            switch resource! {
+                            case .wood: players[playerIndex].wood += 1
+                            case .wheat: players[playerIndex].wheat += 1
+                            case .stone: players[playerIndex].stone += 1
+                            case .sheep: players[playerIndex].sheep += 1
+                            case .brick: players[playerIndex].brick += 1
+                            case .gold: players[playerIndex].gold += 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 //
 //

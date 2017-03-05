@@ -12,11 +12,20 @@ import GameplayKit
 class Dice {
     let red = GKRandomDistribution.d6()
     let yellow = GKRandomDistribution.d6()
-//    let event = GKRandomDistribution.d6()
+    // let event = GKRandomDistribution.d6()
     
-    //returns an array of integers [red, yellow, event]
+    var redValue = -1
+    var yellowValue = -1
+    // var eventValue: Int
+    
+    //returns an array of integers [red + yellow, event]
     func rollDice() -> [Int] {
-        return [red.nextInt(), yellow.nextInt()]
+        redValue = red.nextInt()
+        yellowValue = yellow.nextInt()
+        // eventValue = event.nextInt()
+        
+        return [redValue + yellowValue]
+        // return [redValue + yellowValue, eventValue]
     }
     
 }
