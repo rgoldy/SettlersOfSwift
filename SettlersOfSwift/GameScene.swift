@@ -10,8 +10,13 @@
 import SpriteKit
 import GameplayKit
 
-enum GamePhase {
+enum GamePhase : String {
     case Setup
+    case placeFirstSettlement
+    case placeFirstRoad
+    case wait
+    case placeSecondRoad
+    case placeSecondSettlement
     case p1Turn
     case p2Turn
     case p3Turn
@@ -24,6 +29,7 @@ class GameScene: SKScene {
     var currGamePhase = GamePhase.Setup
     let dice = Dice()
     var players: [Player] = []
+    var currentPlayer = 0
     
     //init tile handler
     var handler : tileHandler!
@@ -213,6 +219,7 @@ class GameScene: SKScene {
         else {
             print ("successful sync player info")
         }
+        currGamePhase = GamePhase.placeFirstSettlement
     }
     
     func setPlayers(info: String) {
@@ -224,6 +231,7 @@ class GameScene: SKScene {
             let pNumb = Int(playerInfo[1])!
             players.append(Player(name: pName, playerNumber: pNumb))
         }
+        currGamePhase = GamePhase.placeFirstSettlement
     }
     
     //function to handle pan gestures for camera movement
@@ -262,18 +270,197 @@ class GameScene: SKScene {
         //reset scale
         recognizer.scale = 1
     }
-
     
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        guard let touch = touches.first else { return }
-//        let targetLocation = touch.location(in: self)
-//        
-//        let centerVertexCol = handler.Edges.tileColumnIndex(fromPosition: targetLocation)
-//        let centerVertexRow = handler.Edges.tileRowIndex(fromPosition: targetLocation)
-//        handler.Edges.setTileGroup(handler.edgesTiles.tileGroups[0], forColumn: centerVertexCol, row: centerVertexRow)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        if (touches.count > 1) { return }
+        let targetLocation = touch.location(in: self)
+        
+        if(players[currentPlayer].name == appDelegate.networkManager.getName()) { //only accept taps if it's your turn            
+            switch currGamePhase {
+            case .placeFirstSettlement :
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
+                    currGamePhase = GamePhase.placeFirstRoad
+                }
+            case .placeFirstRoad :
+                if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
+                    if(currentPlayer == players.count-1) {
+                        currGamePhase = GamePhase.placeSecondSettlement
+                    } else {
+                        currGamePhase = GamePhase.wait
+                        currentPlayer = currentPlayer+1
+                        sendNewCurrPlayer()
+                    }
+                }
+            case .placeSecondSettlement :
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
+                    currGamePhase = GamePhase.placeSecondRoad
+                }
+            case .placeSecondRoad :
+                if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
+                    currGamePhase = GamePhase.wait
+                    if (currentPlayer == 0) {
+                        currGamePhase = GamePhase.p1Turn
+                    } else {
+                        currentPlayer = currentPlayer-1
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase : GamePhase.placeSecondSettlement)
+                    }
+                }
+            default : break
+            }
+        }
+    }
+    
+    //method to send message to other players and update the currentplayer
+    func sendNewCurrPlayer() {
+        let currPlayerInfo = "currPlayerData.\(currentPlayer)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: currPlayerInfo)
+        if (!sent) {
+            print ("failed to sync currentPlayer")
+        }
+        else {
+            print ("successful sync currentPlayer")
+        }
+    }
+    
+    //set current player to message recieved
+    func setNewCurrPlayer(info: String) {
+        currentPlayer = Int(info)!
+    }
+    
+    //method to send message to other players and update their gamephase
+    func sendNewGamePhase(gamePhase : GamePhase) {
+        let gamePhaseInfo = "gamePhaseData.\(gamePhase)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: gamePhaseInfo)
+        if (!sent) {
+            print ("failed to sync gamePhase")
+        }
+        else {
+            print ("successful sync gamePhase")
+        }
+    }
+    
+    //set currGamePhase to message recieved
+    func setNewGamePhase(info: String) {
+        currGamePhase = GamePhase(rawValue: info)!
+    }
+    
+    //function that will place a corner object and set its owner then send info to other players
+    func placeCornerObject(column : Int, row : Int, type : cornerType) -> Bool {
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        if (corner == nil) { return false }
+        if (corner?.cornerObject != nil) { return false }
+        if (canPlaceCorner(corner: corner!) == false) { return false }
+
+        corner!.cornerObject = cornerObject(cornerType : type)
+        players[currentPlayer].ownedCorners.append(corner!)
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        else {
+            print ("successful sync cornerObject")
+        }
+        
+        return true
+    }
+    
+    //function to check if a corner can be placed
+    func canPlaceCorner(corner : LandHexVertex) -> Bool {
+        for vertex in corner.neighbourVertices {
+            if (vertex?.cornerObject != nil) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    //function that will read a recieved message and set the corner object
+    func setCornerObjectFromMessage(info:String) {
+        let cornerInfo = info.components(separatedBy: ",")
+        let currPlayerNumber = Int(cornerInfo[0])!
+        let column = Int(cornerInfo[1])!
+        let row = Int(cornerInfo[2])!
+        let type = cornerType(rawValue: cornerInfo[3])
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        corner?.cornerObject = cornerObject(cornerType : type!)
+        players[currPlayerNumber].ownedCorners.append(corner!)
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+    }
+    
+    //function that will place an edge object and set its owner then send info to other players
+    func placeEdgeObject(column : Int, row : Int, type : edgeType) -> Bool {
+        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        if (edge == nil) { return false }
+        if (edge?.edgeObject != nil) { return false }
+        if (canPlaceEdge(edge: edge!) == false) { return false }
+        
+        edge!.edgeObject = edgeObject(edgeType : type)
+        players[currentPlayer].ownedEdges.append(edge!)
+        let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currentPlayer].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
+        handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let edgeObjectInfo = "edgeData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: edgeObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        else {
+            print ("successful sync cornerObject")
+        }
+        
+        return true
+    }
+    
+    //function to check if an edge can be placed
+    func canPlaceEdge(edge : LandHexEdge) -> Bool {
+        
+        if (players[currentPlayer].ownedCorners.contains(where: {$0.column == edge.neighbourVertex1.column && $0.row == edge.neighbourVertex1.row})) { return true }
+        if (players[currentPlayer].ownedCorners.contains(where: {$0.column == edge.neighbourVertex2.column && $0.row == edge.neighbourVertex2.row})) { return true }
+        
+        if (edge.column % 2 == 0) {
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yEvenOffset[0])})) { return true }
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yEvenOffset[1])})) { return true }
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yEvenOffset[3])})) { return true }
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yEvenOffset[4])})) { return true }
+        } else {
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yOddOffset[0])})) { return true }
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yOddOffset[1])})) { return true }
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yOddOffset[3])})) { return true }
+            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yOddOffset[4])})) { return true }
+        }
+        
+        return false
+    }
+    
+    //function that will read a recieved message and set the edge object
+    func setEdgeObjectFromMessage(info:String) {
+        let edgeInfo = info.components(separatedBy: ",")
+        let currPlayerNumber = Int(edgeInfo[0])!
+        let column = Int(edgeInfo[1])!
+        let row = Int(edgeInfo[2])!
+        let type = edgeType(rawValue: edgeInfo[3])
+        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        edge?.edgeObject = edgeObject(edgeType : type!)
+        players[currPlayerNumber].ownedEdges.append(edge!)
+        let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currPlayerNumber].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
+        handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+    }
 //
-//    }
-//    
 //
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }

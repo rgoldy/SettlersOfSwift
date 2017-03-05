@@ -15,10 +15,8 @@ enum edgeType : String {
 class edgeObject {
     var name : String = ""
     var type : edgeType
-    var direction : directionType
-    
-    init (edgeType : edgeType, directionType : directionType) {
+
+    init (edgeType : edgeType) {
         type = edgeType
-        direction = directionType
     }
 }

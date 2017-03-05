@@ -108,6 +108,18 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "playerData": // data represents players' information
                 scenePort.setPlayers(info: message[1])
                 print ("Updated Players")
+            case "cornerData":
+                scenePort.setCornerObjectFromMessage(info: message[1])
+                print("Updated cornerObject")
+            case "edgeData":
+                scenePort.setEdgeObjectFromMessage(info: message[1])
+                print("Updated edgeObject")
+            case "currPlayerData":
+                scenePort.setNewCurrPlayer(info: message[1])
+                print("Updated currentPlayer")
+            case "gamePhaseData":
+                scenePort.setNewGamePhase(info: message[1])
+                print("Updated currGamePhase")
             default:
                 print("Unknown message")
         }
