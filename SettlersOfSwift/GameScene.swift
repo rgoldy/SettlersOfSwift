@@ -339,7 +339,7 @@ class GameScene: SKScene {
         if(currentPlayer == myPlayerIndex) { //only accept taps if it's your turn
             switch currGamePhase {
             case .placeFirstSettlement :
-                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement, setup:false)) {
                     currGamePhase = GamePhase.placeFirstRoad
                     gameText.text = "Place First Road"
                 }
@@ -357,7 +357,7 @@ class GameScene: SKScene {
                     }
                 }
             case .placeSecondSettlement :
-                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement, setup:true)) {
                     currGamePhase = GamePhase.placeSecondRoad
                     gameText.text = "Place Second Road"
                 }
@@ -500,7 +500,7 @@ class GameScene: SKScene {
     }
     
     //function that will place a corner object and set its owner then send info to other players
-    func placeCornerObject(column : Int, row : Int, type : cornerType) -> Bool {
+    func placeCornerObject(column : Int, row : Int, type : cornerType, setup: Bool) -> Bool {
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false }
         if (corner?.cornerObject != nil) { return false }
@@ -511,8 +511,6 @@ class GameScene: SKScene {
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
-        distributeResourcesOnSetup(vertex: corner!)
-        
         let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
         
         // Send player info to other players
@@ -522,6 +520,10 @@ class GameScene: SKScene {
         }
         else {
             print ("successful sync cornerObject")
+        }
+        
+        if (setup) {
+            distributeResourcesOnSetup(vertex: corner!)
         }
         
         return true
@@ -684,7 +686,7 @@ class GameScene: SKScene {
                             case .stone: player.stone += 1; print("\(player.name) mined stone")
                             case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
                             case .brick: player.brick += 1; print("\(player.name) mined brick")
-                            case .gold: player.gold += 1; print("\(player.name) mined gold")
+                            case .gold: player.gold += 2; print("\(player.name) mined gold")
                         }
                     }
                     if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
@@ -695,7 +697,7 @@ class GameScene: SKScene {
                             case .stone: player.stone += 1; print("\(player.name) mined stone")
                             case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
                             case .brick: player.brick += 1; print("\(player.name) mined brick")
-                            case .gold: player.gold += 1; print("\(player.name) mined gold")
+                            case .gold: player.gold += 2; print("\(player.name) mined gold")
                         }
                     }
                     if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
@@ -706,7 +708,7 @@ class GameScene: SKScene {
                             case .stone: player.stone += 1; print("\(player.name) mined stone")
                             case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
                             case .brick: player.brick += 1; print("\(player.name) mined brick")
-                            case .gold: player.gold += 1; print("\(player.name) mined gold")
+                            case .gold: player.gold += 2; print("\(player.name) mined gold")
                         }
                     }
                 }
@@ -727,7 +729,7 @@ class GameScene: SKScene {
             case .stone: players[myPlayerIndex].stone += 1
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
-            case .gold: players[myPlayerIndex].gold += 1
+            case .gold: players[myPlayerIndex].gold += 2
         }
         if (vertex.tile2 != nil) {
             // Distribute resources of type tile1.type
@@ -737,7 +739,7 @@ class GameScene: SKScene {
             case .stone: players[myPlayerIndex].stone += 1
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
-            case .gold: players[myPlayerIndex].gold += 1
+            case .gold: players[myPlayerIndex].gold += 2
             }
         }
         if (vertex.tile3 != nil) {
@@ -748,7 +750,7 @@ class GameScene: SKScene {
             case .stone: players[myPlayerIndex].stone += 1
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
-            case .gold: players[myPlayerIndex].gold += 1
+            case .gold: players[myPlayerIndex].gold += 2
             }
         }
         

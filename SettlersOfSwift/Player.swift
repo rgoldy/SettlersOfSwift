@@ -20,7 +20,7 @@ class Player {
     var stone = 0
     var sheep = 0
     var brick = 0
-    var gold = 0
+    var gold = 2
     var name : String
     var longestRoad = 0
     var ownedCorners : [LandHexVertex] = []
