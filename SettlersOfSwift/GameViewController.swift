@@ -20,10 +20,6 @@ class GameViewController: UIViewController, NetworkDelegate {
     var scenePort: GameScene!
     var readyPlayers = 0
     
-    // GUI Elements
-    @IBOutlet var redDiceUI: UIImageView!
-    @IBOutlet var yellowDiceUI: UIImageView!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -128,17 +124,14 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let diceData = message[1].components(separatedBy: ",")
                 let redDie = Int(diceData[0])!
                 let yellowDie = Int(diceData[1])!
-                
                 // distribuite resources
-                scenePort.distributeResources(dice: redDie + yellowDie)
-                
+                if(redDie + yellowDie != 7) {
+                    scenePort.distributeResources(dice: redDie + yellowDie)
+                }
                 // update dice and GUI
                 scenePort.dice.redValue = redDie
                 scenePort.dice.yellowValue = yellowDie
-                let redImage = "red\(redDie)"
-                let yellowImage = "yellow\(yellowDie)"
-                redDiceUI.image = UIImage(named: redImage)
-                yellowDiceUI.image = UIImage(named: yellowImage)
+                scenePort.updateDice(red: redDie, yellow: yellowDie)
             default:
                 print("Unknown message")
         }

@@ -31,9 +31,12 @@ class GameScene: SKScene {
     var players: [Player] = []
     var currentPlayer = 0
     var myPlayerIndex = -1
-    
-    // GUI elements
-    
+    let gameButton = UITextField()
+    let gameText = UITextField()
+    let playerInfo = UITextField()
+    let redDiceUI = UIImageView()
+    let yellowDiceUI = UIImageView()
+    var rolled : Bool = false
     
     //init tile handler
     var handler : tileHandler!
@@ -72,6 +75,43 @@ class GameScene: SKScene {
         
         let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(self.handlePinch(recognizer:)))
         view.addGestureRecognizer(pinchGestureRecognizer)
+
+        //init UI
+//        gameText.font = UIFont(name: "Arial", size: 13)
+//        gameText.frame = CGRect(x: self.view!.bounds.width/2 - (self.view!.bounds.width/6), y: self.view!.bounds.height/8, width: self.view!.bounds.width/3, height: self.view!.bounds.height/12)
+//        gameText.text = "Test"
+//        gameText.textAlignment = NSTextAlignment.center
+//        gameText.isHidden = true
+//        gameText.backgroundColor = UIColor.gray
+//        gameText.borderStyle = UITextBorderStyle.roundedRect
+//        gameText.isUserInteractionEnabled = false
+//        self.view?.addSubview(gameText)
+        
+        playerInfo.font = UIFont(name: "Arial", size: 13)
+        playerInfo.frame = CGRect(x: 0, y: 0, width: self.view!.bounds.width, height: self.view!.bounds.height/16)
+        playerInfo.center = CGPoint(x:self.view!.center.x, y:self.view!.bounds.height/32)
+        playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
+        playerInfo.backgroundColor = UIColor.gray
+        playerInfo.textAlignment = NSTextAlignment.center
+        playerInfo.isUserInteractionEnabled = false
+        self.view?.addSubview(playerInfo)
+        
+        gameButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        gameButton.text = "End Turn"
+        gameButton.font = UIFont(name: "Arial", size: 13)
+        gameButton.backgroundColor = UIColor.gray
+        gameButton.borderStyle = UITextBorderStyle.roundedRect
+        gameButton.isUserInteractionEnabled = false
+        gameButton.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(gameButton)
+        
+        redDiceUI.frame = CGRect(x: 0, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
+        redDiceUI.image = UIImage(named: "red1")
+        self.view?.addSubview(redDiceUI)
+        
+        yellowDiceUI.frame = CGRect(x: self.view!.bounds.width/11, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
+        yellowDiceUI.image = UIImage(named: "yellow1")
+        self.view?.addSubview(yellowDiceUI)
     }
     
     func loadSceneNodes() {
@@ -224,7 +264,11 @@ class GameScene: SKScene {
         else {
             print ("successful sync player info")
         }
+        
+        self.playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
         currGamePhase = GamePhase.placeFirstSettlement
+        gameText.text = "Place First Settlement"
+        gameText.isHidden = false
     }
     
     func setPlayers(info: String) {
@@ -241,7 +285,10 @@ class GameScene: SKScene {
                 myPlayerIndex = i
             }
         }
+        
+        self.playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
         currGamePhase = GamePhase.placeFirstSettlement
+        gameText.text = "Place First Settlement"
     }
     
     //function to handle pan gestures for camera movement
@@ -285,19 +332,25 @@ class GameScene: SKScene {
         guard let touch = touches.first else { return }
         if (touches.count > 1) { return }
         let targetLocation = touch.location(in: self)
+        let targetLocationView = touch.location(in: self.view!)
+        print (currGamePhase)
         
         if(players[currentPlayer].name == appDelegate.networkManager.getName()) { //only accept taps if it's your turn            
             switch currGamePhase {
             case .placeFirstSettlement :
                 if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
                     currGamePhase = GamePhase.placeFirstRoad
+                    gameText.text = "Place First Road"
                 }
             case .placeFirstRoad :
                 if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
+                    gameText.text = "Place Second Settlement"
+
                     if(currentPlayer == players.count-1) {
                         currGamePhase = GamePhase.placeSecondSettlement
                     } else {
                         currGamePhase = GamePhase.wait
+                        gameText.isHidden = true
                         currentPlayer = currentPlayer+1
                         sendNewCurrPlayer()
                     }
@@ -305,16 +358,71 @@ class GameScene: SKScene {
             case .placeSecondSettlement :
                 if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
                     currGamePhase = GamePhase.placeSecondRoad
+                    gameText.text = "Place Second Road"
                 }
             case .placeSecondRoad :
                 if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
                     currGamePhase = GamePhase.wait
                     if (currentPlayer == 0) {
                         currGamePhase = GamePhase.p1Turn
+                        gameText.text = "P1 Turn"
                     } else {
                         currentPlayer = currentPlayer-1
                         sendNewCurrPlayer()
                         sendNewGamePhase(gamePhase : GamePhase.placeSecondSettlement)
+                        gameText.isHidden = true
+                    }
+                }
+            case .p1Turn :
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                    if(!rolled) {
+                        rollDice()
+                        rolled = true
+                    }
+                }
+                if (self.gameButton.frame.contains(targetLocationView)) {
+                    if (rolled) {
+                        currentPlayer = currentPlayer + 1
+                        currGamePhase = GamePhase.p2Turn
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase: currGamePhase)
+                        rolled = false
+                    }
+                }
+            case .p2Turn :
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                    if(!rolled) {
+                        rollDice()
+                        rolled = true
+                    }
+                }
+                if (self.gameButton.frame.contains(targetLocationView)) {
+                    if (rolled) {
+                        currentPlayer = (currentPlayer + 1) % players.count
+                        if (currentPlayer == 2) {
+                            currGamePhase = GamePhase.p3Turn
+                        } else {
+                            currGamePhase = GamePhase.p1Turn
+                        }
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase: currGamePhase)
+                        rolled = false
+                    }
+                }
+            case .p3Turn :
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                    if(!rolled) {
+                        rollDice()
+                        rolled = true
+                    }
+                }
+                if (self.gameButton.frame.contains(targetLocationView)) {
+                    if (rolled) {
+                        currentPlayer = 0
+                        currGamePhase = GamePhase.p1Turn
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase: currGamePhase)
+                        rolled = false
                     }
                 }
             default : break
@@ -443,15 +551,42 @@ class GameScene: SKScene {
         if (players[currentPlayer].ownedCorners.contains(where: {$0.column == edge.neighbourVertex2.column && $0.row == edge.neighbourVertex2.row})) { return true }
         
         if (edge.column % 2 == 0) {
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yEvenOffset[0])})) { return true }
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yEvenOffset[1])})) { return true }
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yEvenOffset[3])})) { return true }
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yEvenOffset[4])})) { return true }
+            switch edge.direction {
+            case .flat:
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yEvenOffset[1])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[2]) && $0.row == (edge.row + handler.yEvenOffset[2])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yEvenOffset[4])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[5]) && $0.row == (edge.row + handler.yEvenOffset[5])})) { return true }
+            case .lDiagonal:
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yEvenOffset[0])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[2]) && $0.row == (edge.row + handler.yEvenOffset[2])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yEvenOffset[3])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[5]) && $0.row == (edge.row + handler.yEvenOffset[5])})) { return true }
+            case .rDiagonal:
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yEvenOffset[0])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yEvenOffset[1])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yEvenOffset[3])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yEvenOffset[4])})) { return true }
+            }
+            
         } else {
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yOddOffset[0])})) { return true }
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yOddOffset[1])})) { return true }
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yOddOffset[3])})) { return true }
-            if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yOddOffset[4])})) { return true }
+            switch edge.direction {
+            case .flat:
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yOddOffset[1])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[2]) && $0.row == (edge.row + handler.yOddOffset[2])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yOddOffset[4])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[5]) && $0.row == (edge.row + handler.yOddOffset[5])})) { return true }
+            case .lDiagonal:
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yOddOffset[0])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[2]) && $0.row == (edge.row + handler.yOddOffset[2])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yOddOffset[3])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[5]) && $0.row == (edge.row + handler.yOddOffset[5])})) { return true }
+            case .rDiagonal:
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[0]) && $0.row == (edge.row + handler.yOddOffset[0])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[1]) && $0.row == (edge.row + handler.yOddOffset[1])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[3]) && $0.row == (edge.row + handler.yOddOffset[3])})) { return true }
+                if (players[currentPlayer].ownedEdges.contains(where: {$0.column == (edge.column + handler.xOffset[4]) && $0.row == (edge.row + handler.yOddOffset[4])})) { return true }
+            }
         }
         
         return false
@@ -474,10 +609,14 @@ class GameScene: SKScene {
     // function that rolls the dice
     func rollDice() {
         let values = dice.rollDice()
+        updateDice(red: values[0], yellow: values[1])
         let diceData = "diceRoll.\(values[0]),\(values[1])"
         
         // distribute resources on own device
-        distributeResources(dice: values[0] + values[1])
+        print(values[0] + values[1])
+        if(values[0] + values[1] != 7) {
+            distributeResources(dice: values[0] + values[1])
+        }
         
         // distribute resources on other players' devices
         let sent = appDelegate.networkManager.sendData(data: diceData)
@@ -487,6 +626,11 @@ class GameScene: SKScene {
         else {
             print ("successfully distributed resources to all players")
         }
+    }
+    
+    func updateDice(red : Int, yellow: Int) {
+        redDiceUI.image = UIImage(named: "red\(red)")
+        yellowDiceUI.image = UIImage(named: "yellow\(yellow)")
     }
     
     // function that will distribute resources to all players
@@ -531,6 +675,8 @@ class GameScene: SKScene {
                 }
             }
         }
+        
+        self.playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
     }
 //
 //

@@ -38,4 +38,8 @@ class Player {
             color = playerColor.Red
         }
     }
+    
+    func getPlayerText() -> String {
+        return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold)"
+    }
 }
