@@ -283,6 +283,7 @@ class GameScene: SKScene {
         for i in 1...players.count-1 {
             if (players[i].name == appDelegate.networkManager.getName()) {
                 myPlayerIndex = i
+                print ("I am player \(i+1)")
             }
         }
         
@@ -335,7 +336,7 @@ class GameScene: SKScene {
         let targetLocationView = touch.location(in: self.view!)
         print (currGamePhase)
         
-        if(players[currentPlayer].name == appDelegate.networkManager.getName()) { //only accept taps if it's your turn            
+        if(currentPlayer == myPlayerIndex) { //only accept taps if it's your turn
             switch currGamePhase {
             case .placeFirstSettlement :
                 if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement)) {
@@ -387,6 +388,9 @@ class GameScene: SKScene {
                         sendNewCurrPlayer()
                         sendNewGamePhase(gamePhase: currGamePhase)
                         rolled = false
+                        DispatchQueue.main.async {
+                            self.gameButton.backgroundColor = UIColor.gray
+                        }
                     }
                 }
             case .p2Turn :
@@ -407,6 +411,9 @@ class GameScene: SKScene {
                         sendNewCurrPlayer()
                         sendNewGamePhase(gamePhase: currGamePhase)
                         rolled = false
+                        DispatchQueue.main.async {
+                            self.gameButton.backgroundColor = UIColor.gray
+                        }
                     }
                 }
             case .p3Turn :
@@ -423,6 +430,9 @@ class GameScene: SKScene {
                         sendNewCurrPlayer()
                         sendNewGamePhase(gamePhase: currGamePhase)
                         rolled = false
+                        DispatchQueue.main.async {
+                            self.gameButton.backgroundColor = UIColor.gray
+                        }
                     }
                 }
             default : break
@@ -433,6 +443,17 @@ class GameScene: SKScene {
     //method to send message to other players and update the currentplayer
     func sendNewCurrPlayer() {
         let currPlayerInfo = "currPlayerData.\(currentPlayer)"
+        
+        if (currentPlayer == myPlayerIndex) {
+            DispatchQueue.main.async {
+                self.gameButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                self.gameButton.backgroundColor = UIColor.gray
+            }
+        }
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: currPlayerInfo)
@@ -447,6 +468,16 @@ class GameScene: SKScene {
     //set current player to message recieved
     func setNewCurrPlayer(info: String) {
         currentPlayer = Int(info)!
+        if (currentPlayer == myPlayerIndex) {
+            DispatchQueue.main.async {
+                self.gameButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                self.gameButton.backgroundColor = UIColor.gray
+            }
+        }
     }
     
     //method to send message to other players and update their gamephase
@@ -629,55 +660,62 @@ class GameScene: SKScene {
     }
     
     func updateDice(red : Int, yellow: Int) {
-        redDiceUI.image = UIImage(named: "red\(red)")
-        yellowDiceUI.image = UIImage(named: "yellow\(yellow)")
+        DispatchQueue.main.async
+            {
+            self.redDiceUI.image = UIImage(named: "red\(red)")!
+            self.yellowDiceUI.image = UIImage(named: "yellow\(yellow)")!
+        }
     }
     
     // function that will distribute resources to all players
     func distributeResources(dice: Int) {
+        print ("Dice = \(dice)")
         let producingCoords = handler.landHexDictionary[dice]
         for (col, row) in producingCoords! {
-            for playerIndex in 0...players.count-1 { // for each player...
-                for vertex in players[playerIndex].ownedCorners { // distribute resources if vertex touches hex
+            for player in players { // for each player...
+                for vertex in player.ownedCorners { // distribute resources if vertex touches hex
                     if (vertex.tile1.column == col && vertex.tile1.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
-                            case .wood: players[playerIndex].wood += 1
-                            case .wheat: players[playerIndex].wheat += 1
-                            case .stone: players[playerIndex].stone += 1
-                            case .sheep: players[playerIndex].sheep += 1
-                            case .brick: players[playerIndex].brick += 1
-                            case .gold: players[playerIndex].gold += 1
+                            case .wood: player.wood += 1; print("\(player.name) mined wood")
+                            case .wheat: player.wheat += 1; print("\(player.name) mined wheat")
+                            case .stone: player.stone += 1; print("\(player.name) mined stone")
+                            case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
+                            case .brick: player.brick += 1; print("\(player.name) mined brick")
+                            case .gold: player.gold += 1; print("\(player.name) mined gold")
                         }
                     }
                     if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile2!.type! {
-                            case .wood: players[playerIndex].wood += 1
-                            case .wheat: players[playerIndex].wheat += 1
-                            case .stone: players[playerIndex].stone += 1
-                            case .sheep: players[playerIndex].sheep += 1
-                            case .brick: players[playerIndex].brick += 1
-                            case .gold: players[playerIndex].gold += 1
+                            case .wood: player.wood += 1; print("\(player.name) mined wood")
+                            case .wheat: player.wheat += 1; print("\(player.name) mined wheat")
+                            case .stone: player.stone += 1; print("\(player.name) mined stone")
+                            case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
+                            case .brick: player.brick += 1; print("\(player.name) mined brick")
+                            case .gold: player.gold += 1; print("\(player.name) mined gold")
                         }
                     }
                     if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
-                            case .wood: players[playerIndex].wood += 1
-                            case .wheat: players[playerIndex].wheat += 1
-                            case .stone: players[playerIndex].stone += 1
-                            case .sheep: players[playerIndex].sheep += 1
-                            case .brick: players[playerIndex].brick += 1
-                            case .gold: players[playerIndex].gold += 1
+                            case .wood: player.wood += 1; print("\(player.name) mined wood")
+                            case .wheat: player.wheat += 1; print("\(player.name) mined wheat")
+                            case .stone: player.stone += 1; print("\(player.name) mined stone")
+                            case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
+                            case .brick: player.brick += 1; print("\(player.name) mined brick")
+                            case .gold: player.gold += 1; print("\(player.name) mined gold")
                         }
                     }
                 }
             }
         }
-        
-        self.playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
+        print(players[myPlayerIndex].getPlayerText())
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
     }
+    
 //
 //
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {

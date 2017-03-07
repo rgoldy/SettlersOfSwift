@@ -132,6 +132,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 scenePort.dice.redValue = redDie
                 scenePort.dice.yellowValue = yellowDie
                 scenePort.updateDice(red: redDie, yellow: yellowDie)
+                print ("Updated Dice")
             default:
                 print("Unknown message")
         }
