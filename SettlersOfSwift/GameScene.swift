@@ -511,6 +511,8 @@ class GameScene: SKScene {
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
+        distributeResourcesOnSetup(vertex: corner!)
+        
         let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
         
         // Send player info to other players
@@ -716,13 +718,89 @@ class GameScene: SKScene {
         }
     }
     
+    func distributeResourcesOnSetup(vertex: LandHexVertex)
+    {
+        // Distribute resources of type tile1.type
+        switch vertex.tile1.type! {
+            case .wood: players[myPlayerIndex].wood += 1
+            case .wheat: players[myPlayerIndex].wheat += 1
+            case .stone: players[myPlayerIndex].stone += 1
+            case .sheep: players[myPlayerIndex].sheep += 1
+            case .brick: players[myPlayerIndex].brick += 1
+            case .gold: players[myPlayerIndex].gold += 1
+        }
+        if (vertex.tile2 != nil) {
+            // Distribute resources of type tile1.type
+            switch vertex.tile2!.type! {
+            case .wood: players[myPlayerIndex].wood += 1
+            case .wheat: players[myPlayerIndex].wheat += 1
+            case .stone: players[myPlayerIndex].stone += 1
+            case .sheep: players[myPlayerIndex].sheep += 1
+            case .brick: players[myPlayerIndex].brick += 1
+            case .gold: players[myPlayerIndex].gold += 1
+            }
+        }
+        if (vertex.tile3 != nil) {
+            // Distribute resources of type tile1.type
+            switch vertex.tile3!.type! {
+            case .wood: players[myPlayerIndex].wood += 1
+            case .wheat: players[myPlayerIndex].wheat += 1
+            case .stone: players[myPlayerIndex].stone += 1
+            case .sheep: players[myPlayerIndex].sheep += 1
+            case .brick: players[myPlayerIndex].brick += 1
+            case .gold: players[myPlayerIndex].gold += 1
+            }
+        }
+        
+        sendPlayerData(player: myPlayerIndex)
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+    }
+    
+    // Encode's player's resources and sends to other players
+    func sendPlayerData(player: Int) {
+        var pData = "updatePlayerData.\(player),"
+        pData.append("\(players[player].wood),")
+        pData.append("\(players[player].wheat),")
+        pData.append("\(players[player].stone),")
+        pData.append("\(players[player].sheep),")
+        pData.append("\(players[player].brick),")
+        pData.append("\(players[player].gold)")
+        
+        let sent = appDelegate.networkManager.sendData(data: pData)
+        if (!sent) {
+            print ("Failed to send player data")
+        }
+
+    }
+    
+    // Decodes and sets resources of a specific player
+    func recievePlayerData(data: String) {
+        let playerData = data.components(separatedBy: ",")
+        let player = Int(playerData[0])!
+        let wood = Int(playerData[1])!
+        let wheat = Int(playerData[2])!
+        let stone = Int(playerData[3])!
+        let sheep = Int(playerData[4])!
+        let brick = Int(playerData[5])!
+        let gold = Int(playerData[6])!
+        
+        players[player].wood = wood
+        players[player].wheat = wheat
+        players[player].stone = stone
+        players[player].sheep = sheep
+        players[player].brick = brick
+        players[player].gold = gold
+    }
+    
 //
 //
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }
 //        targetLocation = touch.location(in: self)
 //    }
-//    
+//
 //    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }
 //        targetLocation = touch.location(in: self)
