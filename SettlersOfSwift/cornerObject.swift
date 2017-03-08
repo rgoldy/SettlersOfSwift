@@ -15,8 +15,10 @@ enum cornerType : String {
 class cornerObject {
     var name : String = ""
     var type : cornerType
+    var owner: Int
     
-    init (cornerType : cornerType) {
+    init (cornerType : cornerType, owner: Int) {
         type = cornerType
+        self.owner = owner
     }
 }

@@ -32,6 +32,7 @@ class GameScene: SKScene {
     var currentPlayer = 0
     var myPlayerIndex = -1
     let gameButton = UITextField()
+    let tradeButton = UITextField()
     let gameText = UITextField()
     let playerInfo = UITextField()
     let redDiceUI = UIImageView()
@@ -104,6 +105,15 @@ class GameScene: SKScene {
         gameButton.isUserInteractionEnabled = false
         gameButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(gameButton)
+        
+        tradeButton.frame = CGRect(x: 10, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        tradeButton.text = "Trade"
+        tradeButton.font = UIFont(name: "Arial", size: 13)
+        tradeButton.backgroundColor = UIColor(red: 1.0, green: 175/255, blue: 63/255, alpha: 1.0)
+        tradeButton.borderStyle = UITextBorderStyle.roundedRect
+        tradeButton.isUserInteractionEnabled = false
+        tradeButton.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(tradeButton)
         
         redDiceUI.frame = CGRect(x: 0, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
         redDiceUI.image = UIImage(named: "red1")
@@ -393,6 +403,18 @@ class GameScene: SKScene {
                         }
                     }
                 }
+                if (self.tradeButton.frame.contains(targetLocationView) && rolled) {
+                    presentTradeMenu()
+                }
+                if (buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
+                    print ("Settlement Built")
+                }
+                if (buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)) {
+                    print("Road Built")
+                }
+                if (upgradeSettlement(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
+                    print ("Settlement Upgraded")
+                }
             case .p2Turn :
                 if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
@@ -416,6 +438,18 @@ class GameScene: SKScene {
                         }
                     }
                 }
+                if (self.tradeButton.frame.contains(targetLocationView) && rolled) {
+                    presentTradeMenu()
+                }
+                if (buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
+                    print ("Settlement Built")
+                }
+                if (buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)) {
+                    print("Road Built")
+                }
+                if (upgradeSettlement(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
+                    print ("Settlement Upgraded")
+                }
             case .p3Turn :
                 if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
@@ -435,9 +469,25 @@ class GameScene: SKScene {
                         }
                     }
                 }
+                if (self.tradeButton.frame.contains(targetLocationView) && rolled) {
+                    presentTradeMenu()
+                }
+                if (buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
+                    print ("Settlement Built")
+                }
+                if (buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid: rolled)) {
+                    print("Road Built")
+                }
+                if (upgradeSettlement(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
+                    print ("Settlement Upgraded")
+                }
             default : break
             }
         }
+    }
+    
+    func presentTradeMenu() {
+        print("TRADE CLICKED")
     }
     
     //method to send message to other players and update the currentplayer
@@ -506,7 +556,7 @@ class GameScene: SKScene {
         if (corner?.cornerObject != nil) { return false }
         if (canPlaceCorner(corner: corner!) == false) { return false }
 
-        corner!.cornerObject = cornerObject(cornerType : type)
+        corner!.cornerObject = cornerObject(cornerType : type, owner: myPlayerIndex)
         players[currentPlayer].ownedCorners.append(corner!)
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -539,6 +589,160 @@ class GameScene: SKScene {
         return true
     }
     
+    func buildSettlement(column : Int, row : Int, valid: Bool) -> Bool {
+        if (!valid) { return false }
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        if (corner == nil) { return false}
+        if (corner?.cornerObject != nil) { return false }
+        if (!canPlaceCorner(corner: corner!)) { return false }
+        if (!hasResourcesForNewSettlement()) { return false }
+        
+        corner!.cornerObject = cornerObject(cornerType : .Settlement, owner: myPlayerIndex)
+        players[currentPlayer].ownedCorners.append(corner!)
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(cornerType.Settlement)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        
+        // Remove resources from hand
+        players[myPlayerIndex].wood -= 1
+        players[myPlayerIndex].brick -= 1
+        players[myPlayerIndex].sheep -= 1
+        players[myPlayerIndex].wheat -= 1
+        
+        // Send new resource amounts to other players
+        sendPlayerData(player: myPlayerIndex)
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
+        return true
+    }
+    
+    func buildRoad(column: Int, row: Int, type: edgeType, valid:Bool) -> Bool {
+        if (!valid) { return false }
+        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        if (edge == nil) { return false }
+        if (edge?.edgeObject != nil) { return false }
+        if (!canPlaceEdge(edge: edge!)) { return false }
+        if (!hasResourcesForNewRoad()) { return false }
+        
+        edge!.edgeObject = edgeObject(edgeType : type)
+        players[currentPlayer].ownedEdges.append(edge!)
+        let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currentPlayer].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
+        handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let edgeObjectInfo = "edgeData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: edgeObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        else {
+            print ("successful sync cornerObject")
+        }
+        
+        // Take resources from hand
+        players[myPlayerIndex].brick -= 1
+        players[myPlayerIndex].wood -= 1
+        
+        // Inform others of resource change
+        sendPlayerData(player: myPlayerIndex)
+        
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
+        return true
+    }
+    
+    func upgradeSettlement(column : Int, row : Int, valid:Bool) -> Bool {
+        if (!valid) { return false }
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        if (corner == nil) { return false}
+        if (corner?.cornerObject == nil) { return false }
+        if (corner?.cornerObject?.owner != myPlayerIndex) { return false }
+        if (!hasResourcesToUpgradeSettlement()) { return false }
+        
+        corner?.cornerObject?.type = .City
+        
+        // Subtract resources
+        players[myPlayerIndex].stone -= 3
+        players[myPlayerIndex].wheat -= 2
+        
+        // Inform other players of resource change
+        sendPlayerData(player: myPlayerIndex)
+        
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City.rawValue)"
+        
+        // Send object info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        else {
+            print ("successful sync cornerObject")
+        }
+
+        return true
+    }
+    
+    func hasResourcesForNewSettlement() -> Bool {
+        var numSettlements = 0
+        for corner in players[myPlayerIndex].ownedCorners {
+            if (corner.cornerObject?.type == .Settlement) {
+                numSettlements += 1
+            }
+        }
+        if (numSettlements == 5) { return false }
+        let p = players[myPlayerIndex]
+        if (p.wood > 0 && p.brick > 0 && p.sheep > 0 && p.wheat > 0) {
+            return true
+        }
+        return false
+    }
+    
+    func hasResourcesForNewRoad() -> Bool {
+        if (players[myPlayerIndex].ownedEdges.count == 15) {return false }
+        if (players[myPlayerIndex].wood > 0 && players[myPlayerIndex].brick > 0) {
+            return true
+        }
+        return false
+    }
+    
+    func hasResourcesToUpgradeSettlement() -> Bool {
+        var numCities = 0
+        for corner in players[myPlayerIndex].ownedCorners {
+            if (corner.cornerObject?.type == .City) {
+                numCities += 1
+            }
+        }
+        if (numCities == 4) { return false }
+        if (players[myPlayerIndex].stone > 2 && players[myPlayerIndex].wheat > 1) {
+            return true
+        }
+        return false
+    }
+    
+    func hasResourcesToPurchaseDevCard() -> Bool {
+        let p = players[myPlayerIndex]
+        if (p.stone > 0 && p.wheat > 0 && p.sheep > 0) {
+            return true
+        }
+        return false
+    }
+    
     //function that will read a recieved message and set the corner object
     func setCornerObjectFromMessage(info:String) {
         let cornerInfo = info.components(separatedBy: ",")
@@ -547,7 +751,7 @@ class GameScene: SKScene {
         let row = Int(cornerInfo[2])!
         let type = cornerType(rawValue: cornerInfo[3])
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
-        corner?.cornerObject = cornerObject(cornerType : type!)
+        corner?.cornerObject = cornerObject(cornerType : type!, owner: currPlayerNumber)
         players[currPlayerNumber].ownedCorners.append(corner!)
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
