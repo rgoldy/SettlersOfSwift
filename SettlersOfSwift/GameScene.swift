@@ -33,11 +33,31 @@ class GameScene: SKScene {
     var myPlayerIndex = -1
     let gameButton = UITextField()
     let tradeButton = UITextField()
+    let buildUpgradeButton = UITextField()
+    let buildRoadButton = UITextField()
     let gameText = UITextField()
     let playerInfo = UITextField()
     let redDiceUI = UIImageView()
     let yellowDiceUI = UIImageView()
     var rolled : Bool = false
+    var buildSettlement : Bool = false
+    var buildRoad : Bool = false
+    
+    let tradeBackground = UITextField()
+    let lWood = UITextField()
+    let lSheep = UITextField()
+    let lWheat = UITextField()
+    let lBrick = UITextField()
+    let lStone = UITextField()
+    let lGold = UITextField()
+    let rWood = UITextField()
+    let rSheep = UITextField()
+    let rWheat = UITextField()
+    let rBrick = UITextField()
+    let rStone = UITextField()
+    var tradeOpen : Bool = false
+    var leftTradeItem : hexType?
+    var rightTradeItem : hexType?
     
     //init tile handler
     var handler : tileHandler!
@@ -105,6 +125,24 @@ class GameScene: SKScene {
         gameButton.isUserInteractionEnabled = false
         gameButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(gameButton)
+        
+        buildUpgradeButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5 - self.view!.bounds.width/10, y: self.view!.bounds.height/14.5 + self.view!.bounds.height/13.5 , width: self.view!.bounds.width/5, height: self.view!.bounds.height/14)
+        buildUpgradeButton.text = "Build/Upgrade Settlement"
+        buildUpgradeButton.font = UIFont(name: "Arial", size: 10)
+        buildUpgradeButton.backgroundColor = UIColor.gray
+        buildUpgradeButton.borderStyle = UITextBorderStyle.roundedRect
+        buildUpgradeButton.isUserInteractionEnabled = false
+        buildUpgradeButton.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(buildUpgradeButton)
+        
+        buildRoadButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        buildRoadButton.text = "Build Road"
+        buildRoadButton.font = UIFont(name: "Arial", size: 10)
+        buildRoadButton.backgroundColor = UIColor.gray
+        buildRoadButton.borderStyle = UITextBorderStyle.roundedRect
+        buildRoadButton.isUserInteractionEnabled = false
+        buildRoadButton.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(buildRoadButton)
         
         tradeButton.frame = CGRect(x: 10, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
         tradeButton.text = "Trade"
@@ -275,7 +313,9 @@ class GameScene: SKScene {
             print ("successful sync player info")
         }
         
-        self.playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players.first(where: {$0.name == self.appDelegate.networkManager.getName()})?.getPlayerText()
+        }
         currGamePhase = GamePhase.placeFirstSettlement
         gameText.text = "Place First Settlement"
         gameText.isHidden = false
@@ -297,7 +337,9 @@ class GameScene: SKScene {
             }
         }
         
-        self.playerInfo.text = players.first(where: {$0.name == appDelegate.networkManager.getName()})?.getPlayerText()
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players.first(where: {$0.name == self.appDelegate.networkManager.getName()})?.getPlayerText()
+        }
         currGamePhase = GamePhase.placeFirstSettlement
         gameText.text = "Place First Settlement"
     }
@@ -403,18 +445,8 @@ class GameScene: SKScene {
                         }
                     }
                 }
-                if (self.tradeButton.frame.contains(targetLocationView) && rolled) {
-                    presentTradeMenu()
-                }
-                if (buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
-                    print ("Settlement Built")
-                }
-                if (buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)) {
-                    print("Road Built")
-                }
-                if (upgradeSettlement(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
-                    print ("Settlement Upgraded")
-                }
+                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
+
             case .p2Turn :
                 if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
@@ -438,18 +470,8 @@ class GameScene: SKScene {
                         }
                     }
                 }
-                if (self.tradeButton.frame.contains(targetLocationView) && rolled) {
-                    presentTradeMenu()
-                }
-                if (buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
-                    print ("Settlement Built")
-                }
-                if (buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)) {
-                    print("Road Built")
-                }
-                if (upgradeSettlement(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
-                    print ("Settlement Upgraded")
-                }
+                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
+
             case .p3Turn :
                 if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
@@ -469,25 +491,318 @@ class GameScene: SKScene {
                         }
                     }
                 }
-                if (self.tradeButton.frame.contains(targetLocationView) && rolled) {
-                    presentTradeMenu()
-                }
-                if (buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
-                    print ("Settlement Built")
-                }
-                if (buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid: rolled)) {
-                    print("Road Built")
-                }
-                if (upgradeSettlement(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), valid:rolled)) {
-                    print ("Settlement Upgraded")
-                }
+                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
+                
             default : break
             }
         }
     }
     
+    func handleButtonTouches(targetLocationView: CGPoint, targetLocation: CGPoint) {
+        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement) {
+            if (tradeOpen) {
+                closeTradeMenu()
+            } else {
+                presentTradeMenu()
+            }
+        }
+        if(tradeOpen) {
+            tradeMenuTouches(target: targetLocationView)
+        }
+        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad) {
+            if(buildSettlement) {
+                buildSettlement = false
+                DispatchQueue.main.async {
+                    self.buildUpgradeButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                buildSettlement = true
+                DispatchQueue.main.async {
+                    self.buildUpgradeButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
+        }
+        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement
+            ) {
+            if (buildRoad) {
+                buildRoad = false
+                DispatchQueue.main.async {
+                    self.buildRoadButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                buildRoad = true
+                DispatchQueue.main.async {
+                    self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
+        }
+        if (buildSettlement) {
+            let settlementBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+            
+            if (settlementBuilt) {
+                print ("Settlement Built")
+                buildSettlement = false
+                DispatchQueue.main.async {
+                    self.buildUpgradeButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                let settlementUpgraded = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                if (settlementUpgraded) {
+                    print ("Settlement Upgraded")
+                    buildSettlement = false
+                    DispatchQueue.main.async {
+                        self.buildUpgradeButton.backgroundColor = UIColor.gray
+                    }
+                }
+            }
+        }
+        if (buildRoad) {
+            let roadBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
+            if (roadBuilt) {
+                print("Road Built")
+                buildRoad = false
+                DispatchQueue.main.async {
+                    self.buildRoadButton.backgroundColor = UIColor.gray
+                }
+            }
+        }
+    }
+    
+    //funciton that inits the trade menu
     func presentTradeMenu() {
-        print("TRADE CLICKED")
+        tradeOpen = true
+        
+        tradeBackground.frame = CGRect(x: self.view!.bounds.width * 0.3, y: self.view!.bounds.height/4, width: self.view!.bounds.width/2.5, height: self.view!.bounds.height/2)
+        tradeBackground.backgroundColor = UIColor.lightGray
+        tradeBackground.borderStyle = UITextBorderStyle.roundedRect
+        tradeBackground.isUserInteractionEnabled = false
+        tradeBackground.textAlignment = NSTextAlignment.center
+        tradeBackground.text = "Maritime Trade"
+        tradeBackground.font = UIFont(name: "Arial", size: 13)
+        self.view?.addSubview(tradeBackground)
+        
+        lWood.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        lWood.text = "Wood"
+        lWood.font = UIFont(name: "Arial", size: 13)
+        lWood.backgroundColor = UIColor.gray
+        lWood.borderStyle = UITextBorderStyle.roundedRect
+        lWood.isUserInteractionEnabled = false
+        lWood.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(lWood)
+        
+        lSheep.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        lSheep.text = "Sheep"
+        lSheep.font = UIFont(name: "Arial", size: 13)
+        lSheep.backgroundColor = UIColor.gray
+        lSheep.borderStyle = UITextBorderStyle.roundedRect
+        lSheep.isUserInteractionEnabled = false
+        lSheep.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(lSheep)
+        
+        lWheat.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        lWheat.text = "Wheat"
+        lWheat.font = UIFont(name: "Arial", size: 13)
+        lWheat.backgroundColor = UIColor.gray
+        lWheat.borderStyle = UITextBorderStyle.roundedRect
+        lWheat.isUserInteractionEnabled = false
+        lWheat.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(lWheat)
+        
+        lBrick.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        lBrick.text = "Brick"
+        lBrick.font = UIFont(name: "Arial", size: 13)
+        lBrick.backgroundColor = UIColor.gray
+        lBrick.borderStyle = UITextBorderStyle.roundedRect
+        lBrick.isUserInteractionEnabled = false
+        lBrick.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(lBrick)
+        
+        lStone.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 + (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        lStone.text = "Stone"
+        lStone.font = UIFont(name: "Arial", size: 13)
+        lStone.backgroundColor = UIColor.gray
+        lStone.borderStyle = UITextBorderStyle.roundedRect
+        lStone.isUserInteractionEnabled = false
+        lStone.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(lStone)
+        
+        lGold.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 + (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        lGold.text = "Gold"
+        lGold.font = UIFont(name: "Arial", size: 13)
+        lGold.backgroundColor = UIColor.gray
+        lGold.borderStyle = UITextBorderStyle.roundedRect
+        lGold.isUserInteractionEnabled = false
+        lGold.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(lGold)
+        
+        rWood.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        rWood.text = "Wood"
+        rWood.font = UIFont(name: "Arial", size: 13)
+        rWood.backgroundColor = UIColor.gray
+        rWood.borderStyle = UITextBorderStyle.roundedRect
+        rWood.isUserInteractionEnabled = false
+        rWood.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(rWood)
+        
+        rSheep.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        rSheep.text = "Sheep"
+        rSheep.font = UIFont(name: "Arial", size: 13)
+        rSheep.backgroundColor = UIColor.gray
+        rSheep.borderStyle = UITextBorderStyle.roundedRect
+        rSheep.isUserInteractionEnabled = false
+        rSheep.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(rSheep)
+        
+        rWheat.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        rWheat.text = "Wheat"
+        rWheat.font = UIFont(name: "Arial", size: 13)
+        rWheat.backgroundColor = UIColor.gray
+        rWheat.borderStyle = UITextBorderStyle.roundedRect
+        rWheat.isUserInteractionEnabled = false
+        rWheat.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(rWheat)
+        
+        rBrick.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        rBrick.text = "Brick"
+        rBrick.font = UIFont(name: "Arial", size: 13)
+        rBrick.backgroundColor = UIColor.gray
+        rBrick.borderStyle = UITextBorderStyle.roundedRect
+        rBrick.isUserInteractionEnabled = false
+        rBrick.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(rBrick)
+        
+        rStone.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 + (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        rStone.text = "Stone"
+        rStone.font = UIFont(name: "Arial", size: 13)
+        rStone.backgroundColor = UIColor.gray
+        rStone.borderStyle = UITextBorderStyle.roundedRect
+        rStone.isUserInteractionEnabled = false
+        rStone.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(rStone)
+    }
+    
+    //function that removes all trademenu ui elements
+    func closeTradeMenu() {
+        tradeOpen = false
+        lWood.removeFromSuperview()
+        lSheep.removeFromSuperview()
+        lWheat.removeFromSuperview()
+        lBrick.removeFromSuperview()
+        lStone.removeFromSuperview()
+        lGold.removeFromSuperview()
+        rWood.removeFromSuperview()
+        rSheep.removeFromSuperview()
+        rWheat.removeFromSuperview()
+        rBrick.removeFromSuperview()
+        rStone.removeFromSuperview()
+        tradeBackground.removeFromSuperview()
+    }
+    
+    //function that will handle touches when trade menu is open
+    func tradeMenuTouches(target : CGPoint) {
+        
+        if (leftTradeItem == nil) {
+            if (self.lWood.frame.contains(target) && players[myPlayerIndex].wood >= 4) {
+                DispatchQueue.main.async {
+                    self.lWood.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                leftTradeItem = hexType.wood
+            }
+            if (self.lSheep.frame.contains(target) && players[myPlayerIndex].sheep >= 4) {
+                DispatchQueue.main.async {
+                    self.lSheep.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                leftTradeItem = hexType.sheep
+            }
+            if (self.lBrick.frame.contains(target) && players[myPlayerIndex].brick >= 4) {
+                DispatchQueue.main.async {
+                    self.lBrick.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                leftTradeItem = hexType.brick
+            }
+            if (self.lStone.frame.contains(target) && players[myPlayerIndex].stone >= 4) {
+                DispatchQueue.main.async {
+                    self.lStone.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                leftTradeItem = hexType.stone
+            }
+            if (self.lWheat.frame.contains(target) && players[myPlayerIndex].wheat >= 4) {
+                DispatchQueue.main.async {
+                    self.lWheat.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                leftTradeItem = hexType.wheat
+            }
+            if (self.lGold.frame.contains(target) && players[myPlayerIndex].gold >= 2) {
+                DispatchQueue.main.async {
+                    self.lGold.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                leftTradeItem = hexType.gold
+            }
+        }
+        
+        if (rightTradeItem == nil) {
+            if (self.rWood.frame.contains(target)) {
+                DispatchQueue.main.async {
+                    self.rWood.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                rightTradeItem = hexType.wood
+            }
+            if (self.rSheep.frame.contains(target)) {
+                DispatchQueue.main.async {
+                    self.rSheep.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                rightTradeItem = hexType.sheep
+            }
+            if (self.rBrick.frame.contains(target)) {
+                DispatchQueue.main.async {
+                    self.rBrick.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                rightTradeItem = hexType.brick
+            }
+            if (self.rStone.frame.contains(target)) {
+                DispatchQueue.main.async {
+                    self.rStone.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                rightTradeItem = hexType.stone
+            }
+            if (self.rWheat.frame.contains(target)) {
+                DispatchQueue.main.async {
+                    self.rWheat.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+                rightTradeItem = hexType.wheat
+            }
+        }
+        
+        
+        if (leftTradeItem != nil && rightTradeItem != nil) {
+            switch leftTradeItem! {
+            case .wood : players[myPlayerIndex].wood -= 4
+            case .wheat : players[myPlayerIndex].wheat -= 4
+            case .brick : players[myPlayerIndex].brick -= 4
+            case .stone : players[myPlayerIndex].stone -= 4
+            case .sheep : players[myPlayerIndex].sheep -= 4
+            case .gold : players[myPlayerIndex].gold -= 2
+            }
+            
+            switch rightTradeItem! {
+            case .wood : players[myPlayerIndex].wood += 1
+            case .wheat : players[myPlayerIndex].wheat += 1
+            case .brick : players[myPlayerIndex].brick += 1
+            case .stone : players[myPlayerIndex].stone += 1
+            case .sheep : players[myPlayerIndex].sheep += 1
+            default : break
+            }
+            
+            leftTradeItem = nil
+            rightTradeItem = nil
+            
+            sendPlayerData(player: myPlayerIndex)
+            DispatchQueue.main.async {
+                self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+            }
+            
+            closeTradeMenu()
+        }
     }
     
     //method to send message to other players and update the currentplayer
@@ -597,6 +912,15 @@ class GameScene: SKScene {
         if (!canPlaceCorner(corner: corner!)) { return false }
         if (!hasResourcesForNewSettlement()) { return false }
         
+        var nextToRoad : Bool = false
+        for edge in corner!.neighbourEdges {
+            if (edge?.edgeObject?.owner == myPlayerIndex) {
+                nextToRoad = true
+                break
+            }
+        }
+        if (!nextToRoad) { return false }
+        
         corner!.cornerObject = cornerObject(cornerType : .Settlement, owner: myPlayerIndex)
         players[currentPlayer].ownedCorners.append(corner!)
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
@@ -633,7 +957,7 @@ class GameScene: SKScene {
         if (!canPlaceEdge(edge: edge!)) { return false }
         if (!hasResourcesForNewRoad()) { return false }
         
-        edge!.edgeObject = edgeObject(edgeType : type)
+        edge!.edgeObject = edgeObject(edgeType : type, owner : myPlayerIndex)
         players[currentPlayer].ownedEdges.append(edge!)
         let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currentPlayer].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
         handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -668,6 +992,7 @@ class GameScene: SKScene {
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false}
         if (corner?.cornerObject == nil) { return false }
+        if (corner?.cornerObject!.type == cornerType.City) { return false }
         if (corner?.cornerObject?.owner != myPlayerIndex) { return false }
         if (!hasResourcesToUpgradeSettlement()) { return false }
         
@@ -676,6 +1001,9 @@ class GameScene: SKScene {
         // Subtract resources
         players[myPlayerIndex].stone -= 3
         players[myPlayerIndex].wheat -= 2
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
         // Inform other players of resource change
         sendPlayerData(player: myPlayerIndex)
@@ -764,7 +1092,7 @@ class GameScene: SKScene {
         if (edge?.edgeObject != nil) { return false }
         if (canPlaceEdge(edge: edge!) == false) { return false }
         
-        edge!.edgeObject = edgeObject(edgeType : type)
+        edge!.edgeObject = edgeObject(edgeType : type, owner : myPlayerIndex)
         players[currentPlayer].ownedEdges.append(edge!)
         let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currentPlayer].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
         handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -839,7 +1167,7 @@ class GameScene: SKScene {
         let row = Int(edgeInfo[2])!
         let type = edgeType(rawValue: edgeInfo[3])
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
-        edge?.edgeObject = edgeObject(edgeType : type!)
+        edge?.edgeObject = edgeObject(edgeType : type!, owner : currPlayerNumber)
         players[currPlayerNumber].ownedEdges.append(edge!)
         let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currPlayerNumber].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
         handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -878,41 +1206,47 @@ class GameScene: SKScene {
     // function that will distribute resources to all players
     func distributeResources(dice: Int) {
         print ("Dice = \(dice)")
+        var numberResources : Int = 0
         let producingCoords = handler.landHexDictionary[dice]
         for (col, row) in producingCoords! {
             for player in players { // for each player...
                 for vertex in player.ownedCorners { // distribute resources if vertex touches hex
+                    if (vertex.cornerObject?.type == cornerType.City) {
+                        numberResources = 2
+                    } else {
+                        numberResources = 1
+                    }
                     if (vertex.tile1.column == col && vertex.tile1.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
-                            case .wood: player.wood += 1; print("\(player.name) mined wood")
-                            case .wheat: player.wheat += 1; print("\(player.name) mined wheat")
-                            case .stone: player.stone += 1; print("\(player.name) mined stone")
-                            case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
-                            case .brick: player.brick += 1; print("\(player.name) mined brick")
-                            case .gold: player.gold += 2; print("\(player.name) mined gold")
+                            case .wood: player.wood += numberResources; print("\(player.name) mined wood")
+                            case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                            case .stone: player.stone += numberResources; print("\(player.name) mined stone")
+                            case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
+                            case .brick: player.brick += numberResources; print("\(player.name) mined brick")
+                            case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
                         }
                     }
                     if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile2!.type! {
-                            case .wood: player.wood += 1; print("\(player.name) mined wood")
-                            case .wheat: player.wheat += 1; print("\(player.name) mined wheat")
-                            case .stone: player.stone += 1; print("\(player.name) mined stone")
-                            case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
-                            case .brick: player.brick += 1; print("\(player.name) mined brick")
-                            case .gold: player.gold += 2; print("\(player.name) mined gold")
+                        case .wood: player.wood += numberResources; print("\(player.name) mined wood")
+                        case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                        case .stone: player.stone += numberResources; print("\(player.name) mined stone")
+                        case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
+                        case .brick: player.brick += numberResources; print("\(player.name) mined brick")
+                        case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
                         }
                     }
                     if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
-                            case .wood: player.wood += 1; print("\(player.name) mined wood")
-                            case .wheat: player.wheat += 1; print("\(player.name) mined wheat")
-                            case .stone: player.stone += 1; print("\(player.name) mined stone")
-                            case .sheep: player.sheep += 1; print("\(player.name) mined sheep")
-                            case .brick: player.brick += 1; print("\(player.name) mined brick")
-                            case .gold: player.gold += 2; print("\(player.name) mined gold")
+                        case .wood: player.wood += numberResources; print("\(player.name) mined wood")
+                        case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                        case .stone: player.stone += numberResources; print("\(player.name) mined stone")
+                        case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
+                        case .brick: player.brick += numberResources; print("\(player.name) mined brick")
+                        case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
                         }
                     }
                 }

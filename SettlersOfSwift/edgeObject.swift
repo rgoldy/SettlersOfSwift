@@ -15,8 +15,10 @@ enum edgeType : String {
 class edgeObject {
     var name : String = ""
     var type : edgeType
-
-    init (edgeType : edgeType) {
+    var owner : Int
+    
+    init (edgeType : edgeType, owner : Int) {
         type = edgeType
+        self.owner = owner
     }
 }
