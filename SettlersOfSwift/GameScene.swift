@@ -144,7 +144,7 @@ class GameScene: SKScene {
         buildRoadButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(buildRoadButton)
         
-        tradeButton.frame = CGRect(x: 10, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        tradeButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
         tradeButton.text = "Trade"
         tradeButton.font = UIFont(name: "Arial", size: 13)
         tradeButton.backgroundColor = UIColor(red: 1.0, green: 175/255, blue: 63/255, alpha: 1.0)
@@ -153,11 +153,11 @@ class GameScene: SKScene {
         tradeButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(tradeButton)
         
-        redDiceUI.frame = CGRect(x: 0, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
+        redDiceUI.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
         redDiceUI.image = UIImage(named: "red1")
         self.view?.addSubview(redDiceUI)
         
-        yellowDiceUI.frame = CGRect(x: self.view!.bounds.width/11, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
+        yellowDiceUI.frame = CGRect(x: self.view!.bounds.width/11 + self.view!.bounds.width * 0.025, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
         yellowDiceUI.image = UIImage(named: "yellow1")
         self.view?.addSubview(yellowDiceUI)
     }
@@ -409,7 +409,7 @@ class GameScene: SKScene {
                     }
                 }
             case .placeSecondSettlement :
-                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement, setup:true)) {
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.City, setup:true)) {
                     currGamePhase = GamePhase.placeSecondRoad
                     gameText.text = "Place Second Road"
                 }
@@ -1262,33 +1262,33 @@ class GameScene: SKScene {
     {
         // Distribute resources of type tile1.type
         switch vertex.tile1.type! {
-            case .wood: players[myPlayerIndex].wood += 1
-            case .wheat: players[myPlayerIndex].wheat += 1
-            case .stone: players[myPlayerIndex].stone += 1
-            case .sheep: players[myPlayerIndex].sheep += 1
-            case .brick: players[myPlayerIndex].brick += 1
-            case .gold: players[myPlayerIndex].gold += 2
+            case .wood: players[myPlayerIndex].wood += 2
+            case .wheat: players[myPlayerIndex].wheat += 2
+            case .stone: players[myPlayerIndex].stone += 2
+            case .sheep: players[myPlayerIndex].sheep += 2
+            case .brick: players[myPlayerIndex].brick += 2
+            case .gold: players[myPlayerIndex].gold += 4
         }
         if (vertex.tile2 != nil) {
             // Distribute resources of type tile1.type
             switch vertex.tile2!.type! {
-            case .wood: players[myPlayerIndex].wood += 1
-            case .wheat: players[myPlayerIndex].wheat += 1
-            case .stone: players[myPlayerIndex].stone += 1
-            case .sheep: players[myPlayerIndex].sheep += 1
-            case .brick: players[myPlayerIndex].brick += 1
-            case .gold: players[myPlayerIndex].gold += 2
+            case .wood: players[myPlayerIndex].wood += 2
+            case .wheat: players[myPlayerIndex].wheat += 2
+            case .stone: players[myPlayerIndex].stone += 2
+            case .sheep: players[myPlayerIndex].sheep += 2
+            case .brick: players[myPlayerIndex].brick += 2
+            case .gold: players[myPlayerIndex].gold += 4
             }
         }
         if (vertex.tile3 != nil) {
             // Distribute resources of type tile1.type
             switch vertex.tile3!.type! {
-            case .wood: players[myPlayerIndex].wood += 1
-            case .wheat: players[myPlayerIndex].wheat += 1
-            case .stone: players[myPlayerIndex].stone += 1
-            case .sheep: players[myPlayerIndex].sheep += 1
-            case .brick: players[myPlayerIndex].brick += 1
-            case .gold: players[myPlayerIndex].gold += 2
+            case .wood: players[myPlayerIndex].wood += 2
+            case .wheat: players[myPlayerIndex].wheat += 2
+            case .stone: players[myPlayerIndex].stone += 2
+            case .sheep: players[myPlayerIndex].sheep += 2
+            case .brick: players[myPlayerIndex].brick += 2
+            case .gold: players[myPlayerIndex].gold += 4
             }
         }
         
