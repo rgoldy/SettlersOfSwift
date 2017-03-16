@@ -35,6 +35,7 @@ class GameScene: SKScene {
     let tradeButton = UITextField()
     let buildUpgradeButton = UITextField()
     let buildRoadButton = UITextField()
+    let buildShipButton = UITextField()
     let gameText = UITextField()
     let playerInfo = UITextField()
     let redDiceUI = UIImageView()
@@ -42,6 +43,7 @@ class GameScene: SKScene {
     var rolled : Bool = false
     var buildSettlement : Bool = false
     var buildRoad : Bool = false
+    var buildShip: Bool = false
     
     let tradeBackground = UITextField()
     let lWood = UITextField()
@@ -143,6 +145,15 @@ class GameScene: SKScene {
         buildRoadButton.isUserInteractionEnabled = false
         buildRoadButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(buildRoadButton)
+        
+        buildShipButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        buildShipButton.text = "Build Ship"
+        buildShipButton.font = UIFont(name: "Arial", size: 10)
+        buildShipButton.backgroundColor = UIColor.gray
+        buildShipButton.borderStyle = UITextBorderStyle.roundedRect
+        buildShipButton.isUserInteractionEnabled = false
+        buildShipButton.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(buildShipButton)
         
         tradeButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
         tradeButton.text = "Trade"
@@ -499,7 +510,7 @@ class GameScene: SKScene {
     }
     
     func handleButtonTouches(targetLocationView: CGPoint, targetLocation: CGPoint) {
-        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement) {
+        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
             if (tradeOpen) {
                 closeTradeMenu()
             } else {
@@ -509,7 +520,7 @@ class GameScene: SKScene {
         if(tradeOpen) {
             tradeMenuTouches(target: targetLocationView)
         }
-        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad) {
+        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad && !buildShip) {
             if(buildSettlement) {
                 buildSettlement = false
                 DispatchQueue.main.async {
@@ -522,7 +533,7 @@ class GameScene: SKScene {
                 }
             }
         }
-        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement
+        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement && !buildShip
             ) {
             if (buildRoad) {
                 buildRoad = false
@@ -533,6 +544,20 @@ class GameScene: SKScene {
                 buildRoad = true
                 DispatchQueue.main.async {
                     self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
+        }
+        if (self.buildShipButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewShip() && !tradeOpen && !buildSettlement && !buildRoad
+            ) {
+            if (buildShip) {
+                buildShip = false
+                DispatchQueue.main.async {
+                    self.buildShipButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                buildShip = true
+                DispatchQueue.main.async {
+                    self.buildShipButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
                 }
             }
         }
@@ -563,6 +588,16 @@ class GameScene: SKScene {
                 buildRoad = false
                 DispatchQueue.main.async {
                     self.buildRoadButton.backgroundColor = UIColor.gray
+                }
+            }
+        }
+        if (buildShip) {
+            let shipBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
+            if (shipBuilt) {
+                print("Ship Built")
+                buildShip = false
+                DispatchQueue.main.async {
+                    self.buildShipButton.backgroundColor = UIColor.gray
                 }
             }
         }
@@ -953,6 +988,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
         if (edge == nil) { return false }
+        if (edge?.tile1 == nil && edge?.tile2 == nil) { return false }
         if (edge?.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
         if (!hasResourcesForNewRoad()) { return false }
@@ -975,6 +1011,45 @@ class GameScene: SKScene {
         
         // Take resources from hand
         players[myPlayerIndex].brick -= 1
+        players[myPlayerIndex].wood -= 1
+        
+        // Inform others of resource change
+        sendPlayerData(player: myPlayerIndex)
+        
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
+        return true
+    }
+    
+    func buildShip(column: Int, row: Int, type: edgeType, valid:Bool) -> Bool {
+        if (!valid) { return false }
+        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        if (edge == nil) { return false }
+        if (edge?.tile1 != nil && edge?.tile2 != nil) { return false }
+        if (edge?.edgeObject != nil) { return false }
+        if (!canPlaceEdge(edge: edge!)) { return false }
+        if (!hasResourcesForNewShip()) { return false }
+        
+        edge!.edgeObject = edgeObject(edgeType : type, owner : myPlayerIndex)
+        players[currentPlayer].ownedEdges.append(edge!)
+        let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currentPlayer].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
+        handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let edgeObjectInfo = "edgeData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: edgeObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        else {
+            print ("successful sync cornerObject")
+        }
+        
+        // Take resources from hand
+        players[myPlayerIndex].sheep -= 1
         players[myPlayerIndex].wood -= 1
         
         // Inform others of resource change
@@ -1049,6 +1124,14 @@ class GameScene: SKScene {
         return false
     }
     
+    func hasResourcesForNewShip() -> Bool {
+        if (players[myPlayerIndex].ownedEdges.count == 15) {return false}
+        if (players[myPlayerIndex].wood > 0 && players[myPlayerIndex].sheep > 0) {
+            return true
+        }
+        return false
+    }
+    
     func hasResourcesToUpgradeSettlement() -> Bool {
         var numCities = 0
         for corner in players[myPlayerIndex].ownedCorners {
@@ -1058,14 +1141,6 @@ class GameScene: SKScene {
         }
         if (numCities == 4) { return false }
         if (players[myPlayerIndex].stone > 2 && players[myPlayerIndex].wheat > 1) {
-            return true
-        }
-        return false
-    }
-    
-    func hasResourcesToPurchaseDevCard() -> Bool {
-        let p = players[myPlayerIndex]
-        if (p.stone > 0 && p.wheat > 0 && p.sheep > 0) {
             return true
         }
         return false
@@ -1262,33 +1337,33 @@ class GameScene: SKScene {
     {
         // Distribute resources of type tile1.type
         switch vertex.tile1.type! {
-            case .wood: players[myPlayerIndex].wood += 2
-            case .wheat: players[myPlayerIndex].wheat += 2
-            case .stone: players[myPlayerIndex].stone += 2
-            case .sheep: players[myPlayerIndex].sheep += 2
-            case .brick: players[myPlayerIndex].brick += 2
-            case .gold: players[myPlayerIndex].gold += 4
+            case .wood: players[myPlayerIndex].wood += 1
+            case .wheat: players[myPlayerIndex].wheat += 1
+            case .stone: players[myPlayerIndex].stone += 1
+            case .sheep: players[myPlayerIndex].sheep += 1
+            case .brick: players[myPlayerIndex].brick += 1
+            case .gold: players[myPlayerIndex].gold += 2
         }
         if (vertex.tile2 != nil) {
             // Distribute resources of type tile1.type
             switch vertex.tile2!.type! {
-            case .wood: players[myPlayerIndex].wood += 2
-            case .wheat: players[myPlayerIndex].wheat += 2
-            case .stone: players[myPlayerIndex].stone += 2
-            case .sheep: players[myPlayerIndex].sheep += 2
-            case .brick: players[myPlayerIndex].brick += 2
-            case .gold: players[myPlayerIndex].gold += 4
+            case .wood: players[myPlayerIndex].wood += 1
+            case .wheat: players[myPlayerIndex].wheat += 1
+            case .stone: players[myPlayerIndex].stone += 1
+            case .sheep: players[myPlayerIndex].sheep += 1
+            case .brick: players[myPlayerIndex].brick += 1
+            case .gold: players[myPlayerIndex].gold += 2
             }
         }
         if (vertex.tile3 != nil) {
             // Distribute resources of type tile1.type
             switch vertex.tile3!.type! {
-            case .wood: players[myPlayerIndex].wood += 2
-            case .wheat: players[myPlayerIndex].wheat += 2
-            case .stone: players[myPlayerIndex].stone += 2
-            case .sheep: players[myPlayerIndex].sheep += 2
-            case .brick: players[myPlayerIndex].brick += 2
-            case .gold: players[myPlayerIndex].gold += 4
+            case .wood: players[myPlayerIndex].wood += 1
+            case .wheat: players[myPlayerIndex].wheat += 1
+            case .stone: players[myPlayerIndex].stone += 1
+            case .sheep: players[myPlayerIndex].sheep += 1
+            case .brick: players[myPlayerIndex].brick += 1
+            case .gold: players[myPlayerIndex].gold += 2
             }
         }
         
