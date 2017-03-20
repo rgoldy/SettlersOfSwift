@@ -355,254 +355,6 @@ class GameScene: SKScene {
         gameText.text = "Place First Settlement"
     }
     
-    //function to handle pan gestures for camera movement
-    func handlePanFrom(recognizer: UIPanGestureRecognizer) {
-        if recognizer.state != .changed {
-            return
-        }
-        
-        //get translation amount
-        let translation = recognizer.translation(in: recognizer.view!)
-        
-        //move cam
-        cam.position.x -= translation.x
-        cam.position.y += translation.y
-        
-        //reset tranlation
-        recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
-    }
-    
-    //function to handle pinch gestures for camera scaling
-    func handlePinch(recognizer : UIPinchGestureRecognizer) {
-        if recognizer.state != .changed {
-            return
-        }
-        
-        //scale cam
-        cam.xScale *= 1/recognizer.scale
-        cam.yScale *= 1/recognizer.scale
-        
-        //clamp cam
-        if (cam.xScale > 0.9) {cam.xScale = 0.9}
-        if (cam.xScale < 0.35) {cam.xScale = 0.35}
-        if (cam.yScale > 0.9) {cam.yScale = 0.9}
-        if (cam.yScale < 0.35) {cam.yScale = 0.35}
-        
-        //reset scale
-        recognizer.scale = 1
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        if (touches.count > 1) { return }
-        let targetLocation = touch.location(in: self)
-        let targetLocationView = touch.location(in: self.view!)
-        print (currGamePhase)
-        
-        if(currentPlayer == myPlayerIndex) { //only accept taps if it's your turn
-            switch currGamePhase {
-            case .placeFirstSettlement :
-                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement, setup:false)) {
-                    currGamePhase = GamePhase.placeFirstRoad
-                    gameText.text = "Place First Road"
-                }
-            case .placeFirstRoad :
-                if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
-                    gameText.text = "Place Second Settlement"
-
-                    if(currentPlayer == players.count-1) {
-                        currGamePhase = GamePhase.placeSecondSettlement
-                    } else {
-                        currGamePhase = GamePhase.wait
-                        gameText.isHidden = true
-                        currentPlayer = currentPlayer+1
-                        sendNewCurrPlayer()
-                    }
-                }
-            case .placeSecondSettlement :
-                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.City, setup:true)) {
-                    currGamePhase = GamePhase.placeSecondRoad
-                    gameText.text = "Place Second Road"
-                }
-            case .placeSecondRoad :
-                if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
-                    currGamePhase = GamePhase.wait
-                    if (currentPlayer == 0) {
-                        currGamePhase = GamePhase.p1Turn
-                        gameText.text = "P1 Turn"
-                    } else {
-                        currentPlayer = currentPlayer-1
-                        sendNewCurrPlayer()
-                        sendNewGamePhase(gamePhase : GamePhase.placeSecondSettlement)
-                        gameText.isHidden = true
-                    }
-                }
-            case .p1Turn :
-                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
-                    if(!rolled) {
-                        rollDice()
-                        rolled = true
-                    }
-                }
-                if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled) {
-                        currentPlayer = currentPlayer + 1
-                        currGamePhase = GamePhase.p2Turn
-                        sendNewCurrPlayer()
-                        sendNewGamePhase(gamePhase: currGamePhase)
-                        rolled = false
-                        DispatchQueue.main.async {
-                            self.gameButton.backgroundColor = UIColor.gray
-                        }
-                    }
-                }
-                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
-
-            case .p2Turn :
-                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
-                    if(!rolled) {
-                        rollDice()
-                        rolled = true
-                    }
-                }
-                if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled) {
-                        currentPlayer = (currentPlayer + 1) % players.count
-                        if (currentPlayer == 2) {
-                            currGamePhase = GamePhase.p3Turn
-                        } else {
-                            currGamePhase = GamePhase.p1Turn
-                        }
-                        sendNewCurrPlayer()
-                        sendNewGamePhase(gamePhase: currGamePhase)
-                        rolled = false
-                        DispatchQueue.main.async {
-                            self.gameButton.backgroundColor = UIColor.gray
-                        }
-                    }
-                }
-                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
-
-            case .p3Turn :
-                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
-                    if(!rolled) {
-                        rollDice()
-                        rolled = true
-                    }
-                }
-                if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled) {
-                        currentPlayer = 0
-                        currGamePhase = GamePhase.p1Turn
-                        sendNewCurrPlayer()
-                        sendNewGamePhase(gamePhase: currGamePhase)
-                        rolled = false
-                        DispatchQueue.main.async {
-                            self.gameButton.backgroundColor = UIColor.gray
-                        }
-                    }
-                }
-                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
-                
-            default : break
-            }
-        }
-    }
-    
-    func handleButtonTouches(targetLocationView: CGPoint, targetLocation: CGPoint) {
-        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
-            if (tradeOpen) {
-                closeTradeMenu()
-            } else {
-                presentTradeMenu()
-            }
-        }
-        if(tradeOpen) {
-            tradeMenuTouches(target: targetLocationView)
-        }
-        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad && !buildShip) {
-            if(buildSettlement) {
-                buildSettlement = false
-                DispatchQueue.main.async {
-                    self.buildUpgradeButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                buildSettlement = true
-                DispatchQueue.main.async {
-                    self.buildUpgradeButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-            }
-        }
-        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement && !buildShip
-            ) {
-            if (buildRoad) {
-                buildRoad = false
-                DispatchQueue.main.async {
-                    self.buildRoadButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                buildRoad = true
-                DispatchQueue.main.async {
-                    self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-            }
-        }
-        if (self.buildShipButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewShip() && !tradeOpen && !buildSettlement && !buildRoad
-            ) {
-            if (buildShip) {
-                buildShip = false
-                DispatchQueue.main.async {
-                    self.buildShipButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                buildShip = true
-                DispatchQueue.main.async {
-                    self.buildShipButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-            }
-        }
-        if (buildSettlement) {
-            let settlementBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
-            
-            if (settlementBuilt) {
-                print ("Settlement Built")
-                buildSettlement = false
-                DispatchQueue.main.async {
-                    self.buildUpgradeButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                let settlementUpgraded = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
-                if (settlementUpgraded) {
-                    print ("Settlement Upgraded")
-                    buildSettlement = false
-                    DispatchQueue.main.async {
-                        self.buildUpgradeButton.backgroundColor = UIColor.gray
-                    }
-                }
-            }
-        }
-        if (buildRoad) {
-            let roadBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
-            if (roadBuilt) {
-                print("Road Built")
-                buildRoad = false
-                DispatchQueue.main.async {
-                    self.buildRoadButton.backgroundColor = UIColor.gray
-                }
-            }
-        }
-        if (buildShip) {
-            let shipBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
-            if (shipBuilt) {
-                print("Ship Built")
-                buildShip = false
-                DispatchQueue.main.async {
-                    self.buildShipButton.backgroundColor = UIColor.gray
-                }
-            }
-        }
-    }
-    
     //funciton that inits the trade menu
     func presentTradeMenu() {
         tradeOpen = true
@@ -903,8 +655,10 @@ class GameScene: SKScene {
     func placeCornerObject(column : Int, row : Int, type : cornerType, setup: Bool) -> Bool {
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false }
-        if (corner?.cornerObject != nil) { return false }
+        if (corner!.cornerObject != nil) { return false }
         if (canPlaceCorner(corner: corner!) == false) { return false }
+        if (corner!.tile1.onMainIsland == false) { return false }
+
 
         corner!.cornerObject = cornerObject(cornerType : type, owner: myPlayerIndex)
         players[currentPlayer].ownedCorners.append(corner!)
@@ -1164,8 +918,9 @@ class GameScene: SKScene {
     func placeEdgeObject(column : Int, row : Int, type : edgeType) -> Bool {
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
         if (edge == nil) { return false }
-        if (edge?.edgeObject != nil) { return false }
+        if (edge!.edgeObject != nil) { return false }
         if (canPlaceEdge(edge: edge!) == false) { return false }
+        if (edge!.tile1.onMainIsland == false) { return false }
         
         edge!.edgeObject = edgeObject(edgeType : type, owner : myPlayerIndex)
         players[currentPlayer].ownedEdges.append(edge!)
@@ -1407,6 +1162,255 @@ class GameScene: SKScene {
         players[player].sheep = sheep
         players[player].brick = brick
         players[player].gold = gold
+    }
+    
+    
+    //function to handle pan gestures for camera movement
+    func handlePanFrom(recognizer: UIPanGestureRecognizer) {
+        if recognizer.state != .changed {
+            return
+        }
+        
+        //get translation amount
+        let translation = recognizer.translation(in: recognizer.view!)
+        
+        //move cam
+        cam.position.x -= translation.x
+        cam.position.y += translation.y
+        
+        //reset tranlation
+        recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
+    }
+    
+    //function to handle pinch gestures for camera scaling
+    func handlePinch(recognizer : UIPinchGestureRecognizer) {
+        if recognizer.state != .changed {
+            return
+        }
+        
+        //scale cam
+        cam.xScale *= 1/recognizer.scale
+        cam.yScale *= 1/recognizer.scale
+        
+        //clamp cam
+        if (cam.xScale > 0.9) {cam.xScale = 0.9}
+        if (cam.xScale < 0.35) {cam.xScale = 0.35}
+        if (cam.yScale > 0.9) {cam.yScale = 0.9}
+        if (cam.yScale < 0.35) {cam.yScale = 0.35}
+        
+        //reset scale
+        recognizer.scale = 1
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        if (touches.count > 1) { return }
+        let targetLocation = touch.location(in: self)
+        let targetLocationView = touch.location(in: self.view!)
+        print (currGamePhase)
+        
+        if(currentPlayer == myPlayerIndex) { //only accept taps if it's your turn
+            switch currGamePhase {
+            case .placeFirstSettlement :
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.Settlement, setup:false)) {
+                    currGamePhase = GamePhase.placeFirstRoad
+                    gameText.text = "Place First Road"
+                }
+            case .placeFirstRoad :
+                if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
+                    gameText.text = "Place Second Settlement"
+                    
+                    if(currentPlayer == players.count-1) {
+                        currGamePhase = GamePhase.placeSecondSettlement
+                    } else {
+                        currGamePhase = GamePhase.wait
+                        gameText.isHidden = true
+                        currentPlayer = currentPlayer+1
+                        sendNewCurrPlayer()
+                    }
+                }
+            case .placeSecondSettlement :
+                if (placeCornerObject(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), type: cornerType.City, setup:true)) {
+                    currGamePhase = GamePhase.placeSecondRoad
+                    gameText.text = "Place Second Road"
+                }
+            case .placeSecondRoad :
+                if (placeEdgeObject(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road)) {
+                    currGamePhase = GamePhase.wait
+                    if (currentPlayer == 0) {
+                        currGamePhase = GamePhase.p1Turn
+                        gameText.text = "P1 Turn"
+                    } else {
+                        currentPlayer = currentPlayer-1
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase : GamePhase.placeSecondSettlement)
+                        gameText.isHidden = true
+                    }
+                }
+            case .p1Turn :
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                    if(!rolled) {
+                        rollDice()
+                        rolled = true
+                    }
+                }
+                if (self.gameButton.frame.contains(targetLocationView)) {
+                    if (rolled) {
+                        currentPlayer = currentPlayer + 1
+                        currGamePhase = GamePhase.p2Turn
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase: currGamePhase)
+                        rolled = false
+                        DispatchQueue.main.async {
+                            self.gameButton.backgroundColor = UIColor.gray
+                        }
+                    }
+                }
+                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
+                
+            case .p2Turn :
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                    if(!rolled) {
+                        rollDice()
+                        rolled = true
+                    }
+                }
+                if (self.gameButton.frame.contains(targetLocationView)) {
+                    if (rolled) {
+                        currentPlayer = (currentPlayer + 1) % players.count
+                        if (currentPlayer == 2) {
+                            currGamePhase = GamePhase.p3Turn
+                        } else {
+                            currGamePhase = GamePhase.p1Turn
+                        }
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase: currGamePhase)
+                        rolled = false
+                        DispatchQueue.main.async {
+                            self.gameButton.backgroundColor = UIColor.gray
+                        }
+                    }
+                }
+                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
+                
+            case .p3Turn :
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                    if(!rolled) {
+                        rollDice()
+                        rolled = true
+                    }
+                }
+                if (self.gameButton.frame.contains(targetLocationView)) {
+                    if (rolled) {
+                        currentPlayer = 0
+                        currGamePhase = GamePhase.p1Turn
+                        sendNewCurrPlayer()
+                        sendNewGamePhase(gamePhase: currGamePhase)
+                        rolled = false
+                        DispatchQueue.main.async {
+                            self.gameButton.backgroundColor = UIColor.gray
+                        }
+                    }
+                }
+                handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
+                
+            default : break
+            }
+        }
+    }
+    
+    func handleButtonTouches(targetLocationView: CGPoint, targetLocation: CGPoint) {
+        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
+            if (tradeOpen) {
+                closeTradeMenu()
+            } else {
+                presentTradeMenu()
+            }
+        }
+        if(tradeOpen) {
+            tradeMenuTouches(target: targetLocationView)
+        }
+        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad && !buildShip) {
+            if(buildSettlement) {
+                buildSettlement = false
+                DispatchQueue.main.async {
+                    self.buildUpgradeButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                buildSettlement = true
+                DispatchQueue.main.async {
+                    self.buildUpgradeButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
+        }
+        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement && !buildShip
+            ) {
+            if (buildRoad) {
+                buildRoad = false
+                DispatchQueue.main.async {
+                    self.buildRoadButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                buildRoad = true
+                DispatchQueue.main.async {
+                    self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
+        }
+        if (self.buildShipButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewShip() && !tradeOpen && !buildSettlement && !buildRoad
+            ) {
+            if (buildShip) {
+                buildShip = false
+                DispatchQueue.main.async {
+                    self.buildShipButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                buildShip = true
+                DispatchQueue.main.async {
+                    self.buildShipButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
+        }
+        if (buildSettlement) {
+            let settlementBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+            
+            if (settlementBuilt) {
+                print ("Settlement Built")
+                buildSettlement = false
+                DispatchQueue.main.async {
+                    self.buildUpgradeButton.backgroundColor = UIColor.gray
+                }
+            } else {
+                let settlementUpgraded = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                if (settlementUpgraded) {
+                    print ("Settlement Upgraded")
+                    buildSettlement = false
+                    DispatchQueue.main.async {
+                        self.buildUpgradeButton.backgroundColor = UIColor.gray
+                    }
+                }
+            }
+        }
+        if (buildRoad) {
+            let roadBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
+            if (roadBuilt) {
+                print("Road Built")
+                buildRoad = false
+                DispatchQueue.main.async {
+                    self.buildRoadButton.backgroundColor = UIColor.gray
+                }
+            }
+        }
+        if (buildShip) {
+            let shipBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
+            if (shipBuilt) {
+                print("Ship Built")
+                buildShip = false
+                DispatchQueue.main.async {
+                    self.buildShipButton.backgroundColor = UIColor.gray
+                }
+            }
+        }
     }
     
 //

@@ -87,7 +87,7 @@ class tileHandler {
         guard let tilesArray = dictionary["mainTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray)
+        placeTiles(tilesArray: tilesArray, onMainIsland: true)
         _ = placeNumberTiles(tilesArray: tilesArray)
         
         //init smallIslands
@@ -118,7 +118,7 @@ class tileHandler {
         guard let tilesArray2 = dictionary["islandTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray2)
+        placeTiles(tilesArray: tilesArray2, onMainIsland: false)
         _ = placeNumberTiles(tilesArray: tilesArray2)
         
         //init landHexDictionary
@@ -138,14 +138,14 @@ class tileHandler {
     }
     
     //takes in a 2d int tile array and initialises and places the tile in landBackground with a valid tile type
-    func placeTiles(tilesArray : [[Int]]) {
+    func placeTiles(tilesArray : [[Int]], onMainIsland: Bool) {
         for (row, rowArray) in tilesArray.enumerated() {
             let tileRow = NumRows - row - 1
             for (column, value) in rowArray.enumerated() {
                 if value == 1 {
                     let currTile = getValidTileGroup()
                     landBackground.setTileGroup(currTile, forColumn: column, row: tileRow)
-                    let hex = LandHex(column: column, row: tileRow, type : currTile.name!)
+                    let hex = LandHex(column: column, row: tileRow, type : currTile.name!, onMainIsland: onMainIsland)
                     landHexArray.append(hex)
                 }
             }
