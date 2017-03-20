@@ -261,6 +261,7 @@ class GameScene: SKScene {
             case .sheep: type = 3
             case .brick: type = 4
             case .gold: type = 5
+            default: type = 6
             }
             board.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
@@ -287,7 +288,7 @@ class GameScene: SKScene {
                 case "3": type = .sheep
                 case "4": type = .brick
                 case "5": type = .gold
-                default: type = .wood
+                default: type = .water
             }
             
             // Set hex types and values
@@ -569,6 +570,7 @@ class GameScene: SKScene {
             case .stone : players[myPlayerIndex].stone -= 4
             case .sheep : players[myPlayerIndex].sheep -= 4
             case .gold : players[myPlayerIndex].gold -= 2
+            default: break
             }
             
             switch rightTradeItem! {
@@ -690,6 +692,7 @@ class GameScene: SKScene {
                 return false
             }
         }
+        if(corner.tile1.type == hexType.water && corner.tile2?.type == hexType.water && corner.tile3?.type == hexType.water) { return false }
         return true
     }
     
@@ -742,8 +745,9 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
         if (edge == nil) { return false }
-        if (edge?.tile1 == nil && edge?.tile2 == nil) { return false }
-        if (edge?.edgeObject != nil) { return false }
+        if (edge?.tile2 == nil) { return false }
+        if (edge!.tile1.type == hexType.water && edge!.tile2!.type == hexType.water) { return false }
+        if (edge!.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
         if (!hasResourcesForNewRoad()) { return false }
         
@@ -781,7 +785,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
         if (edge == nil) { return false }
-        if (edge?.tile1 != nil && edge?.tile2 != nil) { return false }
+        if (edge?.tile2?.type != hexType.water) { return false }
         if (edge?.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
         if (!hasResourcesForNewShip()) { return false }
@@ -1055,6 +1059,7 @@ class GameScene: SKScene {
                             case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
                             case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                             case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            default: break
                         }
                     }
                     if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
@@ -1066,6 +1071,7 @@ class GameScene: SKScene {
                         case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
                         case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                         case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                        default: break
                         }
                     }
                     if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
@@ -1077,6 +1083,7 @@ class GameScene: SKScene {
                         case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
                         case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                         case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                        default: break
                         }
                     }
                 }
@@ -1098,6 +1105,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
+            default: break
         }
         if (vertex.tile2 != nil) {
             // Distribute resources of type tile1.type
@@ -1108,6 +1116,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
+            default: break
             }
         }
         if (vertex.tile3 != nil) {
@@ -1119,6 +1128,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
+            default: break
             }
         }
         
