@@ -21,6 +21,16 @@ class Player {
     var sheep = 0
     var brick = 0
     var gold = 2
+    
+    var paper = 0
+    var cloth = 0
+    var coin = 0
+    
+    var fish = 0
+    var hasOldBoot = false
+    
+    var victoryPoints = 0
+    
     var name : String
     var longestRoad = 0
     var ownedCorners : [LandHexVertex] = []
@@ -42,4 +52,5 @@ class Player {
     func getPlayerText() -> String {
         return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold)"
     }
+    
 }

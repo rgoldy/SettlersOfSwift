@@ -16,6 +16,7 @@ enum hexType:String {
     case brick
     case gold
     case water
+    case fish
 }
 
 //class to reperesent a land hex and its respective attributes, including references to its LandHexVertices and LandHexEdges

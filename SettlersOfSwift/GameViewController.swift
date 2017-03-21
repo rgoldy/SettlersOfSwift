@@ -77,6 +77,8 @@ class GameViewController: UIViewController, NetworkDelegate {
             
             // Create player objects and send to non-hosts
             scenePort.initPlayers()
+            // Create and shuffle fish deck then send to non-hosts
+            scenePort.initFish()
         }
         else
         {
@@ -135,6 +137,8 @@ class GameViewController: UIViewController, NetworkDelegate {
                 print ("Updated Dice")
             case "updatePlayerData":
                 scenePort.recievePlayerData(data: message[1])
+            case "fishdeck":
+                scenePort.recievedFishDeck(encoding: message[1])
             default:
                 print("Unknown message")
         }

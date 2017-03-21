@@ -31,6 +31,7 @@ class GameScene: SKScene {
     var players: [Player] = []
     var currentPlayer = 0
     var myPlayerIndex = -1
+    var fishDeck: [FishToken] = []
     let gameButton = UITextField()
     let tradeButton = UITextField()
     let buildUpgradeButton = UITextField()
@@ -261,7 +262,8 @@ class GameScene: SKScene {
             case .sheep: type = 3
             case .brick: type = 4
             case .gold: type = 5
-            default: type = 6
+            case .fish: type = 6
+            default: type = 7
             }
             board.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
@@ -288,6 +290,7 @@ class GameScene: SKScene {
                 case "3": type = .sheep
                 case "4": type = .brick
                 case "5": type = .gold
+                case "6": type = .fish
                 default: type = .water
             }
             
@@ -331,6 +334,22 @@ class GameScene: SKScene {
         currGamePhase = GamePhase.placeFirstSettlement
         gameText.text = "Place First Settlement"
         gameText.isHidden = false
+    }
+    
+    func initFish() {
+        for _ in 1...11 {
+            fishDeck.append(FishToken(v: 1))
+        }
+        for _ in 1...10 {
+            fishDeck.append(FishToken(v: 2))
+        }
+        for _ in 1...8 {
+            fishDeck.append(FishToken(v: 3))
+        }
+        fishDeck.append(FishToken(v:0))
+        
+        shuffleFish(deck: fishDeck)
+        sendFishDeck()
     }
     
     func setPlayers(info: String) {
@@ -1053,36 +1072,159 @@ class GameScene: SKScene {
                     if (vertex.tile1.column == col && vertex.tile1.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
-                            case .wood: player.wood += numberResources; print("\(player.name) mined wood")
+                            case .wood:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.wood += 1; print("\(player.name) mined wood")
+                                    player.paper += 1; print("\(player.name) produced paper")
+                                }
+                                else {
+                                    player.wood += 1; print("\(player.name) mined wood")
+                                }
                             case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
-                            case .stone: player.stone += numberResources; print("\(player.name) mined stone")
-                            case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
+                            case .stone:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.stone += 1; print("\(player.name) mined stone")
+                                    player.coin += 1; print("\(player.name) produced coin")
+                                }
+                                else {
+                                    player.stone += 1; print("\(player.name) mined stone")
+                                }
+                            case .sheep:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.sheep += 1; print("\(player.name) mined sheep")
+                                    player.cloth += 1; print("\(player.name) produced cloth")
+                                }
+                                else {
+                                    player.coin += 1; print("\(player.name) mined sheep")
+                                }
                             case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                             case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .fish:
+                                var numberFish = drawFishCard()
+                        
+                                if (numberFish == -1) { /* Deck is empty */ }
+                                else if (numberFish == 0) {
+                                   player.hasOldBoot = true
+                                }
+                                else {
+                                    player.fish += numberFish
+                                    if (vertex.cornerObject?.type == cornerType.City) {
+                                        numberFish = drawFishCard()
+                                        if (numberFish == -1) { /* Deck is empty */ }
+                                        else if (numberFish == 0) {
+                                            player.hasOldBoot = true
+                                        }
+                                        else {
+                                            player.fish += numberFish
+                                        }
+                                    }
+                                }
                             default: break
                         }
                     }
                     if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
-                        // Distribute resources of type tile1.type
+                        // Distribute resources of type tile2.type
                         switch vertex.tile2!.type! {
-                        case .wood: player.wood += numberResources; print("\(player.name) mined wood")
-                        case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
-                        case .stone: player.stone += numberResources; print("\(player.name) mined stone")
-                        case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
-                        case .brick: player.brick += numberResources; print("\(player.name) mined brick")
-                        case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
-                        default: break
+                            case .wood:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.wood += 1; print("\(player.name) mined wood")
+                                    player.paper += 1; print("\(player.name) produced paper")
+                                }
+                                else {
+                                    player.wood += 1; print("\(player.name) mined wood")
+                                }
+                            case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                            case .stone:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.stone += 1; print("\(player.name) mined stone")
+                                    player.coin += 1; print("\(player.name) produced coin")
+                                }
+                                else {
+                                    player.stone += 1; print("\(player.name) mined stone")
+                                }
+                            case .sheep:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.sheep += 1; print("\(player.name) mined sheep")
+                                    player.cloth += 1; print("\(player.name) produced cloth")
+                                }
+                                else {
+                                    player.coin += 1; print("\(player.name) mined sheep")
+                                }
+                            case .brick: player.brick += numberResources; print("\(player.name) mined brick")
+                            case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .fish:
+                             var numberFish = drawFishCard()
+                             
+                             if (numberFish == -1) { /* Deck is empty */ }
+                             else if (numberFish == 0) {
+                                player.hasOldBoot = true
+                             }
+                             else {
+                                player.fish += numberFish
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    numberFish = drawFishCard()
+                                    if (numberFish == -1) { /* Deck is empty */ }
+                                    else if (numberFish == 0) {
+                                        player.hasOldBoot = true
+                                    }
+                                    else {
+                                        player.fish += numberFish
+                                    }
+                                }
+                             }
+                            default: break
                         }
                     }
                     if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
-                        case .wood: player.wood += numberResources; print("\(player.name) mined wood")
-                        case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
-                        case .stone: player.stone += numberResources; print("\(player.name) mined stone")
-                        case .sheep: player.sheep += numberResources; print("\(player.name) mined sheep")
-                        case .brick: player.brick += numberResources; print("\(player.name) mined brick")
-                        case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .wood:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.wood += 1; print("\(player.name) mined wood")
+                                    player.paper += 1; print("\(player.name) produced paper")
+                                }
+                                else {
+                                    player.wood += 1; print("\(player.name) mined wood")
+                                }
+                            case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                            case .stone:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.stone += 1; print("\(player.name) mined stone")
+                                    player.coin += 1; print("\(player.name) produced coin")
+                                }
+                                else {
+                                    player.stone += 1; print("\(player.name) mined stone")
+                                }
+                            case .sheep:
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    player.sheep += 1; print("\(player.name) mined sheep")
+                                    player.cloth += 1; print("\(player.name) produced cloth")
+                                }
+                                else {
+                                    player.coin += 1; print("\(player.name) mined sheep")
+                                }
+                            case .brick: player.brick += numberResources; print("\(player.name) mined brick")
+                            case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .fish:
+                             var numberFish = drawFishCard()
+                             
+                             if (numberFish == -1) { /* Deck is empty */ }
+                             else if (numberFish == 0) {
+                                player.hasOldBoot = true
+                             }
+                             else {
+                                player.fish += numberFish
+                                if (vertex.cornerObject?.type == cornerType.City) {
+                                    numberFish = drawFishCard()
+                                    if (numberFish == -1) { /* Deck is empty */ }
+                                    else if (numberFish == 0) {
+                                        player.hasOldBoot = true
+                                    }
+                                    else {
+                                        player.fish += numberFish
+                                    }
+                                }
+                             }
                         default: break
                         }
                     }
@@ -1105,6 +1247,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
+            case .fish: players[myPlayerIndex].fish += drawFishCard()
             default: break
         }
         if (vertex.tile2 != nil) {
@@ -1116,6 +1259,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
+            case .fish: players[myPlayerIndex].fish += drawFishCard()
             default: break
             }
         }
@@ -1128,6 +1272,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
+            case .fish: players[myPlayerIndex].fish += drawFishCard()
             default: break
             }
         }
@@ -1146,7 +1291,11 @@ class GameScene: SKScene {
         pData.append("\(players[player].stone),")
         pData.append("\(players[player].sheep),")
         pData.append("\(players[player].brick),")
-        pData.append("\(players[player].gold)")
+        pData.append("\(players[player].gold),")
+        pData.append("\(players[player].paper),")
+        pData.append("\(players[player].cloth),")
+        pData.append("\(players[player].coin),")
+        pData.append("\(players[player].fish)")
         
         let sent = appDelegate.networkManager.sendData(data: pData)
         if (!sent) {
@@ -1165,6 +1314,10 @@ class GameScene: SKScene {
         let sheep = Int(playerData[4])!
         let brick = Int(playerData[5])!
         let gold = Int(playerData[6])!
+        let paper = Int(playerData[7])!
+        let cloth = Int(playerData[8])!
+        let coin = Int(playerData[9])!
+        let fish = Int(playerData[10])!
         
         players[player].wood = wood
         players[player].wheat = wheat
@@ -1172,6 +1325,58 @@ class GameScene: SKScene {
         players[player].sheep = sheep
         players[player].brick = brick
         players[player].gold = gold
+        players[player].paper = paper
+        players[player].cloth = cloth
+        players[player].coin = coin
+        players[player].fish = fish
+    }
+    
+    
+    func sendFishDeck()
+    {
+        var data = "fishdeck."
+        for card in fishDeck
+        {
+            data.append("\(card.value),")
+        }
+        let sent = appDelegate.networkManager.sendData(data: data)
+        if (!sent)
+        {
+            print("Failed to send fish deck")
+        }
+    }
+    
+    func recievedFishDeck(encoding: String)
+    {
+        fishDeck.removeAll()
+        let deckData = encoding.components(separatedBy: ",").dropLast()
+        for fishCard in deckData
+        {
+            let fishValue = Int(fishCard)!
+            fishDeck.append(FishToken(v: fishValue))
+        }
+    }
+    
+    func shuffleFish(deck: [FishToken])
+    {
+        var newDeck :[FishToken] = []
+        while(fishDeck.count > 0)
+        {
+            let randIndex = arc4random_uniform(UInt32(fishDeck.count))
+            let card = fishDeck.remove(at: Int(randIndex))
+            newDeck.append(card)
+        }
+        fishDeck = newDeck
+    }
+    
+    func drawFishCard() -> Int {
+        if (fishDeck.count == 0) {
+            return -1
+        }
+        
+        let fish = fishDeck.remove(at: 0)
+        sendFishDeck()
+        return fish.value
     }
     
     

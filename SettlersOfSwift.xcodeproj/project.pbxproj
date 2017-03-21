@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C3DBEB41E81ACBD00EE07EF /* FishToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */; };
 		6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */; };
 		6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F681E395DF900AAEB79 /* Actions.sks */; };
 		6CCF9F6B1E395DF900AAEB79 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F6A1E395DF900AAEB79 /* GameScene.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FishToken.swift; sourceTree = "<group>"; };
 		6CCF9F611E395DF900AAEB79 /* SettlersOfSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettlersOfSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6CCF9F681E395DF900AAEB79 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				AC9D044A1E67D37300DBCA42 /* Dice.swift */,
 				AC9D044C1E67D6F700DBCA42 /* cornerObject.swift */,
 				AC9D044E1E67D70300DBCA42 /* edgeObject.swift */,
+				6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -238,6 +241,7 @@
 				6CCF9F6D1E395DF900AAEB79 /* GameViewController.swift in Sources */,
 				AC3F565F1E68CDF4005CECC1 /* StartScreenController.swift in Sources */,
 				AC9D044F1E67D70300DBCA42 /* edgeObject.swift in Sources */,
+				6C3DBEB41E81ACBD00EE07EF /* FishToken.swift in Sources */,
 				AC3F565D1E68CDF4005CECC1 /* NewGameController.swift in Sources */,
 				6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */,
 				AC9D044D1E67D6F700DBCA42 /* cornerObject.swift in Sources */,
