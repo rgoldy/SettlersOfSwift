@@ -1030,7 +1030,7 @@ class GameScene: SKScene {
     func rollDice() {
         let values = dice.rollDice()
         updateDice(red: values[0], yellow: values[1])
-        let diceData = "diceRoll.\(values[0]),\(values[1])"
+        let diceData = "diceRoll.\(values[0]),\(values[1]),\(values[2])"
         
         // distribute resources on own device
         print(values[0] + values[1])

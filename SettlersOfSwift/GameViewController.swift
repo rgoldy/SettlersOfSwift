@@ -126,6 +126,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let diceData = message[1].components(separatedBy: ",")
                 let redDie = Int(diceData[0])!
                 let yellowDie = Int(diceData[1])!
+                let eventDie = Int(diceData[2])!
                 // distribuite resources
                 if(redDie + yellowDie != 7) {
                     scenePort.distributeResources(dice: redDie + yellowDie)
