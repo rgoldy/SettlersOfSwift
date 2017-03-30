@@ -1100,14 +1100,14 @@ class GameScene: SKScene {
                             case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                             case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
                             case .fish:
-                                var numberFish = drawFishCard()
+                                var newFish = drawFishCard()
                         
-                                if (numberFish == -1) { /* Deck is empty */ }
-                                else if (numberFish == 0) {
+                                if (newFish.value == -1) { /* Deck is empty */ }
+                                else if (newFish.value == 0) {
                                    player.hasOldBoot = true
                                 }
                                 else {
-                                    player.fish += numberFish
+                                    player.fish.append(newFish)
                                     if (vertex.cornerObject?.type == cornerType.City) {
                                         numberFish = drawFishCard()
                                         if (numberFish == -1) { /* Deck is empty */ }
@@ -1115,7 +1115,7 @@ class GameScene: SKScene {
                                             player.hasOldBoot = true
                                         }
                                         else {
-                                            player.fish += numberFish
+                                            player.fish.append(newFish)
                                         }
                                     }
                                 }
@@ -1153,22 +1153,22 @@ class GameScene: SKScene {
                             case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                             case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
                             case .fish:
-                             var numberFish = drawFishCard()
+                             var newFish = drawFishCard()
                              
-                             if (numberFish == -1) { /* Deck is empty */ }
-                             else if (numberFish == 0) {
+                             if (newFish.value == -1) { /* Deck is empty */ }
+                             else if (newFish.value == 0) {
                                 player.hasOldBoot = true
                              }
                              else {
-                                player.fish += numberFish
+                                player.fish.append(newFish)
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    numberFish = drawFishCard()
-                                    if (numberFish == -1) { /* Deck is empty */ }
-                                    else if (numberFish == 0) {
+                                    newFish = drawFishCard()
+                                    if (newFish.value == -1) { /* Deck is empty */ }
+                                    else if (newFish.value == 0) {
                                         player.hasOldBoot = true
                                     }
                                     else {
-                                        player.fish += numberFish
+                                        player.fish.append(newFish)
                                     }
                                 }
                              }
@@ -1206,22 +1206,22 @@ class GameScene: SKScene {
                             case .brick: player.brick += numberResources; print("\(player.name) mined brick")
                             case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
                             case .fish:
-                             var numberFish = drawFishCard()
+                             var newFish = drawFishCard()
                              
-                             if (numberFish == -1) { /* Deck is empty */ }
-                             else if (numberFish == 0) {
+                             if (newFish.value == -1) { /* Deck is empty */ }
+                             else if (newFish.value == 0) {
                                 player.hasOldBoot = true
                              }
                              else {
-                                player.fish += numberFish
+                                player.fish.append(newFish)
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    numberFish = drawFishCard()
-                                    if (numberFish == -1) { /* Deck is empty */ }
-                                    else if (numberFish == 0) {
+                                    newFish = drawFishCard()
+                                    if (newFish.value == -1) { /* Deck is empty */ }
+                                    else if (newFish.value == 0) {
                                         player.hasOldBoot = true
                                     }
                                     else {
-                                        player.fish += numberFish
+                                        player.fish.append(newFish)
                                     }
                                 }
                              }
@@ -1247,7 +1247,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
-            case .fish: players[myPlayerIndex].fish += drawFishCard()
+            case .fish: players[myPlayerIndex].fish.append(drawFishCard())
             default: break
         }
         if (vertex.tile2 != nil) {
@@ -1259,7 +1259,7 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
-            case .fish: players[myPlayerIndex].fish += drawFishCard()
+            case .fish: players[myPlayerIndex].fish.append(drawFishCard())
             default: break
             }
         }
@@ -1272,12 +1272,13 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
-            case .fish: players[myPlayerIndex].fish += drawFishCard()
+            case .fish: players[myPlayerIndex].fish.append(drawFishCard())
             default: break
             }
         }
         
         sendPlayerData(player: myPlayerIndex)
+        sendFishDeck()
         DispatchQueue.main.async {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
@@ -1294,8 +1295,10 @@ class GameScene: SKScene {
         pData.append("\(players[player].gold),")
         pData.append("\(players[player].paper),")
         pData.append("\(players[player].cloth),")
-        pData.append("\(players[player].coin),")
-        pData.append("\(players[player].fish)")
+        pData.append("\(players[player].coin);")
+        for f in players[player].fish {
+            pData.append("\(f.value),")
+        }
         
         let sent = appDelegate.networkManager.sendData(data: pData)
         if (!sent) {
@@ -1306,18 +1309,20 @@ class GameScene: SKScene {
     
     // Decodes and sets resources of a specific player
     func recievePlayerData(data: String) {
-        let playerData = data.components(separatedBy: ",")
-        let player = Int(playerData[0])!
-        let wood = Int(playerData[1])!
-        let wheat = Int(playerData[2])!
-        let stone = Int(playerData[3])!
-        let sheep = Int(playerData[4])!
-        let brick = Int(playerData[5])!
-        let gold = Int(playerData[6])!
-        let paper = Int(playerData[7])!
-        let cloth = Int(playerData[8])!
-        let coin = Int(playerData[9])!
-        let fish = Int(playerData[10])!
+        let playerData = data.components(separatedBy: ";")
+        let resourceData = playerData[0].components(separatedBy: ",")
+        let fishData = playerData[1].components(separatedBy: ",").dropLast()
+        
+        let player = Int(resourceData[0])!
+        let wood = Int(resourceData[1])!
+        let wheat = Int(resourceData[2])!
+        let stone = Int(resourceData[3])!
+        let sheep = Int(resourceData[4])!
+        let brick = Int(resourceData[5])!
+        let gold = Int(resourceData[6])!
+        let paper = Int(resourceData[7])!
+        let cloth = Int(resourceData[8])!
+        let coin = Int(resourceData[9])!
         
         players[player].wood = wood
         players[player].wheat = wheat
@@ -1328,7 +1333,12 @@ class GameScene: SKScene {
         players[player].paper = paper
         players[player].cloth = cloth
         players[player].coin = coin
-        players[player].fish = fish
+        
+        players[player].fish.removeAll()
+        for fish in fishData {
+            let value = Int(fish)!
+            players[player].fish.append(FishToken(v: value))
+        }
     }
     
     
@@ -1369,14 +1379,14 @@ class GameScene: SKScene {
         fishDeck = newDeck
     }
     
-    func drawFishCard() -> Int {
+    func drawFishCard() -> FishToken {
         if (fishDeck.count == 0) {
-            return -1
+            return FishToken(v: -1)
         }
         
         let fish = fishDeck.remove(at: 0)
         sendFishDeck()
-        return fish.value
+        return fish
     }
     
     
