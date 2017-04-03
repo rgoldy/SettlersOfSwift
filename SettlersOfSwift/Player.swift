@@ -35,6 +35,7 @@ class Player {
     var longestRoad = 0
     var ownedCorners : [LandHexVertex] = []
     var ownedEdges : [LandHexEdge] = []
+    var ownedKnights : [LandHexVertex] = []
     var color : playerColor
     
     init(name : String, playerNumber : Int) {
@@ -50,7 +51,7 @@ class Player {
     }
     
     func getPlayerText() -> String {
-        return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold)"
+        return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold), Paper = \(paper), Cloth = \(cloth), Coin = \(coin)"
     }
     
     func discardFish(numFish: Int) -> [FishToken] {
@@ -69,6 +70,7 @@ class Player {
                     for i in 0..<self.fish.count {
                         if setIndex < set.count && set[setIndex].value == self.fish[i].value {
                             self.fish.remove(at: i)
+                            i -= 1
                             setIndex += 1
                         }
                     }
