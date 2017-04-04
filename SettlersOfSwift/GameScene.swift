@@ -965,6 +965,7 @@ class GameScene: SKScene {
         }
         
         let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.hasBeenActivatedThisTurn ?? false)"
+
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1015,7 +1016,7 @@ class GameScene: SKScene {
         
         return true
     }
-    
+
     func hasResourcesForNewSettlement() -> Bool {
         var numSettlements = 0
         for corner in players[myPlayerIndex].ownedCorners {
@@ -1075,6 +1076,7 @@ class GameScene: SKScene {
         return false
     }
     
+
     func hasResourcesToPromoteKnight() -> Bool {
         // TODO:
         //      MUST HAVE PURCHASED THRID LEVEL POLITICS(BLUE) CITY IMPROVEMENT
