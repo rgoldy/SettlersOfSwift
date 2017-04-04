@@ -24,6 +24,7 @@ class cornerObject {
     var hasBeenUpgradedThisTurn : Bool
     var hasBeenActivatedThisTurn : Bool
     
+
     // Var pertaining only to cities
     var hasCityWall : Bool
     
@@ -35,7 +36,9 @@ class cornerObject {
         strength = 1
         hasBeenUpgradedThisTurn = false
         hasBeenActivatedThisTurn = false
+
         
         hasCityWall = false
+
     }
 }

@@ -964,7 +964,11 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
+<<<<<<< HEAD
         let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.hasBeenActivatedThisTurn ?? false)"
+=======
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength),\(corner?.cornerObject?.isActive),\(corner?.cornerObject?.hasBeenUpgradedThisTurn),\(corner?.cornerObject?.hasBeenActivatedThisTurn)"
+>>>>>>> 9c0ca6e2231e308e6154f6fefe2b06041f4ee3d8
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -978,6 +982,7 @@ class GameScene: SKScene {
         return true
     }
     
+<<<<<<< HEAD
     func activateKnight(column : Int, row : Int, valid:Bool) -> Bool {
         if (!valid) { return false }
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
@@ -1016,6 +1021,8 @@ class GameScene: SKScene {
         return true
     }
     
+=======
+>>>>>>> 9c0ca6e2231e308e6154f6fefe2b06041f4ee3d8
     func hasResourcesForNewSettlement() -> Bool {
         var numSettlements = 0
         for corner in players[myPlayerIndex].ownedCorners {
@@ -1075,7 +1082,11 @@ class GameScene: SKScene {
         return false
     }
     
+<<<<<<< HEAD
     func hasResourcesToPromoteKnight() -> Bool {
+=======
+    func hasResoucesToPromoteKnight() -> Bool {
+>>>>>>> 9c0ca6e2231e308e6154f6fefe2b06041f4ee3d8
         // TODO:
         //      MUST HAVE PURCHASED THRID LEVEL POLITICS(BLUE) CITY IMPROVEMENT
         //      IN ORDER TO UPGRADE KNIGHT TO HIGHEST LEVEL
@@ -1098,10 +1109,17 @@ class GameScene: SKScene {
         corner?.cornerObject = cornerObject(cornerType : type!, owner: currPlayerNumber)
         
         if type == .Knight {
+<<<<<<< HEAD
             corner?.cornerObject?.strength = Int(cornerInfo[4])!
             corner?.cornerObject?.isActive = Bool(cornerInfo[5])!
             corner?.cornerObject?.hasBeenUpgradedThisTurn = Bool(cornerInfo[6])!
             corner?.cornerObject?.hasBeenActivatedThisTurn = Bool(cornerInfo[7])!
+=======
+            corner?.cornerObject.strength = Int(cornerInfo[4])!
+            corner?.cornerObject.isActive = Bool(cornerInfo[5])!
+            corner?.cornerObject.hasBeenUpgradedThisTurn = Int(cornerInfo[6])!
+            corner?.cornerObject.hasBeenActivatedThisTurn = Int(cornerInfo[7])!
+>>>>>>> 9c0ca6e2231e308e6154f6fefe2b06041f4ee3d8
             
             players[currPlayerNumber].ownedKnights.append(corner!)
         }
