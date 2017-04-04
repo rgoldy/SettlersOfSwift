@@ -32,6 +32,7 @@ class GameScene: SKScene {
     var currentPlayer = 0
     var myPlayerIndex = -1
     var fishDeck: [FishToken] = []
+    
     let gameButton = UITextField()
     let tradeButton = UITextField()
     let buildUpgradeButton = UITextField()
@@ -42,6 +43,7 @@ class GameScene: SKScene {
     let redDiceUI = UIImageView()
     let yellowDiceUI = UIImageView()
     let eventDiceUI = UIImageView()
+    
     var rolled : Bool = false
     var buildSettlement : Bool = false
     var buildRoad : Bool = false
@@ -54,11 +56,13 @@ class GameScene: SKScene {
     let lBrick = UITextField()
     let lStone = UITextField()
     let lGold = UITextField()
+    
     let rWood = UITextField()
     let rSheep = UITextField()
     let rWheat = UITextField()
     let rBrick = UITextField()
     let rStone = UITextField()
+    
     var tradeOpen : Bool = false
     var leftTradeItem : hexType?
     var rightTradeItem : hexType?
@@ -645,7 +649,9 @@ class GameScene: SKScene {
     
     //set current player to message recieved
     func setNewCurrPlayer(info: String) {
+        endTurn(player: currentPlayer)
         currentPlayer = Int(info)!
+        
         if (currentPlayer == myPlayerIndex) {
             DispatchQueue.main.async {
                 self.gameButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
@@ -698,7 +704,7 @@ class GameScene: SKScene {
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue)"
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue),\(1),\(false),\(false),\(true)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -947,8 +953,11 @@ class GameScene: SKScene {
         if (corner?.cornerObject!.type != cornerType.Knight) { return false }
         if (corner?.cornerObject?.owner != myPlayerIndex) { return false }
         if (!hasResourcesToPromoteKnight()) { return false }
+        if (corner?.cornerObject?.hasBeenUpgradedThisTurn)! { return false }
+        if (corner?.cornerObject?.strength == 3) { return false }
         
         corner?.cornerObject?.strength += 1
+        corner?.cornerObject?.hasBeenUpgradedThisTurn = true
         
         // Subtract resources
         players[myPlayerIndex].stone -= 1
@@ -964,8 +973,8 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
-
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.hasBeenActivatedThisTurn ?? false)"
+        // Inform other players of knight change
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? false)"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -986,11 +995,10 @@ class GameScene: SKScene {
         if (corner?.cornerObject == nil) { return false }
         if (corner?.cornerObject!.type != cornerType.Knight) { return false }
         if (corner?.cornerObject?.owner != myPlayerIndex) { return false }
+        if (corner?.cornerObject?.isActive)! { return false }
         if (!hasResourcesToActivateKnight()) { return false }
-        if (corner?.cornerObject!.hasBeenActivatedThisTurn)! { return false }
         
         corner?.cornerObject?.isActive = true
-        corner?.cornerObject?.hasBeenActivatedThisTurn = true
 
         // Subtract resources
         players[myPlayerIndex].wheat -= 1
@@ -1005,7 +1013,7 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.hasBeenActivatedThisTurn ?? false)"
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? false)"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1078,7 +1086,7 @@ class GameScene: SKScene {
     func hasResourcesToPromoteKnight() -> Bool {
         // TODO:
         //      MUST HAVE PURCHASED THRID LEVEL POLITICS(BLUE) CITY IMPROVEMENT
-        //      IN ORDER TO UPGRADE KNIGHT TO HIGHEST LEVEL
+        //      IN ORDER TO UPGRADE KNIGHT TO HIGHEST LEVEL (need flip chart)
         if (players[myPlayerIndex].stone >= 1 && players[myPlayerIndex].sheep >= 1) {
             return true
         }
@@ -1101,7 +1109,7 @@ class GameScene: SKScene {
             corner?.cornerObject?.strength = Int(cornerInfo[4])!
             corner?.cornerObject?.isActive = Bool(cornerInfo[5])!
             corner?.cornerObject?.hasBeenUpgradedThisTurn = Bool(cornerInfo[6])!
-            corner?.cornerObject?.hasBeenActivatedThisTurn = Bool(cornerInfo[7])!
+            corner?.cornerObject?.didActionThisTurn = Bool(cornerInfo[7])!
             
             players[currPlayerNumber].ownedKnights.append(corner!)
         }
@@ -1566,6 +1574,14 @@ class GameScene: SKScene {
         return fish
     }
     
+    func endTurn(player: Int) {
+        for knightCorner in players[player].ownedKnights {
+            let knight = knightCorner.cornerObject
+            knight?.hasBeenUpgradedThisTurn = false
+            knight?.didActionThisTurn = false
+        }
+    }
+    
     
     //function to handle pan gestures for camera movement
     func handlePanFrom(recognizer: UIPanGestureRecognizer) {
@@ -1658,6 +1674,7 @@ class GameScene: SKScene {
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     if (rolled) {
+                        endTurn(player: currentPlayer)
                         currentPlayer = currentPlayer + 1
                         currGamePhase = GamePhase.p2Turn
                         sendNewCurrPlayer()
@@ -1679,6 +1696,7 @@ class GameScene: SKScene {
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     if (rolled) {
+                        endTurn(player: currentPlayer)
                         currentPlayer = (currentPlayer + 1) % players.count
                         if (currentPlayer == 2) {
                             currGamePhase = GamePhase.p3Turn
@@ -1704,6 +1722,7 @@ class GameScene: SKScene {
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     if (rolled) {
+                        endTurn(player: currentPlayer)
                         currentPlayer = 0
                         currGamePhase = GamePhase.p1Turn
                         sendNewCurrPlayer()

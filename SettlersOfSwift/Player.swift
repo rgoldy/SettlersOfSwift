@@ -66,14 +66,17 @@ class Player {
             // discard this set if it sums to the desired value
             if sum == numFish {
                 var setIndex = 0
+                var toRemove : [Int] = []
                 for _ in 0..<self.fish.count {
                     for i in 0..<self.fish.count {
                         if setIndex < set.count && set[setIndex].value == self.fish[i].value {
-                            self.fish.remove(at: i)
-                            i -= 1
+                            toRemove.append(i)
                             setIndex += 1
                         }
                     }
+                }
+                for i in toRemove.count-1...0 {
+                        self.fish.remove(at: i)
                 }
                 return set
             }
