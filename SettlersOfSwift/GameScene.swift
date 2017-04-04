@@ -964,8 +964,8 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.hasBeenActivatedThisTurn ?? false)"
 
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.hasBeenActivatedThisTurn ?? false)"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -992,7 +992,6 @@ class GameScene: SKScene {
         corner?.cornerObject?.isActive = true
         corner?.cornerObject?.hasBeenActivatedThisTurn = true
 
-        
         // Subtract resources
         players[myPlayerIndex].wheat -= 1
         
@@ -1075,7 +1074,6 @@ class GameScene: SKScene {
         }
         return false
     }
-    
 
     func hasResourcesToPromoteKnight() -> Bool {
         // TODO:
