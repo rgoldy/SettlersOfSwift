@@ -96,7 +96,7 @@ class InGameTradeViewController: UIViewController {
             }   }
         } else {
             if selectedSource != .None, selectedTarget != .None {
-                let requestDefinition = "Some player would like to exchange \(currentRatio) \(selectedSource.rawValue) for 1 \(selectedTarget.rawValue)...would you like to proceed with the trade?"
+                let requestDefinition = "playerTradeRequest.\(gameDataReference.scenePort.myPlayerIndex + ((segmentSelector.selectedSegmentIndex == 1) ? 2 : 1)).\(gameDataReference.scenePort.myPlayerIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
                 if sendRequest(requestDefinition) {
                     let otherPlayer: Player
                     if segmentSelector.selectedSegmentIndex == 1 {
@@ -149,6 +149,7 @@ class InGameTradeViewController: UIViewController {
                     let alert = UIAlertController(title: "Trade Notification", message: "The other player has accepted your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
+                    //  SEND TO OTHER PLAYER UPDATED RESOURCE COUNTS (NOT IMPLEMENTED)
                 } else {
                     let alert = UIAlertController(title: "Trade Notification", message: "The other player has declined your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
@@ -161,7 +162,13 @@ class InGameTradeViewController: UIViewController {
     //  OTHER PLAYER SHOULD RECEIVE AN ALERT BOX WITH TRADE SPECIFICATIONS
     //  MAY ACCEPT OR DECLINE
     
-    func sendRequest(_ definition: String) -> Bool { return true }  //  NOT IMPLEMENTED, BLOCKING
+    func sendRequest(_ definition: String) -> Bool {
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].tradeAccepted = nil
+        let messageHasBeenSent = gameDataReference.appDelegate.networkManager.sendData(data: definition)
+        if !messageHasBeenSent { return sendRequest(definition) }
+        while gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].tradeAccepted == nil { sleep(500) }
+        return gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].tradeAccepted!
+    }
     
     @IBAction func selectedSourceAsBrick(_ sender: Any) {
         let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]

@@ -45,6 +45,8 @@ class Player {
     var fish : [FishToken] = []
     var hasOldBoot = false
     
+    var tradeAccepted: Bool? = nil
+    
     var victoryPoints = 0
     
     var name : String

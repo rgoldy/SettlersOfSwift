@@ -135,6 +135,8 @@ class GameViewController: UIViewController, NetworkDelegate {
         }
     }
 
+//    let requestDefinition = "playerTradeRequest.\(gameDataReference.scenePort.myPlayerIndex + ((segmentSelector.selectedSegmentIndex == 1) ? 2 : 1)).\(gameDataReference.scenePort.myPlayerIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
+    
     func recievedData(data: String) {
         let message = data.components(separatedBy: ".")
         print("RECEIVED MESSAGE \(message[0])")
@@ -183,6 +185,23 @@ class GameViewController: UIViewController, NetworkDelegate {
                 scenePort.recievePlayerData(data: message[1])
             case "fishdeck":
                 scenePort.recievedFishDeck(encoding: message[1])
+            case "playerTradeRequest":
+                if Int(message[1]) != nil && Int(message[1])! % 3 == scenePort.myPlayerIndex {
+                    let composedString = "Some player would like to trade \(message[3]) \(message[4])(s) for one of your \(message[5])...would you like to proceed?"
+                    let alert = UIAlertController(title: "Trade Notification", message: composedString, preferredStyle: .actionSheet)
+                    alert.addAction(UIAlertAction(title: "ACCEPT", style: .default, handler: { (action) in
+                        while !self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).YES") { }   //  keep trying
+                    }))
+                    alert.addAction(UIAlertAction(title: "DECLINE", style: .default, handler: { (action) in
+                        while !self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).NO") { }   //  keep trying
+                    }))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            case "tradeAcknowledgement":
+                if Int(message[1]) != nil && Int(message[1])! == scenePort.myPlayerIndex {
+                    if message[2] == "YES" { scenePort.players[scenePort.myPlayerIndex].tradeAccepted = true }
+                    if message[2] == "NO" { scenePort.players[scenePort.myPlayerIndex].tradeAccepted = true }
+                }
             default:
                 print("Unknown message")
         }
