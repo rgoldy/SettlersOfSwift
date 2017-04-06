@@ -152,6 +152,7 @@ class InGameFlipChartsViewController: UIViewController {
         super.viewWillAppear(animated)
         chartsSceneIndex = 0
         drawCurrentChartScene()
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillDoNothing
     }
 
     override func didReceiveMemoryWarning() {
@@ -333,8 +334,7 @@ class InGameFlipChartsViewController: UIViewController {
             case 2: playerReference.nextAction = .WillBuildRoad
             default: break;
         }
-        self.navigationController?.popViewController(animated: true)
-        self.navigationController?.popViewController(animated: true)
+        self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func buildItemB(_ sender: Any) {
@@ -345,8 +345,7 @@ class InGameFlipChartsViewController: UIViewController {
             case 2: playerReference.nextAction = .WillBuildShip
             default: break;
         }
-        self.navigationController?.popViewController(animated: true)
-        self.navigationController?.popViewController(animated: true)
+        self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func buildItemC(_ sender: Any) {
@@ -356,8 +355,7 @@ class InGameFlipChartsViewController: UIViewController {
             case 2: playerReference.nextAction = .WillBuildSettlement
             default: break;
         }
-        self.navigationController?.popViewController(animated: true)
-        self.navigationController?.popViewController(animated: true)
+        self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
     //  DO METROPOLIS CHECKS

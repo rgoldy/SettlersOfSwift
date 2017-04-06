@@ -154,7 +154,9 @@ class InGameTradeViewController: UIViewController {
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
                 }
-    }   }   }
+        }   }
+        updateOptions()
+    }
     
     //  OTHER PLAYER SHOULD RECEIVE AN ALERT BOX WITH TRADE SPECIFICATIONS
     //  MAY ACCEPT OR DECLINE

@@ -61,12 +61,15 @@ class GameViewController: UIViewController, NetworkDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        do {
-            let music = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "background.mp3", ofType: nil)!))
-            backgroundMusicPlayer = music
-            backgroundMusicPlayer.numberOfLoops = -1
-            backgroundMusicPlayer.play()
-        } catch { }
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        if backgroundMusicPlayer == nil {
+            do {
+                let music = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "background.mp3", ofType: nil)!))
+                backgroundMusicPlayer = music
+                backgroundMusicPlayer.numberOfLoops = -1
+                backgroundMusicPlayer.play()
+            } catch { }
+        }
         setAppearanceForMenuButton()
     }
     

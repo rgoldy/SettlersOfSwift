@@ -113,7 +113,7 @@ enum ProgressCardsType {
                 let removedCard = fromDeck.remove(at: index)
                 return removedCard
         }   }
-        return nil
+        return nil  //  no more cards remaining in deck
     }
     
 }

@@ -22,6 +22,15 @@ enum GamePhase : String {
     case p3Turn
 }
 
+enum EventDieSides: Int {
+    case BarbarianSideA = 1
+    case BarbarianSideB = 2
+    case BarbarianSideC = 3
+    case PoliticsSide   = 4
+    case SciencesSide   = 5
+    case TradesSide     = 6
+}
+
 class GameScene: SKScene {
     
     //init scene nodes
@@ -32,6 +41,7 @@ class GameScene: SKScene {
     var currentPlayer = 0
     var myPlayerIndex = -1
     var fishDeck: [FishToken] = []
+    var gameDeck = ProgressCardsType.generateNewGameDeck()
     
     let gameButton = UITextField()
     let tradeButton = UITextField()
@@ -1258,7 +1268,10 @@ class GameScene: SKScene {
         else {
             print ("successfully distributed resources to all players")
         }
+        
         //  TO IMPLEMENT _ check for progress card match and distribute
+        let eventDieOutcome = EventDieSides.init(rawValue: values[2])
+        //
     }
     
     func updateDice(red : Int, yellow: Int, event: Int) {
