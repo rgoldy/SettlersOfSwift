@@ -32,6 +32,39 @@
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.settlersOfSwift.newGame</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>New Game</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>start a new game session</string>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>NEW_GAME</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.settlersOfSwift.joinGame</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Join Game</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>join an existing game session</string>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>JOIN_GAME</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.settlersOfSwift.loadGame</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Load Game</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>load a former game session</string>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>LOAD_GAME</string>
+		</dict>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

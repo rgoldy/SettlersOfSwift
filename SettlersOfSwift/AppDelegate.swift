@@ -11,13 +11,32 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    enum QuickActionDescription: String {
+        case NewGame = "com.settlersOfSwift.newGame"
+        case loadGame = "com.settlersOfSwift.loadGame"
+        case joinGame = "com.settlersOfSwift.joinGame"
+    }
+    
     var window: UIWindow?
     var networkManager: NetworkConnection!
 
+//    func loadScreenForShortcut(_ shortcut: UIApplicationShortcutItem) -> Bool {
+//        //  set up views for shortcut association
+//        return true
+//    }
+    
+//    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+//        let shortcutProcessed = loadScreenForShortcut(shortcutItem)
+//        completionHandler(shortcutProcessed)
+//    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         networkManager = NetworkConnection()
-        
+//        if let shortcut = launchOptions?[UIApplicationLaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
+//            let _ = loadScreenForShortcut(shortcut)
+//            return false
+//        } else { return true }
         return true
     }
 

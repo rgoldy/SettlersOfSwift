@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E0197BA1E9682820054503B /* ProgressCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0197B91E9682820054503B /* ProgressCards.swift */; };
+		0E65BF831E8F235900C5543B /* InGameMenuTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BF821E8F235900C5543B /* InGameMenuTabBarController.swift */; };
+		0E65BFA31E8F299F00C5543B /* InGameFlipChartsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA21E8F299F00C5543B /* InGameFlipChartsViewController.swift */; };
+		0E65BFA51E8F29AB00C5543B /* InGameCardsDeckViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA41E8F29AB00C5543B /* InGameCardsDeckViewController.swift */; };
+		0E65BFA71E8F29B400C5543B /* InGameTradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA61E8F29B400C5543B /* InGameTradeViewController.swift */; };
+		0E65BFA91E8F2B6500C5543B /* InGameStatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA81E8F2B6500C5543B /* InGameStatisticsViewController.swift */; };
+		0EE1C4791E95D37A00A3EACE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */; };
+		0EE1C47B1E95D4A000A3EACE /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0EE1C47A1E95D4A000A3EACE /* background.mp3 */; };
+		0EE216E41E93664C004EADAC /* PlayerIntentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE216E31E93664C004EADAC /* PlayerIntentions.swift */; };
 		6C3DBEB41E81ACBD00EE07EF /* FishToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */; };
 		6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */; };
 		6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F681E395DF900AAEB79 /* Actions.sks */; };
@@ -34,6 +43,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E0197B91E9682820054503B /* ProgressCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressCards.swift; sourceTree = "<group>"; };
+		0E65BF821E8F235900C5543B /* InGameMenuTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameMenuTabBarController.swift; sourceTree = "<group>"; };
+		0E65BFA21E8F299F00C5543B /* InGameFlipChartsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameFlipChartsViewController.swift; sourceTree = "<group>"; };
+		0E65BFA41E8F29AB00C5543B /* InGameCardsDeckViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameCardsDeckViewController.swift; sourceTree = "<group>"; };
+		0E65BFA61E8F29B400C5543B /* InGameTradeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameTradeViewController.swift; sourceTree = "<group>"; };
+		0E65BFA81E8F2B6500C5543B /* InGameStatisticsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameStatisticsViewController.swift; sourceTree = "<group>"; };
+		0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		0EE1C47A1E95D4A000A3EACE /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
+		0EE216E31E93664C004EADAC /* PlayerIntentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerIntentions.swift; sourceTree = "<group>"; };
 		6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FishToken.swift; sourceTree = "<group>"; };
 		6CCF9F611E395DF900AAEB79 /* SettlersOfSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettlersOfSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -67,17 +85,35 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0EE1C4791E95D37A00A3EACE /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0EE1C4771E95D37900A3EACE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0EE1C47C1E95D4A600A3EACE /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				0EE1C47A1E95D4A000A3EACE /* background.mp3 */,
+			);
+			name = Audio;
+			sourceTree = "<group>";
+		};
 		6CCF9F581E395DF900AAEB79 = {
 			isa = PBXGroup;
 			children = (
 				6CCF9F631E395DF900AAEB79 /* SettlersOfSwift */,
 				6CCF9F621E395DF900AAEB79 /* Products */,
+				0EE1C4771E95D37900A3EACE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -93,10 +129,15 @@
 			isa = PBXGroup;
 			children = (
 				ACCBA9AB1E3B189800DE13FD /* Extensions.swift */,
+				0EE1C47C1E95D4A600A3EACE /* Audio */,
 				AC50757A1E3960B500DB5229 /* GameScene */,
 				AC3F56661E68D00B005CECC1 /* Networking */,
 				6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */,
 				AC3F56631E68CF1B005CECC1 /* Main.storyboard */,
+				0E65BFA21E8F299F00C5543B /* InGameFlipChartsViewController.swift */,
+				0E65BFA81E8F2B6500C5543B /* InGameStatisticsViewController.swift */,
+				0E65BFA41E8F29AB00C5543B /* InGameCardsDeckViewController.swift */,
+				0E65BFA61E8F29B400C5543B /* InGameTradeViewController.swift */,
 				AC1FDC371E65386A00CD0723 /* Assets.xcassets */,
 				ACCBA9AD1E3B1BA900DE13FD /* map layouts */,
 				6CCF9F731E395DF900AAEB79 /* LaunchScreen.storyboard */,
@@ -108,6 +149,7 @@
 		AC0830CC1E4A3F7300ACE1B1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0E0197B91E9682820054503B /* ProgressCards.swift */,
 				AC0830CD1E4A3F9100ACE1B1 /* LandHex.swift */,
 				AC3F4B4E1E4C830B0000E5F6 /* LandHexVertex.swift */,
 				AC3F4B501E4C831A0000E5F6 /* LandHexEdge.swift */,
@@ -117,6 +159,7 @@
 				AC9D044C1E67D6F700DBCA42 /* cornerObject.swift */,
 				AC9D044E1E67D70300DBCA42 /* edgeObject.swift */,
 				6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */,
+				0EE216E31E93664C004EADAC /* PlayerIntentions.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -141,6 +184,7 @@
 				6CCF9F681E395DF900AAEB79 /* Actions.sks */,
 				6CCF9F6A1E395DF900AAEB79 /* GameScene.swift */,
 				6CCF9F6C1E395DF900AAEB79 /* GameViewController.swift */,
+				0E65BF821E8F235900C5543B /* InGameMenuTabBarController.swift */,
 			);
 			name = GameScene;
 			sourceTree = "<group>";
@@ -217,6 +261,7 @@
 				ACB54A331E3A9E920042461A /* Tiles.sks in Resources */,
 				AC648A511E6281B700E4BEA0 /* GameScene.sks in Resources */,
 				AC3F56651E68CF1B005CECC1 /* Main.storyboard in Resources */,
+				0EE1C47B1E95D4A000A3EACE /* background.mp3 in Resources */,
 				AC1FDC381E65386A00CD0723 /* Assets.xcassets in Resources */,
 				6CCF9F751E395DF900AAEB79 /* LaunchScreen.storyboard in Resources */,
 				6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */,
@@ -230,6 +275,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E65BFA31E8F299F00C5543B /* InGameFlipChartsViewController.swift in Sources */,
 				AC1FDC361E65115A00CD0723 /* tileHandler.swift in Sources */,
 				AC3F4B511E4C831A0000E5F6 /* LandHexEdge.swift in Sources */,
 				AC3F565C1E68CDF4005CECC1 /* NetworkConnection.swift in Sources */,
@@ -237,14 +283,20 @@
 				AC3F4B4F1E4C830B0000E5F6 /* LandHexVertex.swift in Sources */,
 				AC3F565E1E68CDF4005CECC1 /* PlayerListController.swift in Sources */,
 				6CCF9F6B1E395DF900AAEB79 /* GameScene.swift in Sources */,
+				0E0197BA1E9682820054503B /* ProgressCards.swift in Sources */,
 				AC0830CE1E4A3F9100ACE1B1 /* LandHex.swift in Sources */,
+				0E65BF831E8F235900C5543B /* InGameMenuTabBarController.swift in Sources */,
 				6CCF9F6D1E395DF900AAEB79 /* GameViewController.swift in Sources */,
 				AC3F565F1E68CDF4005CECC1 /* StartScreenController.swift in Sources */,
 				AC9D044F1E67D70300DBCA42 /* edgeObject.swift in Sources */,
 				6C3DBEB41E81ACBD00EE07EF /* FishToken.swift in Sources */,
+				0E65BFA91E8F2B6500C5543B /* InGameStatisticsViewController.swift in Sources */,
+				0E65BFA51E8F29AB00C5543B /* InGameCardsDeckViewController.swift in Sources */,
 				AC3F565D1E68CDF4005CECC1 /* NewGameController.swift in Sources */,
 				6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */,
+				0EE216E41E93664C004EADAC /* PlayerIntentions.swift in Sources */,
 				AC9D044D1E67D6F700DBCA42 /* cornerObject.swift in Sources */,
+				0E65BFA71E8F29B400C5543B /* InGameTradeViewController.swift in Sources */,
 				AC9D04491E67B43300DBCA42 /* Player.swift in Sources */,
 				ACCBA9AC1E3B189800DE13FD /* Extensions.swift in Sources */,
 			);

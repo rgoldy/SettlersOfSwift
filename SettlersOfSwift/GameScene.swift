@@ -68,6 +68,9 @@ class GameScene: SKScene {
     // Access to network manager
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
+    var pirateRemoved = false
+    var robberRemoved = false
+    
     override func didMove(to view: SKView) {
         //load tiles
         loadSceneNodes()
@@ -1545,6 +1548,26 @@ class GameScene: SKScene {
     }
     
     func handleButtonTouches(targetLocationView: CGPoint, targetLocation: CGPoint) {
+        
+        //  TEMPORARY TEST CODE FOR REWIRING FLIP CHART FUNCTIONALITIES TO BUTTON HANDLING CODE (RESET INTENTIONS AFTERWARDS)
+        
+//        if (currGamePhase == .p1Turn || currGamePhase == .p2Turn || currGamePhase == .p3Turn) && currentPlayer == myPlayerIndex {
+//        
+//            switch players[myPlayerIndex].nextAction {
+//                case .WillDoNothing: return;   //  NOT IMPLEMENTED
+//                case .WillBuildRoad: return;   //  NOT IMPLEMENTED
+//                case .WillBuildShip: return;   //  NOT IMPLEMENTED
+//                case .WillBuildSettlement: return;   //  NOT IMPLEMENTED
+//                case .WillBuildCity: return;   //  NOT IMPLEMENTED
+//                case .WillBuildWall: return;   //  NOT IMPLEMENTED
+//                case .WillBuildKnight: return;   //  NOT IMPLEMENTED
+//                case .WillPromoteKnight: return;   //  NOT IMPLEMENTED
+//                case .WillActivateKnight: return;   //  NOT IMPLEMENTED
+//                case default: return;
+//            }
+//            
+//        }
+        
         if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
             if (tradeOpen) {
                 closeTradeMenu()

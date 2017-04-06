@@ -11,8 +11,17 @@ import UIKit
 import SpriteKit
 import GameplayKit
 import MultipeerConnectivity
+import AVFoundation
 
 class GameViewController: UIViewController, NetworkDelegate {
+    
+    //  SET BUTTON AS DISABLED FOR SET UP PHASE
+    
+    @IBOutlet weak var menuButton: UIButton!
+    
+    //  PLAYS BACKGROUND MUSIC CONTAINED IN FILE NAMED background.mp3 (NOT TESTED)
+    
+    var backgroundMusicPlayer: AVAudioPlayer!
     
     // Added by Riley
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -45,6 +54,26 @@ class GameViewController: UIViewController, NetworkDelegate {
         appDelegate.networkManager.stopBrowsing()
         
         syncBoard()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        do {
+            let music = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "background.mp3", ofType: nil)!))
+            backgroundMusicPlayer = music
+            backgroundMusicPlayer.numberOfLoops = -1
+            backgroundMusicPlayer.play()
+        } catch { }
+        setAppearanceForMenuButton()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if backgroundMusicPlayer != nil {
+            backgroundMusicPlayer.stop()
+            backgroundMusicPlayer = nil
+        }
     }
     
     override var shouldAutorotate: Bool {
@@ -59,6 +88,9 @@ class GameViewController: UIViewController, NetworkDelegate {
         return true
     }
     
+    func setAppearanceForMenuButton() {
+        //  CUSTOMIZES MENU BUTTON APPEARANCE
+    }
     
     func syncBoard() {
         if (appDelegate.networkManager.isHost) {
