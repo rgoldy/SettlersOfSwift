@@ -23,4 +23,9 @@ enum PlayerIntentions {
     case WillBuildKnight
     case WillPromoteKnight
     case WillActivateKnight
+    case WillBuildMetropolis
+    case WillRemoveOutlaw
+    case WillMoveShip
+    case WillMoveKnight
+    case WillMoveOutlaw
 }

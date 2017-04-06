@@ -97,7 +97,7 @@ enum ProgressCardsType {
         deck[46] = .MerchantFleet;      deck[47] = .MerchantFleet;
         deck[48] = .ResourceMonopoly;   deck[49] = .ResourceMonopoly;   deck[50] = .ResourceMonopoly;   deck[51] = .ResourceMonopoly;
         deck[52] = .TradeMonopoly;      deck[53] = .TradeMonopoly;
-        for _ in 0...200 {
+        for _ in 0..<216 {
             let first = Int(arc4random() % 54)
             let second = Int(arc4random() % 54)
             let temporaryCard = deck[first]
@@ -112,8 +112,7 @@ enum ProgressCardsType {
             if fromDeck[index] != nil && ProgressCardsType.getCategoryOfCard(fromDeck[index]!) == category {
                 let removedCard = fromDeck.remove(at: index)
                 return removedCard
-            }
-        }
+        }   }
         return nil
     }
     

@@ -15,9 +15,11 @@ import AVFoundation
 
 class GameViewController: UIViewController, NetworkDelegate {
     
-    //  SET BUTTON AS DISABLED FOR SET UP PHASE
+    //  CUSTOM BUTTONS FOR DIFFERENT PURPOSES
     
     @IBOutlet weak var menuButton: UIButton!
+    @IBOutlet weak var backgroundMusicButton: UIButton!
+    @IBOutlet weak var endCurrentTurnButton: UIButton!
     
     //  PLAYS BACKGROUND MUSIC CONTAINED IN FILE NAMED background.mp3 (NOT TESTED)
     
@@ -89,6 +91,12 @@ class GameViewController: UIViewController, NetworkDelegate {
     }
     
     func setAppearanceForMenuButton() {
+        let playerColor = scenePort.players[scenePort.myPlayerIndex].color
+        switch playerColor {
+            case .Blue: menuButton.backgroundColor = UIColor.blue
+            case .Orange: menuButton.backgroundColor = UIColor.orange
+            case .Red: menuButton.backgroundColor = UIColor.red
+        }
         //  CUSTOMIZES MENU BUTTON APPEARANCE
     }
     
@@ -175,6 +183,24 @@ class GameViewController: UIViewController, NetworkDelegate {
             default:
                 print("Unknown message")
         }
+    }
+    
+    @IBAction func toggleMusicPlayback(_ sender: Any) {
+        if backgroundMusicPlayer != nil {
+            backgroundMusicPlayer.stop()
+            backgroundMusicPlayer = nil
+        } else {
+            do {
+                let music = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "background.mp3", ofType: nil)!))
+                backgroundMusicPlayer = music
+                backgroundMusicPlayer.numberOfLoops = -1
+                backgroundMusicPlayer.play()
+            } catch { }
+    }   }
+    
+    @IBAction func endCurrentPlayerTurn(_ sender: Any) {
+        //  REPLACES END TURN FOR CURRENT PLAYER FROM SCENE FILE
+        //  CURRENTLY DOES NOTHING AT ALL
     }
     
     // Do nothing

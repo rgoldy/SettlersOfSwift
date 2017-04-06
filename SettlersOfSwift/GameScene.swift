@@ -67,6 +67,18 @@ class GameScene: SKScene {
     var leftTradeItem : hexType?
     var rightTradeItem : hexType?
     
+    //  SHOULD BE PASSED TO ALL PLAYERS SUCH THAT THEY DO NOT PLACE METROPOLIS BY ACCIDENT
+    
+    var politicsMetropolisPlaced = false
+    var sciencesMetropolisPlaced = false
+    var tradesMetropolisPlaced = false
+    
+    var maximaPoliticsImprovementReached = false
+    var maximaSciencesImprovementReached = false
+    var maximaTradesImprovementReached = false
+    
+    //  END OF SEND TO ALL PLAYERS
+    
     //init tile handler
     var handler : tileHandler!
     
@@ -860,6 +872,12 @@ class GameScene: SKScene {
         players[myPlayerIndex].brick -= 1
         players[myPlayerIndex].wood -= 1
         
+        //  Give back taken resources if build costs nothing
+        if players[myPlayerIndex].nextAction == .WillBuildRoadForFree {
+            players[myPlayerIndex].brick += 1
+            players[myPlayerIndex].wood += 1
+        }
+        
         // Inform others of resource change
         sendPlayerData(player: myPlayerIndex)
         
@@ -898,6 +916,12 @@ class GameScene: SKScene {
         // Take resources from hand
         players[myPlayerIndex].sheep -= 1
         players[myPlayerIndex].wood -= 1
+        
+        //  Give back taken resources if build costs nothing
+        if players[myPlayerIndex].nextAction == .WillBuildShipForFree {
+            players[myPlayerIndex].sheep += 1
+            players[myPlayerIndex].wood += 1
+        }
         
         // Inform others of resource change
         sendPlayerData(player: myPlayerIndex)
@@ -1234,6 +1258,7 @@ class GameScene: SKScene {
         else {
             print ("successfully distributed resources to all players")
         }
+        //  TO IMPLEMENT _ check for progress card match and distribute
     }
     
     func updateDice(red : Int, yellow: Int, event: Int) {
@@ -1578,6 +1603,7 @@ class GameScene: SKScene {
     }
     
     func endTurn(player: Int) {
+        players[player].nextAction = .WillDoNothing
         for knightCorner in players[player].ownedKnights {
             let knight = knightCorner.cornerObject
             knight?.hasBeenUpgradedThisTurn = false
@@ -1747,114 +1773,134 @@ class GameScene: SKScene {
         
         //  TEMPORARY TEST CODE FOR REWIRING FLIP CHART FUNCTIONALITIES TO BUTTON HANDLING CODE (RESET INTENTIONS AFTERWARDS)
         
-//        if (currGamePhase == .p1Turn || currGamePhase == .p2Turn || currGamePhase == .p3Turn) && currentPlayer == myPlayerIndex {
-//        
-//            switch players[myPlayerIndex].nextAction {
-//                case .WillDoNothing: return;   //  NOT IMPLEMENTED
-//                case .WillBuildRoad: return;   //  NOT IMPLEMENTED
-//                case .WillBuildShip: return;   //  NOT IMPLEMENTED
-//                case .WillBuildSettlement: return;   //  NOT IMPLEMENTED
-//                case .WillBuildCity: return;   //  NOT IMPLEMENTED
-//                case .WillBuildWall: return;   //  NOT IMPLEMENTED
-//                case .WillBuildKnight: return;   //  NOT IMPLEMENTED
-//                case .WillPromoteKnight: return;   //  NOT IMPLEMENTED
-//                case .WillActivateKnight: return;   //  NOT IMPLEMENTED
-//                case default: return;
-//            }
-//            
-//        }
+        if (currGamePhase == .p1Turn || currGamePhase == .p2Turn || currGamePhase == .p3Turn) && currentPlayer == myPlayerIndex {
         
-        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
-            if (tradeOpen) {
-                closeTradeMenu()
-            } else {
-                presentTradeMenu()
+            switch players[myPlayerIndex].nextAction {
+                case .WillDoNothing: break
+                case .WillBuildRoad:
+                    let roadHasBeenBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
+                    if roadHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillBuildRoadForFree:
+                    let roadHasBeenBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
+                    if roadHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillBuildShip:
+                    let shipHasBeenBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
+                    if shipHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillBuildShipForFree:
+                    let shipHasBeenBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
+                    if shipHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillBuildSettlement:
+                    let settlementHasBeenBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if settlementHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillBuildCity:
+                    let cityHasBeenBuilt = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if cityHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillBuildWall: return;   //  NOT IMPLEMENTED
+                case .WillBuildKnight: return;   //  NOT IMPLEMENTED
+                case .WillPromoteKnight: return;   //  NOT IMPLEMENTED
+                case .WillActivateKnight: return;   //  NOT IMPLEMENTED
+                case .WillBuildMetropolis: return;   //  NOT IMPLEMENTED
+                case .WillRemoveOutlaw: return;   //  NOT IMPLEMENTED
+                case .WillMoveShip: return;   //  NOT IMPLEMENTED
+                case .WillMoveKnight: return;   //  NOT IMPLEMENTED
+                case .WillMoveOutlaw: return;   //  NOT IMPLEMENTED
             }
-        }
-        if(tradeOpen) {
-            tradeMenuTouches(target: targetLocationView)
-        }
-        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad && !buildShip) {
-            if(buildSettlement) {
-                buildSettlement = false
-                DispatchQueue.main.async {
-                    self.buildUpgradeButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                buildSettlement = true
-                DispatchQueue.main.async {
-                    self.buildUpgradeButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-            }
-        }
-        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement && !buildShip
-            ) {
-            if (buildRoad) {
-                buildRoad = false
-                DispatchQueue.main.async {
-                    self.buildRoadButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                buildRoad = true
-                DispatchQueue.main.async {
-                    self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-            }
-        }
-        if (self.buildShipButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewShip() && !tradeOpen && !buildSettlement && !buildRoad
-            ) {
-            if (buildShip) {
-                buildShip = false
-                DispatchQueue.main.async {
-                    self.buildShipButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                buildShip = true
-                DispatchQueue.main.async {
-                    self.buildShipButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-            }
-        }
-        if (buildSettlement) {
-            let settlementBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
             
-            if (settlementBuilt) {
-                print ("Settlement Built")
-                buildSettlement = false
-                DispatchQueue.main.async {
-                    self.buildUpgradeButton.backgroundColor = UIColor.gray
-                }
-            } else {
-                let settlementUpgraded = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
-                if (settlementUpgraded) {
-                    print ("Settlement Upgraded")
-                    buildSettlement = false
-                    DispatchQueue.main.async {
-                        self.buildUpgradeButton.backgroundColor = UIColor.gray
-                    }
-                }
-            }
         }
-        if (buildRoad) {
-            let roadBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
-            if (roadBuilt) {
-                print("Road Built")
-                buildRoad = false
-                DispatchQueue.main.async {
-                    self.buildRoadButton.backgroundColor = UIColor.gray
-                }
-            }
-        }
-        if (buildShip) {
-            let shipBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
-            if (shipBuilt) {
-                print("Ship Built")
-                buildShip = false
-                DispatchQueue.main.async {
-                    self.buildShipButton.backgroundColor = UIColor.gray
-                }
-            }
-        }
+
+        
+        
+//        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
+//            if (tradeOpen) {
+//                closeTradeMenu()
+//            } else {
+//                presentTradeMenu()
+//            }
+//        }
+//        if(tradeOpen) {
+//            tradeMenuTouches(target: targetLocationView)
+//        }
+//        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad && !buildShip) {
+//            if(buildSettlement) {
+//                buildSettlement = false
+//                DispatchQueue.main.async {
+//                    self.buildUpgradeButton.backgroundColor = UIColor.gray
+//                }
+//            } else {
+//                buildSettlement = true
+//                DispatchQueue.main.async {
+//                    self.buildUpgradeButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+//                }
+//            }
+//        }
+//        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement && !buildShip
+//            ) {
+//            if (buildRoad) {
+//                buildRoad = false
+//                DispatchQueue.main.async {
+//                    self.buildRoadButton.backgroundColor = UIColor.gray
+//                }
+//            } else {
+//                buildRoad = true
+//                DispatchQueue.main.async {
+//                    self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+//                }
+//            }
+//        }
+//        if (self.buildShipButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewShip() && !tradeOpen && !buildSettlement && !buildRoad
+//            ) {
+//            if (buildShip) {
+//                buildShip = false
+//                DispatchQueue.main.async {
+//                    self.buildShipButton.backgroundColor = UIColor.gray
+//                }
+//            } else {
+//                buildShip = true
+//                DispatchQueue.main.async {
+//                    self.buildShipButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+//                }
+//            }
+//        }
+//        if (buildSettlement) {
+//            let settlementBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+//            
+//            if (settlementBuilt) {
+//                print ("Settlement Built")
+//                buildSettlement = false
+//                DispatchQueue.main.async {
+//                    self.buildUpgradeButton.backgroundColor = UIColor.gray
+//                }
+//            } else {
+//                let settlementUpgraded = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+//                if (settlementUpgraded) {
+//                    print ("Settlement Upgraded")
+//                    buildSettlement = false
+//                    DispatchQueue.main.async {
+//                        self.buildUpgradeButton.backgroundColor = UIColor.gray
+//                    }
+//                }
+//            }
+//        }
+//        if (buildRoad) {
+//            let roadBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
+//            if (roadBuilt) {
+//                print("Road Built")
+//                buildRoad = false
+//                DispatchQueue.main.async {
+//                    self.buildRoadButton.backgroundColor = UIColor.gray
+//                }
+//            }
+//        }
+//        if (buildShip) {
+//            let shipBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
+//            if (shipBuilt) {
+//                print("Ship Built")
+//                buildShip = false
+//                DispatchQueue.main.async {
+//                    self.buildShipButton.backgroundColor = UIColor.gray
+//                }
+//            }
+//        }
     }
     
 //

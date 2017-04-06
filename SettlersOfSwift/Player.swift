@@ -32,6 +32,10 @@ class Player {
     var sciencesImprovementLevel = -1
     var tradesImprovementLevel = -1
     
+    var holdsPoliticsMetropolis = false
+    var holdsSciencesMetropolis = false
+    var holdsTradesMetropolis = false
+    
     var nextAction: PlayerIntentions = .WillDoNothing
     
     var paper = 0
@@ -61,6 +65,15 @@ class Player {
             color = playerColor.Red
         }
     }
+    
+    //  CALL THIS WHEN REMOVING METROPOLIS FROM A PLAYER
+    
+    func willLoseMetropolisFor(_ type: ChartTypes) {
+        switch type {
+            case .Politics: break
+            case .Sciences: break
+            case .Trades: break
+    }   }
     
     func getPlayerText() -> String {
         return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold), Paper = \(paper), Cloth = \(cloth), Coin = \(coin)"

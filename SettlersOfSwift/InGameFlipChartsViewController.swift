@@ -360,19 +360,66 @@ class InGameFlipChartsViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    //  DO METROPOLIS CHECKS
+    
     @IBAction func improveCurrentChart(_ sender: Any) {
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         switch chartsSceneIndex {
             case 0:
                 playerReference.coin -= playerReference.politicsImprovementLevel + 2
                 playerReference.politicsImprovementLevel += 1
+                //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
+                if playerReference.politicsImprovementLevel == 3 && !gameDataReference.scenePort.politicsMetropolisPlaced {
+                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
+                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
+                    //  SET gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
+                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
+                if playerReference.politicsImprovementLevel == 4 && !gameDataReference.scenePort.maximaPoliticsImprovementReached && !playerReference.holdsPoliticsMetropolis {
+                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
+                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
+                    //  SET gameDataReference.scenePort.maximaPoliticsImprovementReached and gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
+                    //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
+                    //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
+                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
             case 1:
                 playerReference.paper -= playerReference.sciencesImprovementLevel + 2
                 playerReference.sciencesImprovementLevel += 1
+                //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
+                if playerReference.sciencesImprovementLevel == 3 && !gameDataReference.scenePort.sciencesMetropolisPlaced {
+                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
+                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
+                    //  SET gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
+                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
+                if playerReference.sciencesImprovementLevel == 4 && !gameDataReference.scenePort.maximaSciencesImprovementReached && !playerReference.holdsSciencesMetropolis {
+                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
+                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
+                    //  SET gameDataReference.scenePort.maximaPoliticsImprovementReached and gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
+                    //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
+                    //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
+                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
             case 2:
                 playerReference.cloth -= playerReference.tradesImprovementLevel + 2
                 playerReference.tradesImprovementLevel += 1
-            default: break;
+                //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
+                if playerReference.tradesImprovementLevel == 3 && !gameDataReference.scenePort.tradesMetropolisPlaced {
+                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
+                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
+                    //  SET gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
+                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
+                if playerReference.tradesImprovementLevel == 4 && !gameDataReference.scenePort.maximaTradesImprovementReached && !playerReference.holdsTradesMetropolis {
+                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
+                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
+                    //  SET gameDataReference.scenePort.maximaPoliticsImprovementReached and gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
+                    //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
+                    //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
+                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
+            default: break
         }
         drawCurrentChartScene()
     }
