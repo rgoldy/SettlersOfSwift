@@ -230,7 +230,7 @@ extension NetworkConnection : MCSessionDelegate {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         NSLog("%@", "didReceiveData: \(data)")
         let datastring = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-        delegate?.recievedData(data: datastring as! String)
+        delegate?.recievedData(data: datastring! as String)
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {

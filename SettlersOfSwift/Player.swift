@@ -47,6 +47,7 @@ class Player {
     var longestRoad = 0
     var ownedCorners : [LandHexVertex] = []
     var ownedEdges : [LandHexEdge] = []
+    var ownedKnights : [LandHexVertex] = []
     var color : playerColor
     
     init(name : String, playerNumber : Int) {
@@ -62,7 +63,7 @@ class Player {
     }
     
     func getPlayerText() -> String {
-        return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold)"
+        return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold), Paper = \(paper), Cloth = \(cloth), Coin = \(coin)"
     }
     
     func discardFish(numFish: Int) -> [FishToken] {
@@ -77,13 +78,17 @@ class Player {
             // discard this set if it sums to the desired value
             if sum == numFish {
                 var setIndex = 0
+                var toRemove : [Int] = []
                 for _ in 0..<self.fish.count {
                     for i in 0..<self.fish.count {
                         if setIndex < set.count && set[setIndex].value == self.fish[i].value {
-                            self.fish.remove(at: i)
+                            toRemove.append(i)
                             setIndex += 1
                         }
                     }
+                }
+                for i in toRemove.count-1...0 {
+                        self.fish.remove(at: i)
                 }
                 return set
             }
