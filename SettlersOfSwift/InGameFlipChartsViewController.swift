@@ -236,7 +236,8 @@ class InGameFlipChartsViewController: UIViewController {
                 firstItemRequirementC.image = nil
                 firstItemRequirementD.image = nil
                 firstItemRequirementE.image = nil
-                if playerReference.stone < 1 || playerReference.sheep < 1 { firstItemButton.isEnabled = false } else { firstItemButton.isEnabled = true }
+                if playerReference.stone < 1 || playerReference.sheep < 1 { firstItemButton.isEnabled = false }
+                else { firstItemButton.isEnabled = true }
                 secondItemButton.setTitle("PROMOTE KNIGHT", for: UIControlState.normal)
                 secondItemButton.setTitle("PROMOTE KNIGHT", for: UIControlState.disabled)
                 secondItemRequirementA.image = UIImage(named: "STONE_REQ")
@@ -244,7 +245,13 @@ class InGameFlipChartsViewController: UIViewController {
                 secondItemRequirementC.image = nil
                 secondItemRequirementD.image = nil
                 secondItemRequirementE.image = nil
-                if playerReference.stone < 1 || playerReference.sheep < 1 { secondItemButton.isEnabled = false } else { secondItemButton.isEnabled = true }
+                var canUpgradeKnight = false
+                for knight in playerReference.ownedKnights {
+                    if ((knight.cornerObject?.strength)! == 1) { canUpgradeKnight = true; break }
+                    else if (knight.cornerObject?.strength == 2 && playerReference.politicsImprovementLevel >= 2) { canUpgradeKnight = true; break }
+                }
+                if playerReference.stone < 1 || playerReference.sheep < 1 || !canUpgradeKnight { secondItemButton.isEnabled = false }
+                else { secondItemButton.isEnabled = true }
                 thirdItemButton.setTitle("ACTIVATE KNIGHT", for: UIControlState.normal)
                 thirdItemButton.setTitle("ACTIVATE KNIGHT", for: UIControlState.disabled)
                 thirdItemRequirementA.image = UIImage(named: "WHEAT_REQ")
@@ -252,7 +259,11 @@ class InGameFlipChartsViewController: UIViewController {
                 thirdItemRequirementC.image = nil
                 thirdItemRequirementD.image = nil
                 thirdItemRequirementE.image = nil
-                if playerReference.wheat < 1 { thirdItemButton.isEnabled = false } else { thirdItemButton.isEnabled = true }
+                var canActivateKnight = false
+                for knight in playerReference.ownedKnights {
+                    if (!(knight.cornerObject?.isActive)!) { canActivateKnight = true; break }
+                }
+                if playerReference.wheat < 1 || !canActivateKnight { thirdItemButton.isEnabled = false } else { thirdItemButton.isEnabled = true }
                 if playerReference.sciencesImprovementLevel == 4 {
                     fourthItemButton.setTitle("", for: UIControlState.normal)
                     fourthItemButton.setTitle("", for: UIControlState.disabled)
