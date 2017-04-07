@@ -815,50 +815,6 @@ class GameScene: SKScene {
         return true
     }
     
-    func buildKnight(column : Int, row : Int, valid: Bool) -> Bool {
-        if (!valid) { return false }
-        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
-        if (corner == nil) { return false}
-        if (corner?.cornerObject != nil) { return false }
-        if (!canPlaceKnight(corner: corner!)) { return false }
-        if (!hasResourcesToBuildKnight()) { return false }
-        
-        var nextToRoad : Bool = false
-        for edge in corner!.neighbourEdges {
-            if (edge?.edgeObject?.owner == myPlayerIndex) {
-                nextToRoad = true
-                break
-            }
-        }
-        if (!nextToRoad) { return false }
-        
-        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
-        players[currentPlayer].ownedKnights.append(corner!)
-        
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
-        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
-        
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
-        
-        // Send player info to other players
-        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
-        if (!sent) {
-            print ("failed to sync cornerObject")
-        }
-        
-        // Remove resources from hand
-        players[myPlayerIndex].stone -= 1
-        players[myPlayerIndex].sheep -= 1
-        
-        // Send new resource amounts to other players
-        sendPlayerData(player: myPlayerIndex)
-        DispatchQueue.main.async {
-            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
-        }
-        
-        return true
-    }
-    
     func buildRoad(column: Int, row: Int, type: edgeType, valid:Bool) -> Bool {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
@@ -1036,6 +992,50 @@ class GameScene: SKScene {
             print ("successful sync cornerObject")
         }
 
+        return true
+    }
+    
+    func buildKnight(column : Int, row : Int, valid: Bool) -> Bool {
+        if (!valid) { return false }
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        if (corner == nil) { return false}
+        if (corner?.cornerObject != nil) { return false }
+        if (!canPlaceKnight(corner: corner!)) { return false }
+        if (!hasResourcesToBuildKnight()) { return false }
+        
+        var nextToRoad : Bool = false
+        for edge in corner!.neighbourEdges {
+            if (edge?.edgeObject?.owner == myPlayerIndex) {
+                nextToRoad = true
+                break
+            }
+        }
+        if (!nextToRoad) { return false }
+        
+        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
+        players[currentPlayer].ownedKnights.append(corner!)
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        
+        // Remove resources from hand
+        players[myPlayerIndex].stone -= 1
+        players[myPlayerIndex].sheep -= 1
+        
+        // Send new resource amounts to other players
+        sendPlayerData(player: myPlayerIndex)
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
         return true
     }
     
@@ -1436,6 +1436,19 @@ class GameScene: SKScene {
         return false
     }
     
+    func hasResourcesForCityWall() -> Bool {
+        if (players[myPlayerIndex].brick < 2) { return false }
+        var numWalls = 0
+        for cityCorner in players[myPlayerIndex].ownedCorners {
+            let city = cityCorner.cornerObject!
+            if city.hasCityWall {
+                numWalls += 1
+            }
+        }
+        if numWalls == 3 { return false }
+        return true
+    }
+    
     //function that will read a recieved message and set the corner object
     func setCornerObjectFromMessage(info:String) {
         let cornerInfo = info.components(separatedBy: ",")
@@ -1451,9 +1464,27 @@ class GameScene: SKScene {
             
             if type == .Knight {
                 corner?.cornerObject?.strength = Int(cornerInfo[4])!
-                corner?.cornerObject?.isActive = Bool(cornerInfo[5])!
-                corner?.cornerObject?.hasBeenUpgradedThisTurn = Bool(cornerInfo[6])!
-                corner?.cornerObject?.didActionThisTurn = Bool(cornerInfo[7])!
+                let active = Bool(cornerInfo[5])
+                if (active == nil) {
+                    corner?.cornerObject?.isActive = false
+                }
+                else {
+                    corner?.cornerObject?.isActive = active!
+                }
+                let upgraded = Bool(cornerInfo[6])
+                if (upgraded == nil) {
+                    corner?.cornerObject?.hasBeenUpgradedThisTurn = false
+                }
+                else {
+                    corner?.cornerObject?.hasBeenUpgradedThisTurn = upgraded!
+                }
+                let used = Bool(cornerInfo[6])
+                if (used == nil) {
+                    corner?.cornerObject?.didActionThisTurn = true
+                }
+                else {
+                    corner?.cornerObject?.didActionThisTurn = used!
+                }
                 
                 players[currPlayerNumber].ownedKnights.append(corner!)
             }
@@ -1463,11 +1494,8 @@ class GameScene: SKScene {
             
             var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
             
-            if type == .Knight && (corner?.cornerObject?.isActive)! {
-                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)Active"})
-            }
-            else if type == .Knight {
-                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)InActive"})
+            if type == .Knight {
+                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
             }
             
             handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
