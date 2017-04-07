@@ -46,6 +46,7 @@ class Player {
     var hasOldBoot = false
     
     var tradeAccepted: Bool? = nil
+    var fetchedTargetData = false
     
     var victoryPoints = 0
     

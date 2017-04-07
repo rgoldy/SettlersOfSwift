@@ -190,6 +190,25 @@ class GameViewController: UIViewController, NetworkDelegate {
                     let composedString = "Some player would like to trade \(message[3]) \(message[4])(s) for one of your \(message[5])...would you like to proceed?"
                     let alert = UIAlertController(title: "Trade Notification", message: composedString, preferredStyle: .actionSheet)
                     alert.addAction(UIAlertAction(title: "ACCEPT", style: .default, handler: { (action) in
+                        let receivedResourcesCount = Int(message[3])!
+                        switch message[4] {
+                            case "BRICK": self.scenePort.players[self.scenePort.myPlayerIndex].brick += receivedResourcesCount
+                            case "GOLD": self.scenePort.players[self.scenePort.myPlayerIndex].gold += receivedResourcesCount
+                            case "SHEEP": self.scenePort.players[self.scenePort.myPlayerIndex].sheep += receivedResourcesCount
+                            case "STONE": self.scenePort.players[self.scenePort.myPlayerIndex].stone += receivedResourcesCount
+                            case "WHEAT": self.scenePort.players[self.scenePort.myPlayerIndex].wheat += receivedResourcesCount
+                            case "WOOD": self.scenePort.players[self.scenePort.myPlayerIndex].wood += receivedResourcesCount
+                            default: break
+                        }
+                        switch message[5] {
+                        case "BRICK": self.scenePort.players[self.scenePort.myPlayerIndex].brick -= 1
+                        case "GOLD": self.scenePort.players[self.scenePort.myPlayerIndex].gold -= 1
+                        case "SHEEP": self.scenePort.players[self.scenePort.myPlayerIndex].sheep -= 1
+                        case "STONE": self.scenePort.players[self.scenePort.myPlayerIndex].stone -= 1
+                        case "WHEAT": self.scenePort.players[self.scenePort.myPlayerIndex].wheat -= 1
+                        case "WOOD": self.scenePort.players[self.scenePort.myPlayerIndex].wood -= 1
+                        default: break
+                        }
                         while !self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).YES") { }   //  keep trying
                     }))
                     alert.addAction(UIAlertAction(title: "DECLINE", style: .default, handler: { (action) in
@@ -200,8 +219,23 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "tradeAcknowledgement":
                 if Int(message[1]) != nil && Int(message[1])! == scenePort.myPlayerIndex {
                     if message[2] == "YES" { scenePort.players[scenePort.myPlayerIndex].tradeAccepted = true }
-                    if message[2] == "NO" { scenePort.players[scenePort.myPlayerIndex].tradeAccepted = true }
+                    if message[2] == "NO" { scenePort.players[scenePort.myPlayerIndex].tradeAccepted = false }
                 }
+            case "getTradeResources":
+                if Int(message[1]) != nil && Int(message[1])! == scenePort.myPlayerIndex {
+                    let player = scenePort.players[scenePort.myPlayerIndex]
+                    let message = "sendResourcesCount.\(scenePort.myPlayerIndex).\(player.brick).\(player.gold).\(player.sheep).\(player.stone).\(player.wheat).\(player.wood)"
+                    while !self.appDelegate.networkManager.sendData(data: message) { }
+                }
+            case "sendResourcesCount":
+                let player = scenePort.players[Int(message[1])!]
+                player.brick = Int(message[2])!
+                player.gold = Int(message[3])!
+                player.sheep = Int(message[4])!
+                player.stone = Int(message[5])!
+                player.wheat = Int(message[6])!
+                player.wood = Int(message[7])!
+                scenePort.players[scenePort.myPlayerIndex].fetchedTargetData = true
             default:
                 print("Unknown message")
         }

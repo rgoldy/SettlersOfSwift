@@ -45,7 +45,7 @@ class InGameTradeViewController: UIViewController {
     var gameDataReference: GameViewController!
     
     var currentRatio = 1
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         //  MIGHT HAVE TO MODIFY BELOW CODE TO viewWillAppear(Bool) METHOD TO BE COMPATIBLE WITH SAVE LOADING
@@ -86,14 +86,19 @@ class InGameTradeViewController: UIViewController {
                     case .None: break;
                 }
                 switch selectedTarget {
-                case .Brick: myPlayerIndex.brick += 1
-                case .Gold: myPlayerIndex.gold += 1
-                case .Sheep: myPlayerIndex.sheep += 1
-                case.Stone: myPlayerIndex.stone += 1
-                case .Wheat: myPlayerIndex.wheat += 1
-                case .Wood: myPlayerIndex.wood += 1
-                case .None: break;
-            }   }
+                    case .Brick: myPlayerIndex.brick += 1
+                    case .Gold: myPlayerIndex.gold += 1
+                    case .Sheep: myPlayerIndex.sheep += 1
+                    case.Stone: myPlayerIndex.stone += 1
+                    case .Wheat: myPlayerIndex.wheat += 1
+                    case .Wood: myPlayerIndex.wood += 1
+                    case .None: break;
+                }
+            } else {
+                let alert = UIAlertController(title: "Alert", message: "Please pick a source and a target resource prior to performing trade...", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
         } else {
             if selectedSource != .None, selectedTarget != .None {
                 let requestDefinition = "playerTradeRequest.\(gameDataReference.scenePort.myPlayerIndex + ((segmentSelector.selectedSegmentIndex == 1) ? 2 : 1)).\(gameDataReference.scenePort.myPlayerIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
@@ -149,13 +154,17 @@ class InGameTradeViewController: UIViewController {
                     let alert = UIAlertController(title: "Trade Notification", message: "The other player has accepted your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
-                    //  SEND TO OTHER PLAYER UPDATED RESOURCE COUNTS (NOT IMPLEMENTED)
                 } else {
                     let alert = UIAlertController(title: "Trade Notification", message: "The other player has declined your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
                 }
-        }   }
+            } else {
+                let alert = UIAlertController(title: "Alert", message: "Please pick a source and a target resource prior to performing trade...", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
         updateOptions()
     }
     
@@ -305,6 +314,13 @@ class InGameTradeViewController: UIViewController {
     
     @IBAction func didChangeSegment(_ sender: Any) {
         currentRatio = 1
+        if segmentSelector.selectedSegmentIndex != 0 {
+            let targetIndex = (gameDataReference.scenePort.myPlayerIndex + ((segmentSelector.selectedSegmentIndex == 1) ? 2 : 1)) % 3
+            gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fetchedTargetData = false
+            let message = "getTradeResources.\(targetIndex)"
+            while !gameDataReference.appDelegate.networkManager.sendData(data: message) { }
+            while gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fetchedTargetData == false { sleep(500) }
+        }
         updateOptions()
     }
 
