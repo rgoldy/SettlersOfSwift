@@ -87,7 +87,7 @@ class tileHandler {
         guard let tilesArray = dictionary["mainTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray, onMainIsland: true, water: false)
+        placeTiles(tilesArray: tilesArray, onMainIsland: true, water: false, harbour: false)
         _ = placeNumberTiles(tilesArray: tilesArray)
         
         //init smallIslands
@@ -118,7 +118,7 @@ class tileHandler {
         guard let tilesArray2 = dictionary["islandTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray2, onMainIsland: false, water: false)
+        placeTiles(tilesArray: tilesArray2, onMainIsland: false, water: false, harbour: false)
         _ = placeNumberTiles(tilesArray: tilesArray2)
         
         //init landHexDictionary
@@ -139,20 +139,36 @@ class tileHandler {
         guard let tilesArray3 = dictionary["waterTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray3, onMainIsland: false, water: true)
+        placeTiles(tilesArray: tilesArray3, onMainIsland: false, water: true, harbour: false)
+        
+        //init harbourTiles
+        
+        //get tile layout
+        guard let tilesArray4 = dictionary["harbourTiles"] as? [[Int]] else { return }
+        
+        //place tiles
+        placeTiles(tilesArray: tilesArray4, onMainIsland: false, water: false, harbour: true)
         
         //init all hex attributes
         initHexAttributes()
     }
     
     //takes in a 2d int tile array and initialises and places the tile in landBackground with a valid tile type
-    func placeTiles(tilesArray : [[Int]], onMainIsland: Bool, water: Bool) {
+    func placeTiles(tilesArray : [[Int]], onMainIsland: Bool, water: Bool, harbour: Bool) {
         for (row, rowArray) in tilesArray.enumerated() {
             let tileRow = NumRows - row - 1
             for (column, value) in rowArray.enumerated() {
                 if (water) {
                     if value == 0 {
                         let hex = LandHex(column: column, row: tileRow, type : "water", onMainIsland: onMainIsland, water: true)
+                        landHexArray.append(hex)
+                    }
+                } else if (harbour) {
+                    if value == 1 {
+                        let currTile = terrainTiles.tileGroups[7]
+                        landBackground.setTileGroup(currTile, forColumn: column, row: tileRow)
+                        let hex = LandHex(column: column, row: tileRow, type : "harbour", onMainIsland: onMainIsland, water: false)
+                        landHexArray.remove(at: landHexArray.index(where: {$0.column == column && $0.row == row})!)
                         landHexArray.append(hex)
                     }
                 } else {

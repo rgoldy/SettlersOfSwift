@@ -16,6 +16,7 @@ enum hexType:String {
     case brick
     case gold
     case water
+    case harbour
     case fish
 }
 
@@ -43,6 +44,7 @@ class LandHex {
         case "brick": self.type = hexType.brick
         case "gold": self.type = hexType.gold
         case "water": self.type = hexType.water
+        case "harbour": self.type = hexType.harbour
         default:
             self.type = nil
         }

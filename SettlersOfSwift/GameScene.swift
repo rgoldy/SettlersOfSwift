@@ -296,8 +296,9 @@ class GameScene: SKScene {
             case .sheep: type = 3
             case .brick: type = 4
             case .gold: type = 5
-            case .fish: type = 6
-            default: type = 7
+            case .harbour: type = 6
+            case .fish: type = 7
+            default: type = 8
             }
             board.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
@@ -324,7 +325,8 @@ class GameScene: SKScene {
                 case "3": type = .sheep
                 case "4": type = .brick
                 case "5": type = .gold
-                case "6": type = .fish
+                case "6": type = .harbour
+                case "7": type = .fish
                 default: type = .water
             }
             
@@ -860,7 +862,7 @@ class GameScene: SKScene {
         if (edge!.tile1.type == hexType.water && edge!.tile2!.type == hexType.water) { return false }
         if (edge!.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
-        if (!hasResourcesForNewRoad()) { return false }
+        if (!hasResourcesForNewRoad() && players[currentPlayer].nextAction != .WillBuildRoadForFree) { return false }
         
         edge!.edgeObject = edgeObject(edgeType : type, owner : myPlayerIndex)
         players[currentPlayer].ownedEdges.append(edge!)
@@ -878,14 +880,10 @@ class GameScene: SKScene {
             print ("successful sync cornerObject")
         }
         
-        // Take resources from hand
-        players[myPlayerIndex].brick -= 1
-        players[myPlayerIndex].wood -= 1
-        
-        //  Give back taken resources if build costs nothing
-        if players[myPlayerIndex].nextAction == .WillBuildRoadForFree {
-            players[myPlayerIndex].brick += 1
-            players[myPlayerIndex].wood += 1
+        // Take resources from hand if not building road for free
+        if(players[currentPlayer].nextAction != .WillBuildRoadForFree) {
+            players[myPlayerIndex].brick -= 1
+            players[myPlayerIndex].wood -= 1
         }
         
         // Inform others of resource change
@@ -905,7 +903,7 @@ class GameScene: SKScene {
         if (edge?.tile2?.type != hexType.water) { return false }
         if (edge?.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
-        if (!hasResourcesForNewShip()) { return false }
+        if (!hasResourcesForNewShip() && players[currentPlayer].nextAction != .WillBuildShipForFree) { return false }
         
         edge!.edgeObject = edgeObject(edgeType : type, owner : myPlayerIndex)
         players[currentPlayer].ownedEdges.append(edge!)
@@ -923,14 +921,10 @@ class GameScene: SKScene {
             print ("successful sync cornerObject")
         }
         
-        // Take resources from hand
-        players[myPlayerIndex].sheep -= 1
-        players[myPlayerIndex].wood -= 1
-        
-        //  Give back taken resources if build costs nothing
-        if players[myPlayerIndex].nextAction == .WillBuildShipForFree {
-            players[myPlayerIndex].sheep += 1
-            players[myPlayerIndex].wood += 1
+        // Take resources from hand if not building ship for free
+        if(players[currentPlayer].nextAction != .WillBuildShipForFree) {
+            players[myPlayerIndex].sheep -= 1
+            players[myPlayerIndex].wood -= 1
         }
         
         // Inform others of resource change
@@ -939,6 +933,64 @@ class GameScene: SKScene {
         DispatchQueue.main.async {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
+        
+        return true
+    }
+    
+    func moveShip(column: Int, row: Int, valid:Bool) -> Bool {
+        if (!valid) { return false }
+        if (players[myPlayerIndex].movedShipThisTurn) { return false }
+        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        if (edge == nil) { return false }
+        if (edge!.edgeObject == nil) { return false }
+        if (edge!.edgeObject!.type != edgeType.Boat) { return false }
+        if (edge!.edgeObject!.justBuilt) { return false }
+        if(!canMoveShip(edge: edge!)) { return false }
+        
+        handler.Edges.setTileGroup(nil, forColumn: column, row: row)
+        let index = players[currentPlayer].ownedEdges.index(where: {$0.column == column && $0.row == row})
+        players[currentPlayer].ownedEdges.remove(at: index!)
+        
+        let edgeObjectInfo = "edgeData.\(currentPlayer),\(column),\(row),nil"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: edgeObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        else {
+            print ("successful sync cornerObject")
+        }
+        
+        //BUILDSHIPFORFREE
+        players[currentPlayer].nextAction = PlayerIntentions.WillBuildShipForFree
+        
+        players[currentPlayer].movedShipThisTurn = true
+        return true
+    }
+    
+    func canMoveShip(edge: LandHexEdge) -> Bool {
+        
+        var neighbourCounter1 = 0
+        var neighbourCounter2 = 0
+        
+        for i in 0...3 {
+            let edgeObject1 = edge.neighbourVertex1.neighbourEdges[i]?.edgeObject
+            let edgeObject2 = edge.neighbourVertex2.neighbourEdges[i]?.edgeObject
+            
+            if (edgeObject1 != nil) {
+                if(edgeObject1!.type == edgeType.Boat && edgeObject1!.owner == myPlayerIndex) {
+                    neighbourCounter1 += 1
+                }
+            }
+            if (edgeObject2 != nil) {
+                if(edgeObject2!.type == edgeType.Boat && edgeObject2!.owner == myPlayerIndex) {
+                    neighbourCounter2 += 1
+                }
+            }
+        }
+        
+        if (neighbourCounter1 > 1 && neighbourCounter2 > 1) { return false }
         
         return true
     }
@@ -1240,12 +1292,18 @@ class GameScene: SKScene {
         let currPlayerNumber = Int(edgeInfo[0])!
         let column = Int(edgeInfo[1])!
         let row = Int(edgeInfo[2])!
-        let type = edgeType(rawValue: edgeInfo[3])
-        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
-        edge?.edgeObject = edgeObject(edgeType : type!, owner : currPlayerNumber)
-        players[currPlayerNumber].ownedEdges.append(edge!)
-        let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currPlayerNumber].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
-        handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+        if(edgeInfo[3] != "nil") {
+            let type = edgeType(rawValue: edgeInfo[3])
+            let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+            edge?.edgeObject = edgeObject(edgeType : type!, owner : currPlayerNumber)
+            players[currPlayerNumber].ownedEdges.append(edge!)
+            let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[currPlayerNumber].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
+            handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
+        } else {
+            let index = players[currPlayerNumber].ownedEdges.index(where: {$0.column == column && $0.row == row})
+            players[currPlayerNumber].ownedEdges.remove(at: index!)
+            handler.Edges.setTileGroup(nil, forColumn: column, row: row)
+        }
     }
     
     // function that rolls the dice
@@ -1622,6 +1680,12 @@ class GameScene: SKScene {
             knight?.hasBeenUpgradedThisTurn = false
             knight?.didActionThisTurn = false
         }
+        
+        for edge in players[player].ownedEdges {
+            edge.edgeObject?.justBuilt = false
+        }
+        
+        players[player].movedShipThisTurn = false
     }
     
     

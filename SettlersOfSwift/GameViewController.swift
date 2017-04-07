@@ -70,7 +70,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 backgroundMusicPlayer.play()
             } catch { }
         }
-        setAppearanceForMenuButton()
+        //setAppearanceForMenuButton()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

@@ -16,9 +16,11 @@ class edgeObject {
     var name : String = ""
     var type : edgeType
     var owner : Int
+    var justBuilt: Bool
     
     init (edgeType : edgeType, owner : Int) {
         type = edgeType
         self.owner = owner
+        justBuilt = true
     }
 }

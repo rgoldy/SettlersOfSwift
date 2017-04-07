@@ -12,11 +12,22 @@ enum cornerType : String {
     case Knight
 }
 
+enum harbourType : String {
+    case Brick
+    case Wheat
+    case Stone
+    case Sheep
+    case Wood
+    case General
+}
+
 //class that will represent a piece on a hex corner and its attributes
 class cornerObject {
     var name : String = ""
     var type : cornerType
     var owner: Int
+    var isHarbour : Bool = false;
+    var harbourType : harbourType?
     
     // Vars pertaining only to knights
     var strength : Int

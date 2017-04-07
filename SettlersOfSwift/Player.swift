@@ -56,6 +56,8 @@ class Player {
     var ownedKnights : [LandHexVertex] = []
     var color : playerColor
     
+    var movedShipThisTurn : Bool = false
+    
     init(name : String, playerNumber : Int) {
         self.name = name
         switch playerNumber {
