@@ -42,7 +42,7 @@ class Player {
     var cloth = 0
     var coin = 0
     
-    var fish : [FishToken] = []
+    var fish = 0
     var hasOldBoot = false
     
     var tradeAccepted: Bool? = nil
@@ -56,6 +56,11 @@ class Player {
     var ownedEdges : [LandHexEdge] = []
     var ownedKnights : [LandHexVertex] = []
     var color : playerColor
+    
+    var movingKnightStrength: Int = 0
+    var movingKnightUpgraded: Bool = false
+    var movingKnightFromRow: Int = 0
+    var movingKnightFromCol: Int = 0
     
     var movedShipThisTurn : Bool = false
     
@@ -82,54 +87,5 @@ class Player {
     
     func getPlayerText() -> String {
         return "\(name) : Wood = \(wood), Wheat = \(wheat), Stone = \(stone), Sheep = \(sheep), Brick = \(brick), Gold = \(gold), Paper = \(paper), Cloth = \(cloth), Coin = \(coin)"
-    }
-    
-    func discardFish(numFish: Int) -> [FishToken] {
-        let powerset = getPowerset(list: fish)
-        for set in powerset {
-            // get number of fish in the set
-            var sum = 0
-            for f in set {
-                sum += f.value
-            }
-            
-            // discard this set if it sums to the desired value
-            if sum == numFish {
-                var setIndex = 0
-                var toRemove : [Int] = []
-                for _ in 0..<self.fish.count {
-                    for i in 0..<self.fish.count {
-                        if setIndex < set.count && set[setIndex].value == self.fish[i].value {
-                            toRemove.append(i)
-                            setIndex += 1
-                        }
-                    }
-                }
-                for i in toRemove.count-1...0 {
-                        self.fish.remove(at: i)
-                }
-                return set
-            }
-        }
-        
-        return []
-    }
-    
-    func getPowerset(list: [FishToken]) -> [[FishToken]] {
-        var powerset: [[FishToken]] {
-            if list.count == 0 {
-                return [list]
-            }
-            else {
-                let tail = Array(list[1..<list.endIndex])
-                let head = list[0]
-                
-                let withoutHead = getPowerset(list: tail)
-                let withHead = withoutHead.map { $0 + [head] }
-                
-                return withHead + withoutHead
-            }
-        }
-        return powerset
     }
 }

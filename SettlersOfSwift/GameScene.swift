@@ -728,10 +728,15 @@ class GameScene: SKScene {
             players[currentPlayer].ownedCorners.append(corner!)
         }
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        
+        if type == .Knight {
+            tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
+        }
+        
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue),\(1),\(false),\(false),\(true)"
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -830,10 +835,10 @@ class GameScene: SKScene {
         corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
         players[currentPlayer].ownedKnights.append(corner!)
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(cornerType.Knight)"
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1044,6 +1049,9 @@ class GameScene: SKScene {
         if (!hasResourcesToPromoteKnight()) { return false }
         if (corner?.cornerObject?.hasBeenUpgradedThisTurn)! { return false }
         if (corner?.cornerObject?.strength == 3) { return false }
+        if (corner?.cornerObject?.strength == 2 && players[myPlayerIndex].politicsImprovementLevel < 2) {
+            return false
+        }
         
         corner?.cornerObject?.strength += 1
         corner?.cornerObject?.hasBeenUpgradedThisTurn = true
@@ -1052,7 +1060,7 @@ class GameScene: SKScene {
         players[myPlayerIndex].stone -= 1
         players[myPlayerIndex].sheep -= 1
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
         // Inform other players of resource change
@@ -1063,7 +1071,7 @@ class GameScene: SKScene {
         }
         
         // Inform other players of knight change
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? false)"
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? true)"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1092,7 +1100,7 @@ class GameScene: SKScene {
         // Subtract resources
         players[myPlayerIndex].wheat -= 1
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
         // Inform other players of resource change
@@ -1102,7 +1110,7 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? false)"
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1111,6 +1119,255 @@ class GameScene: SKScene {
         }
         
         return true
+    }
+    
+    func moveKnight(column: Int, row: Int, valid:Bool) -> Bool {
+        if (!valid) { return false }
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        if (corner == nil) { return false }
+        if (corner!.cornerObject == nil) { return false }
+        if (corner!.cornerObject!.type != .Knight) { return false }
+        if (corner!.cornerObject!.didActionThisTurn) { return false }
+        
+        handler.Vertices.setTileGroup(nil, forColumn: column, row: row)
+        let index = players[currentPlayer].ownedKnights.index(where: {$0.column == column && $0.row == row})
+        players[currentPlayer].ownedKnights.remove(at: index!)
+        
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),nil"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        
+        //BUILDKNIGHTFORFREE
+        players[currentPlayer].nextAction = PlayerIntentions.WillBuildKnightForFree
+        players[currentPlayer].movingKnightStrength = corner!.cornerObject!.strength
+        players[currentPlayer].movingKnightUpgraded = corner!.cornerObject!.hasBeenUpgradedThisTurn
+        players[currentPlayer].movingKnightFromRow = row
+        players[currentPlayer].movingKnightFromCol = column
+        
+        return true
+    }
+    
+    func placeKnightForFree(column: Int, row: Int, valid:Bool, displacable: Bool) -> Bool {
+        if (!valid) { return false }
+        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        if (corner == nil) { return false}
+        if (!canPlaceKnight(corner: corner!)) { return false }
+        
+        if (corner?.cornerObject != nil && !displacable) { return false }
+        else if (corner?.cornerObject != nil) {
+            let displace = corner!.cornerObject!
+            if (displace.type != .Knight) { return false }
+            if (displace.owner == myPlayerIndex) { return false }
+            if (displace.strength >= players[myPlayerIndex].movingKnightStrength) { return false }
+            
+            let index = players[displace.owner].ownedKnights.index(where: {$0.column == column && $0.row == row})
+            players[displace.owner].ownedKnights.remove(at: index!)
+            
+            corner?.cornerObject = nil
+            
+            let displaceInfo = "cornerData.\(currentPlayer),\(column),\(row),nil"
+            let sent = appDelegate.networkManager.sendData(data: displaceInfo)
+            if (!sent) {
+                print ("failed to sync cornerObject")
+            }
+            sendDisplaceRequest(player: displace.owner, column: column, row: row, strength: displace.strength, active: displace.isActive)
+        }
+        
+        var nextToRoad : Bool = false
+        for edge in corner!.neighbourEdges {
+            if (edge?.edgeObject?.owner == myPlayerIndex) {
+                nextToRoad = true
+                break
+            }
+        }
+        if (!nextToRoad) { return false }
+        
+        let start = handler.landHexVertexArray.first(where: {$0.column == players[myPlayerIndex].movingKnightFromCol && $0.row == players[myPlayerIndex].movingKnightFromRow})
+        let connected = pathBetween(a: start, b: corner)
+        if (!connected) { return false }
+        
+        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
+        corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
+        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
+        players[currentPlayer].ownedKnights.append(corner!)
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+
+        DispatchQueue.main.async {
+            self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
+        return true
+    }
+    
+    func sendDisplaceRequest(player: Int, column:Int, row:Int, strength: Int, active: Bool) {
+        let message = "displace.\(player),\(column),\(row),\(strength),\(active)"
+        
+        let sent = appDelegate.networkManager.sendData(data: message)
+        if !sent {
+            print("Failed to send displace knight message")
+        }
+    }
+    
+    func displaceKnight(data: String) {
+        let info = data.components(separatedBy: ",")
+        let player = Int(info[0])!
+        let col = Int(info[1])!
+        let row = Int(info[2])!
+        let strength = Int(info[3])!
+        let active = Bool(info[4])!
+        
+        if !replacementExists(row: row, col: col) { return }
+        
+        players[player].movingKnightFromCol = col
+        players[player].movingKnightFromRow = row
+        players[player].movingKnightStrength = strength
+        players[player].movingKnightUpgraded = active
+        players[player].nextAction = .WillDisplaceKnight
+    }
+    
+    func pathBetween(a: LandHexVertex?, b: LandHexVertex?) -> Bool {
+        if (a == nil || b == nil) { return false }
+        
+        var queue : [LandHexVertex] = []
+        var visited : [LandHexEdge] = []
+        queue.append(a!)
+        
+        while (queue.count > 0) {
+            let v = queue.remove(at: 0)
+            
+            if (v.column == b?.column && v.row == b?.row) {
+                return true
+            }
+            
+            let e1 = v.neighbourEdges[0]
+            let e2 = v.neighbourEdges[1]
+            let e3 = v.neighbourEdges[2]
+            let has1 = visited.first(where: {$0.column == e1?.column && $0.row == e1?.row})
+            let has2 = visited.first(where: {$0.column == e2?.column && $0.row == e2?.row})
+            let has3 = visited.first(where: {$0.column == e3?.column && $0.row == e3?.row})
+            
+            if (has1 == nil && e1 != nil && e1?.edgeObject?.owner == myPlayerIndex) {
+                let v1 = e1?.neighbourVertex1
+                let v2 = e1?.neighbourVertex2
+                visited.append(e1!)
+                if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
+                    if (v1?.row == v.row && v1?.column == v.column) {
+                        queue.append(v2!)
+                    }
+                    else {
+                        queue.append(v1!)
+                    }
+                }
+            }
+            if (has2 == nil && e2 != nil && e2?.edgeObject?.owner == myPlayerIndex) {
+                let v1 = e2?.neighbourVertex1
+                let v2 = e2?.neighbourVertex2
+                visited.append(e2!)
+                if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
+                    if (v1?.row == v.row && v1?.column == v.column) {
+                        queue.append(v2!)
+                    }
+                    else {
+                        queue.append(v1!)
+                    }
+                }
+
+            }
+            if (has3 == nil && e3 != nil && e3?.edgeObject?.owner == myPlayerIndex) {
+                let v1 = e3?.neighbourVertex1
+                let v2 = e3?.neighbourVertex2
+                visited.append(e3!)
+                if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
+                    if (v1?.row == v.row && v1?.column == v.column) {
+                        queue.append(v2!)
+                    }
+                    else {
+                        queue.append(v1!)
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    func replacementExists(row: Int, col: Int) -> Bool {
+        let start = players[myPlayerIndex].ownedKnights.first(where:{$0.row == row && $0.column == col})
+        var queue : [LandHexVertex] = []
+        var visited : [LandHexEdge] = []
+        queue.append(start!)
+        
+        while (queue.count > 0) {
+            let v = queue.remove(at: 0)
+            
+            if (v.cornerObject == nil && (v.row != start?.row || v.column != start?.column)) {
+                return true
+            }
+            
+            let e1 = v.neighbourEdges[0]
+            let e2 = v.neighbourEdges[1]
+            let e3 = v.neighbourEdges[2]
+            let has1 = visited.first(where: {$0.column == e1?.column && $0.row == e1?.row})
+            let has2 = visited.first(where: {$0.column == e2?.column && $0.row == e2?.row})
+            let has3 = visited.first(where: {$0.column == e3?.column && $0.row == e3?.row})
+            
+            if (has1 == nil && e1 != nil && e1?.edgeObject?.owner == myPlayerIndex) {
+                let v1 = e1?.neighbourVertex1
+                let v2 = e1?.neighbourVertex2
+                visited.append(e1!)
+                if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
+                    if (v1?.row == v.row && v1?.column == v.column) {
+                        queue.append(v2!)
+                    }
+                    else {
+                        queue.append(v1!)
+                    }
+                }
+            }
+            if (has2 == nil && e2 != nil && e2?.edgeObject?.owner == myPlayerIndex) {
+                let v1 = e2?.neighbourVertex1
+                let v2 = e2?.neighbourVertex2
+                visited.append(e2!)
+                if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
+                    if (v1?.row == v.row && v1?.column == v.column) {
+                        queue.append(v2!)
+                    }
+                    else {
+                        queue.append(v1!)
+                    }
+                }
+                
+            }
+            if (has3 == nil && e3 != nil && e3?.edgeObject?.owner == myPlayerIndex) {
+                let v1 = e3?.neighbourVertex1
+                let v2 = e3?.neighbourVertex2
+                visited.append(e3!)
+                if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
+                    if (v1?.row == v.row && v1?.column == v.column) {
+                        queue.append(v2!)
+                    }
+                    else {
+                        queue.append(v1!)
+                    }
+                }
+            }
+        }
+        
+        return false
     }
 
     func hasResourcesForNewSettlement() -> Bool {
@@ -1173,9 +1430,6 @@ class GameScene: SKScene {
     }
 
     func hasResourcesToPromoteKnight() -> Bool {
-        // TODO:
-        //      MUST HAVE PURCHASED THRID LEVEL POLITICS(BLUE) CITY IMPROVEMENT
-        //      IN ORDER TO UPGRADE KNIGHT TO HIGHEST LEVEL (need flip chart)
         if (players[myPlayerIndex].stone >= 1 && players[myPlayerIndex].sheep >= 1) {
             return true
         }
@@ -1188,27 +1442,54 @@ class GameScene: SKScene {
         let currPlayerNumber = Int(cornerInfo[0])!
         let column = Int(cornerInfo[1])!
         let row = Int(cornerInfo[2])!
-        let type = cornerType(rawValue: cornerInfo[3])
-        
-        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
-        
-        corner?.cornerObject = cornerObject(cornerType : type!, owner: currPlayerNumber)
-        
-        if type == .Knight {
-            corner?.cornerObject?.strength = Int(cornerInfo[4])!
-            corner?.cornerObject?.isActive = Bool(cornerInfo[5])!
-            corner?.cornerObject?.hasBeenUpgradedThisTurn = Bool(cornerInfo[6])!
-            corner?.cornerObject?.didActionThisTurn = Bool(cornerInfo[7])!
+        if(cornerInfo[3] != "nil") {
+            let type = cornerType(rawValue: cornerInfo[3])
             
-            players[currPlayerNumber].ownedKnights.append(corner!)
+            let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+            
+            corner?.cornerObject = cornerObject(cornerType : type!, owner: currPlayerNumber)
+            
+            if type == .Knight {
+                corner?.cornerObject?.strength = Int(cornerInfo[4])!
+                corner?.cornerObject?.isActive = Bool(cornerInfo[5])!
+                corner?.cornerObject?.hasBeenUpgradedThisTurn = Bool(cornerInfo[6])!
+                corner?.cornerObject?.didActionThisTurn = Bool(cornerInfo[7])!
+                
+                players[currPlayerNumber].ownedKnights.append(corner!)
+            }
+            else {
+                players[currPlayerNumber].ownedCorners.append(corner!)
+            }
+            
+            var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+            
+            if type == .Knight && (corner?.cornerObject?.isActive)! {
+                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)Active"})
+            }
+            else if type == .Knight {
+                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)InActive"})
+            }
+            
+            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         }
         else {
-            players[currPlayerNumber].ownedCorners.append(corner!)
+            var isKnight = false
+            var index = players[currPlayerNumber].ownedCorners.index(where: {$0.column == column && $0.row == row})
+            
+            if (index == nil) {
+                index = players[currPlayerNumber].ownedKnights.index(where: {$0.column == column && $0.row == row})
+                isKnight = true
+            }
+            
+            if (isKnight) {
+                players[currPlayerNumber].ownedKnights.remove(at: index!)
+            }
+            else {
+                players[currPlayerNumber].ownedCorners.remove(at: index!)
+            }
+            
+            handler.Edges.setTileGroup(nil, forColumn: column, row: row)
         }
-        
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
-        
-        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
     }
     
     //function that will place an edge object and set its owner then send info to other players
@@ -1387,20 +1668,20 @@ class GameScene: SKScene {
                             case .fish:
                                 var newFish = drawFishCard()
                         
-                                if (newFish.value == -1) { /* Deck is empty */ }
-                                else if (newFish.value == 0) {
+                                if (newFish == -1) { /* Deck is empty */ }
+                                else if (newFish == 0) {
                                    player.hasOldBoot = true
                                 }
                                 else {
-                                    player.fish.append(newFish)
+                                    player.fish += newFish
                                     if (vertex.cornerObject?.type == cornerType.City) {
                                         newFish = drawFishCard()
-                                        if (newFish.value == -1) { /* Deck is empty */ }
-                                        else if (newFish.value == 0) {
+                                        if (newFish == -1) { /* Deck is empty */ }
+                                        else if (newFish == 0) {
                                             player.hasOldBoot = true
                                         }
                                         else {
-                                            player.fish.append(newFish)
+                                            player.fish += newFish
                                         }
                                     }
                                 }
@@ -1440,20 +1721,20 @@ class GameScene: SKScene {
                             case .fish:
                              var newFish = drawFishCard()
                              
-                             if (newFish.value == -1) { /* Deck is empty */ }
-                             else if (newFish.value == 0) {
+                             if (newFish == -1) { /* Deck is empty */ }
+                             else if (newFish == 0) {
                                 player.hasOldBoot = true
                              }
                              else {
-                                player.fish.append(newFish)
+                                player.fish += newFish
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     newFish = drawFishCard()
-                                    if (newFish.value == -1) { /* Deck is empty */ }
-                                    else if (newFish.value == 0) {
+                                    if (newFish == -1) { /* Deck is empty */ }
+                                    else if (newFish == 0) {
                                         player.hasOldBoot = true
                                     }
                                     else {
-                                        player.fish.append(newFish)
+                                        player.fish += newFish
                                     }
                                 }
                              }
@@ -1493,20 +1774,20 @@ class GameScene: SKScene {
                             case .fish:
                              var newFish = drawFishCard()
                              
-                             if (newFish.value == -1) { /* Deck is empty */ }
-                             else if (newFish.value == 0) {
+                             if (newFish == -1) { /* Deck is empty */ }
+                             else if (newFish == 0) {
                                 player.hasOldBoot = true
                              }
                              else {
-                                player.fish.append(newFish)
+                                player.fish += newFish
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     newFish = drawFishCard()
-                                    if (newFish.value == -1) { /* Deck is empty */ }
-                                    else if (newFish.value == 0) {
+                                    if (newFish == -1) { /* Deck is empty */ }
+                                    else if (newFish  == 0) {
                                         player.hasOldBoot = true
                                     }
                                     else {
-                                        player.fish.append(newFish)
+                                        player.fish += newFish
                                     }
                                 }
                              }
@@ -1532,7 +1813,6 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
-            case .fish: players[myPlayerIndex].fish.append(drawFishCard())
             default: break
         }
         if (vertex.tile2 != nil) {
@@ -1544,7 +1824,6 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
-            case .fish: players[myPlayerIndex].fish.append(drawFishCard())
             default: break
             }
         }
@@ -1557,7 +1836,6 @@ class GameScene: SKScene {
             case .sheep: players[myPlayerIndex].sheep += 1
             case .brick: players[myPlayerIndex].brick += 1
             case .gold: players[myPlayerIndex].gold += 2
-            case .fish: players[myPlayerIndex].fish.append(drawFishCard())
             default: break
             }
         }
@@ -1580,10 +1858,8 @@ class GameScene: SKScene {
         pData.append("\(players[player].gold),")
         pData.append("\(players[player].paper),")
         pData.append("\(players[player].cloth),")
-        pData.append("\(players[player].coin);")
-        for f in players[player].fish {
-            pData.append("\(f.value),")
-        }
+        pData.append("\(players[player].coin),")
+        pData.append("\(players[player].fish)")
         
         let sent = appDelegate.networkManager.sendData(data: pData)
         if (!sent) {
@@ -1594,20 +1870,19 @@ class GameScene: SKScene {
     
     // Decodes and sets resources of a specific player
     func recievePlayerData(data: String) {
-        let playerData = data.components(separatedBy: ";")
-        let resourceData = playerData[0].components(separatedBy: ",")
-        let fishData = playerData[1].components(separatedBy: ",").dropLast()
+        let playerData = data.components(separatedBy: ",")
         
-        let player = Int(resourceData[0])!
-        let wood = Int(resourceData[1])!
-        let wheat = Int(resourceData[2])!
-        let stone = Int(resourceData[3])!
-        let sheep = Int(resourceData[4])!
-        let brick = Int(resourceData[5])!
-        let gold = Int(resourceData[6])!
-        let paper = Int(resourceData[7])!
-        let cloth = Int(resourceData[8])!
-        let coin = Int(resourceData[9])!
+        let player = Int(playerData[0])!
+        let wood = Int(playerData[1])!
+        let wheat = Int(playerData[2])!
+        let stone = Int(playerData[3])!
+        let sheep = Int(playerData[4])!
+        let brick = Int(playerData[5])!
+        let gold = Int(playerData[6])!
+        let paper = Int(playerData[7])!
+        let cloth = Int(playerData[8])!
+        let coin = Int(playerData[9])!
+        let fish = Int(playerData[10])!
         
         players[player].wood = wood
         players[player].wheat = wheat
@@ -1618,12 +1893,7 @@ class GameScene: SKScene {
         players[player].paper = paper
         players[player].cloth = cloth
         players[player].coin = coin
-        
-        players[player].fish.removeAll()
-        for fish in fishData {
-            let value = Int(fish)!
-            players[player].fish.append(FishToken(v: value))
-        }
+        players[player].fish = fish
     }
     
     func sendFishDeck()
@@ -1653,7 +1923,7 @@ class GameScene: SKScene {
     
     func shuffleFish(deck: [FishToken])
     {
-        var newDeck :[FishToken] = []
+        var newDeck : [FishToken] = []
         while(fishDeck.count > 0)
         {
             let randIndex = arc4random_uniform(UInt32(fishDeck.count))
@@ -1663,14 +1933,17 @@ class GameScene: SKScene {
         fishDeck = newDeck
     }
     
-    func drawFishCard() -> FishToken {
+    func drawFishCard() -> Int {
         if (fishDeck.count == 0) {
-            return FishToken(v: -1)
+            return -1
         }
         
         let fish = fishDeck.remove(at: 0)
+        if fish.value != 0 {
+            fishDeck.append(fish);
+        }
         sendFishDeck()
-        return fish
+        return fish.value
     }
     
     func endTurn(player: Int) {
@@ -1779,7 +2052,7 @@ class GameScene: SKScene {
                     }
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled) {
+                    if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
                         endTurn(player: currentPlayer)
                         currentPlayer = currentPlayer + 1
                         currGamePhase = GamePhase.p2Turn
@@ -1801,7 +2074,7 @@ class GameScene: SKScene {
                     }
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled) {
+                    if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
                         endTurn(player: currentPlayer)
                         currentPlayer = (currentPlayer + 1) % players.count
                         if (currentPlayer == 2) {
@@ -1827,7 +2100,7 @@ class GameScene: SKScene {
                     }
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled) {
+                    if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
                         endTurn(player: currentPlayer)
                         currentPlayer = 0
                         currGamePhase = GamePhase.p1Turn
@@ -1843,6 +2116,9 @@ class GameScene: SKScene {
                 
             default : break
             }
+        }
+        else {
+            handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
         }
     }
     
@@ -1873,16 +2149,43 @@ class GameScene: SKScene {
                     let cityHasBeenBuilt = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
                     if cityHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
                 case .WillBuildWall: return;   //  NOT IMPLEMENTED
-                case .WillBuildKnight: return;   //  NOT IMPLEMENTED
-                case .WillPromoteKnight: return;   //  NOT IMPLEMENTED
-                case .WillActivateKnight: return;   //  NOT IMPLEMENTED
+                case .WillBuildKnight:
+                    let built = buildKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if (built) { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillPromoteKnight:
+                    let upgraded = upgradeKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if (upgraded) { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillActivateKnight:
+                    let activated = activateKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if (activated) { players[myPlayerIndex].nextAction = .WillDoNothing }
                 case .WillBuildMetropolis: return;   //  NOT IMPLEMENTED
                 case .WillRemoveOutlaw: return;   //  NOT IMPLEMENTED
                 case .WillMoveShip: return;   //  NOT IMPLEMENTED
-                case .WillMoveKnight: return;   //  NOT IMPLEMENTED
+                case .WillMoveKnight:
+                    let movedKnight = moveKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled)
+                    if (movedKnight) { players[myPlayerIndex].nextAction = .WillBuildKnightForFree }
                 case .WillMoveOutlaw: return;   //  NOT IMPLEMENTED
+                case .WillBuildKnightForFree:
+                    let movedKnight = placeKnightForFree(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled, displacable: true)
+                    if movedKnight { players[myPlayerIndex].nextAction = .WillDoNothing }
+                case .WillDisplaceKnight:
+                    let movedKnight = placeKnightForFree(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: true, displacable: false)
+                    if movedKnight {
+                        players[myPlayerIndex].nextAction = .WillDoNothing
+                    }
             }
             
+        }
+        else if (currGamePhase == .p1Turn || currGamePhase == .p2Turn || currGamePhase == .p3Turn) {
+            // If it's not your turn but an action is still required
+            switch players[myPlayerIndex].nextAction {
+                case .WillDisplaceKnight:
+                    let movedKnight = placeKnightForFree(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: true, displacable: false)
+                    if movedKnight {
+                        players[myPlayerIndex].nextAction = .WillDoNothing
+                    }
+                default: break
+            }
         }
 
         

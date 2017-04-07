@@ -21,6 +21,8 @@ enum PlayerIntentions {
     case WillBuildCity
     case WillBuildWall
     case WillBuildKnight
+    case WillBuildKnightForFree
+    case WillDisplaceKnight
     case WillPromoteKnight
     case WillActivateKnight
     case WillBuildMetropolis

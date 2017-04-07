@@ -236,6 +236,8 @@ class GameViewController: UIViewController, NetworkDelegate {
                 player.wheat = Int(message[6])!
                 player.wood = Int(message[7])!
                 scenePort.players[scenePort.myPlayerIndex].fetchedTargetData = true
+            case "displace":
+                scenePort.displaceKnight(data: message[1])
             default:
                 print("Unknown message")
         }
