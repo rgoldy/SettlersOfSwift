@@ -72,10 +72,6 @@ class GameViewController: UIViewController, NetworkDelegate {
     @IBAction func invokeActionsMenu(_ sender: Any) {
         if (scenePort.currGamePhase == .p1Turn || scenePort.currGamePhase == .p2Turn || scenePort.currGamePhase == .p3Turn) && scenePort.currentPlayer == scenePort.myPlayerIndex {
             let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
-            let displaceKnight = UIAlertAction(title: "Displace Knight", style: .default) { action -> Void in
-                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillDisplaceKnight
-            }
-            actionSheet.addAction(displaceKnight)
             let moveKnight = UIAlertAction(title: "Move Knight", style: .default) { action -> Void in
                 self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveKnight
             }
@@ -88,15 +84,6 @@ class GameViewController: UIViewController, NetworkDelegate {
                 self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveShip
             }
             actionSheet.addAction(moveShip)
-            let never_mind_XD = UIAlertAction(title: "Cancel", style: .default) { action -> Void in }
-            actionSheet.addAction(never_mind_XD)
-            self.present(actionSheet, animated: true, completion: nil)
-        } else if scenePort.currGamePhase == .p1Turn || scenePort.currGamePhase == .p2Turn || scenePort.currGamePhase == .p3Turn {
-            let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
-            let displaceKnight = UIAlertAction(title: "Displace Knight", style: .default) { action -> Void in
-                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillDisplaceKnight
-            }
-            actionSheet.addAction(displaceKnight)
             let never_mind_XD = UIAlertAction(title: "Cancel", style: .default) { action -> Void in }
             actionSheet.addAction(never_mind_XD)
             self.present(actionSheet, animated: true, completion: nil)
@@ -122,6 +109,28 @@ class GameViewController: UIViewController, NetworkDelegate {
             backgroundMusicPlayer.stop()
             backgroundMusicPlayer = nil
         }
+    }
+
+    @IBAction func displayCurrentHoldings(_ sender: Any) {
+        let player = scenePort.players[scenePort.myPlayerIndex]
+        let notificationBanner = UIView(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
+        notificationBanner.isOpaque = false
+        notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.6)
+        let notificationContent = UILabel(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
+        notificationContent.isOpaque = false
+        notificationContent.font = UIFont(name: "Avenir-Roman", size: 9)
+        notificationContent.textColor = UIColor.darkGray
+        notificationContent.textAlignment = .center
+        notificationContent.numberOfLines = 0
+        notificationContent.lineBreakMode = .byWordWrapping
+        notificationContent.adjustsFontSizeToFitWidth = true
+        notificationContent.text = "Current Holdings:\n\n\n~ Resources ~\n\nBrick: \(player.brick)\nGold: \(player.gold)\nSheep: \(player.sheep)\nStone: \(player.stone)\nWheat: \(player.wheat)\nWood: \(player.wood)\n\n~ Commodities ~\n\nCloth: \(player.cloth)\nCoin: \(player.coin)\nPaper: \(player.paper)\n\nFish: \(player.fish)"
+        self.view?.addSubview(notificationBanner)
+        self.view?.addSubview(notificationContent)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+            notificationContent.removeFromSuperview()
+            notificationBanner.removeFromSuperview()
+        })
     }
     
     override var shouldAutorotate: Bool {

@@ -175,7 +175,7 @@ class InGameFlipChartsViewController: UIViewController {
                 default: break
             }
         } else {
-            currentChartSubtitle.text = "Upgrade to THE " + ChartTypes.getImprovementDescription(level, chart: ChartTypes.init(rawValue: chartsSceneIndex)!) + " to unlock new benefits!"
+            currentChartSubtitle.text = "Upgrade to THE " + ChartTypes.getImprovementDescription(2, chart: ChartTypes.init(rawValue: chartsSceneIndex)!) + " to unlock new benefits!"
         }
         previousChartPreview.image = UIImage(named: "leftOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
         nextChartPreview.image = UIImage(named: "rightOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
