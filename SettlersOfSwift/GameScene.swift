@@ -34,6 +34,7 @@ enum EventDieSides: Int {
 class GameScene: SKScene {
     
     //init scene nodes
+    //var vw: UIViewController
     var cam:SKCameraNode!
     var currGamePhase = GamePhase.Setup
     let dice = Dice()
@@ -346,10 +347,12 @@ class GameScene: SKScene {
         var playerInfo = "playerData.\(appDelegate.networkManager.getName()),\(0);"
         myPlayerIndex = 0
         
-        for i in 0...appDelegate.networkManager.session.connectedPeers.count-1 {
-            let p = Player(name: appDelegate.networkManager.session.connectedPeers[i].displayName, playerNumber: i+1)
+        var i = 1
+        for peer in appDelegate.networkManager.session.connectedPeers {
+            let p = Player(name: peer.displayName, playerNumber: i)
             players.append(p)
-            playerInfo.append("\(appDelegate.networkManager.session.connectedPeers[i].displayName),\(i+1);")
+            playerInfo.append("\(peer.displayName),\(i);")
+            i += 1
         }
         
         // Send player info to other players
@@ -1649,6 +1652,172 @@ class GameScene: SKScene {
         }
     }
     
+    func barbarianAttack() {
+        var knightStrength : [Int] = [0, 0, 0]
+        var barbarianStrength = 0
+        
+        var immune : [Bool] = [true, true, true]
+        for player in 0..<players.count {
+            for knightCorner in players[player].ownedKnights {
+                if (knightCorner.cornerObject?.isActive)! {
+                    knightStrength[player] += (knightCorner.cornerObject?.strength)!
+                    knightCorner.cornerObject?.isActive = false
+                    
+                    //Update knight GUI
+//                    let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(player.color.rawValue)Knight\(knightCorner.cornerObject?.strength)false"})
+//                    handler.Vertices.setTileGroup(tileGroup, forColumn: knightCorner.column, row: knightCorner.row)
+                }
+            }
+            for cityCorner in players[player].ownedCorners {
+                if (cityCorner.cornerObject?.type == .City) {
+                    barbarianStrength += 1
+                    if (!(cityCorner.cornerObject?.isMetropolis)!) {
+                        immune[player] = false
+                    }
+                }
+            }
+        }
+        
+        if knightStrength[0] + knightStrength[1] + knightStrength[2] < barbarianStrength {
+            // determine weakest player(s)
+            var weakest = -1
+            if !immune[0] { weakest = knightStrength[1] }
+            if knightStrength[1] < weakest && !immune[1] { weakest = knightStrength[1] }
+            if knightStrength[2] < weakest && !immune[2] { weakest = knightStrength[2] }
+            
+            var num = 0
+            for player in 0..<players.count {
+                if knightStrength[player] == weakest {
+                    num += 1
+                }
+            }
+            
+            // If everyone is immune nothing happens
+            if num == 0 {
+                return
+            }
+            
+            if knightStrength[myPlayerIndex] == weakest {
+                var numCities = 0
+                for cityCorner in players[myPlayerIndex].ownedCorners {
+                    if cityCorner.cornerObject?.type == .City && !(cityCorner.cornerObject?.isMetropolis)! {
+                        numCities += 1
+                    }
+                }
+                
+                if (numCities == 1) {
+                    let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The barbarians are stronger than the knights, and will pillage your city", preferredStyle: UIAlertControllerStyle.alert)
+                    let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                        let cityCorner = self.players[self.myPlayerIndex].ownedCorners.first(where: {$0.cornerObject?.type == .City && $0.cornerObject?.isMetropolis == false})
+                        let _ = self.destroyCity(column: (cityCorner?.column)!, row: (cityCorner?.row)!)
+                    }
+                    alert.addAction(okay)
+                    OperationQueue.main.addOperation { () -> Void in
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    }
+                }
+                else {
+                    let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The barbarians have defeated the knights - choose which city they pillage", preferredStyle: UIAlertControllerStyle.alert)
+                    let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                        self.players[self.myPlayerIndex].nextAction = .WillDestroyCity
+                    }
+                    alert.addAction(okay)
+                    OperationQueue.main.addOperation { () -> Void in
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+        else {
+            // determine strongest player(s)
+            var strongest = knightStrength[0]
+            if knightStrength[1] > strongest { strongest = knightStrength[1] }
+            if knightStrength[2] > strongest { strongest = knightStrength[2] }
+            
+            var num = 0
+            for player in 0..<players.count {
+                if knightStrength[player] == strongest {
+                    num += 1
+                }
+            }
+            
+            if num == 1 {
+                if knightStrength[myPlayerIndex] == strongest {
+                    players[myPlayerIndex].victoryPoints += 1
+                    let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The knights have defeated the barbarians! You are the \"Defender of Catan\", and receive one victory point!", preferredStyle: UIAlertControllerStyle.alert)
+                    let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                        self.players[self.myPlayerIndex].victoryPoints += 1
+                    }
+                    alert.addAction(okay)
+                    OperationQueue.main.addOperation { () -> Void in
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+            else {
+                if knightStrength[myPlayerIndex] == strongest {
+                    let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The knights have defeated the barbarians! Draw a Progress Card", preferredStyle: UIAlertControllerStyle.alert)
+                    
+                    let trade: UIAlertAction = UIAlertAction(title: "Trade", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                        self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &self.gameDeck)!)
+                        
+                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.TRADES")
+                        if !sent { print("failed to send draw progress card") }
+                    }
+                    
+                    let politics = UIAlertAction(title: "Politics", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                        self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &self.gameDeck)!)
+                        
+                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.POLITICS")
+                        if !sent { print("failed to send draw progress card") }
+                    }
+                    
+                    let science = UIAlertAction(title: "Science", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                        self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &self.gameDeck)!)
+                        
+                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.SCIENCES")
+                        if !sent { print("failed to send draw progress card") }
+                    }
+                    
+                    alert.addAction(trade)
+                    alert.addAction(politics)
+                    alert.addAction(science)
+                    
+                    OperationQueue.main.addOperation { () -> Void in
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    func destroyCity(column: Int, row: Int) -> Bool {
+        let cityCorner = players[myPlayerIndex].ownedCorners.first(where: {$0.column == column && $0.row == row})
+        if cityCorner == nil {return false}
+        if cityCorner?.cornerObject == nil {return false}
+        if cityCorner?.cornerObject?.owner != myPlayerIndex {return false}
+        if cityCorner?.cornerObject?.type != .City {return false}
+        if (cityCorner?.cornerObject?.isMetropolis)! { return false }
+        
+        cityCorner?.cornerObject?.type = .Settlement
+        cityCorner?.cornerObject?.hasCityWall = false
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cityCorner!.cornerObject!.type.rawValue)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        
+        if !sent { print ("Failed to update others on city destruction") }
+        
+        cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Settlement)"
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        
+        if !sent { print ("Failed to update others on city destruction") }
+        
+        return true
+    }
+    
     // function that rolls the dice
     func rollDice() {
         let values = dice.rollDice()
@@ -1695,6 +1864,7 @@ class GameScene: SKScene {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
                         })
+                        barbarianAttack()
                         barbariansDistanceFromCatan = 7
                         break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
                     case 1...2:
@@ -2233,7 +2403,11 @@ class GameScene: SKScene {
                     cancelButton.backgroundColor = UIColor.gray
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
+                    var ready = true
+                    for p in players {
+                        if p.nextAction != .WillDoNothing {ready = false; break}
+                    }
+                    if (rolled && ready) {
                         endTurn(player: currentPlayer)
                         currentPlayer = currentPlayer + 1
                         currGamePhase = GamePhase.p2Turn
@@ -2259,7 +2433,11 @@ class GameScene: SKScene {
                     cancelButton.backgroundColor = UIColor.gray
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
+                    var ready = true
+                    for p in players {
+                        if p.nextAction != .WillDoNothing {ready = false; break}
+                    }
+                    if (rolled && ready) {
                         endTurn(player: currentPlayer)
                         currentPlayer = (currentPlayer + 1) % players.count
                         if (currentPlayer == 2) {
@@ -2289,7 +2467,11 @@ class GameScene: SKScene {
                     cancelButton.backgroundColor = UIColor.gray
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
-                    if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
+                    var ready = true
+                    for p in players {
+                        if p.nextAction != .WillDoNothing {ready = false; break}
+                    }
+                    if (rolled && ready) {
                         endTurn(player: currentPlayer)
                         currentPlayer = 0
                         currGamePhase = GamePhase.p1Turn
@@ -2363,6 +2545,9 @@ class GameScene: SKScene {
                     if movedKnight {
                         players[myPlayerIndex].nextAction = .WillDoNothing
                     }
+                case .WillDestroyCity:
+                    let destroyedCity = destroyCity(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation))
+                    if destroyedCity {players[myPlayerIndex].nextAction = .WillDoNothing }
             }
             
         }
@@ -2374,6 +2559,9 @@ class GameScene: SKScene {
                     if movedKnight {
                         players[myPlayerIndex].nextAction = .WillDoNothing
                     }
+                case .WillDestroyCity:
+                    let destroyedCity = destroyCity(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation))
+                    if destroyedCity {players[myPlayerIndex].nextAction = .WillDoNothing }
                 default: break
             }
         }

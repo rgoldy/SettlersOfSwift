@@ -30,4 +30,5 @@ enum PlayerIntentions {
     case WillMoveShip
     case WillMoveKnight
     case WillMoveOutlaw
+    case WillDestroyCity
 }

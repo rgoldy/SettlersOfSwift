@@ -35,6 +35,7 @@ class cornerObject {
 
     // Var pertaining only to cities
     var hasCityWall : Bool
+    var isMetropolis : Bool = false
     
     init (cornerType : cornerType, owner: Int) {
         type = cornerType

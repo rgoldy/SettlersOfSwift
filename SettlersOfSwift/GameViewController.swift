@@ -314,6 +314,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
                         })
+                        scenePort.barbarianAttack()
                         scenePort.barbariansDistanceFromCatan = 7
                     break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
                     case 1...2:
