@@ -1726,6 +1726,7 @@ class GameScene: SKScene {
             case .PoliticsSide:
                 if players[myPlayerIndex].politicsImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Politics, fromDeck: &gameDeck)
+                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.POLITICS")
                     if let card = newCard {
                         notificationContent.text = "You have just received The \(card) Progress Card from the Politics Deck...congratulations!"
                         self.view?.addSubview(notificationBanner)
@@ -1746,6 +1747,7 @@ class GameScene: SKScene {
                 }   }
             case .SciencesSide:
                 if players[myPlayerIndex].sciencesImprovementLevel + 3 > values[0] {
+                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.SCIENCES")
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Sciences, fromDeck: &gameDeck)
                     if let card = newCard {
                         notificationContent.text = "You have just received The \(card) Progress Card from the Sciences Deck...congratulations!"
@@ -1768,6 +1770,7 @@ class GameScene: SKScene {
             case .TradesSide:
                 if players[myPlayerIndex].tradesImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Trades, fromDeck: &gameDeck)
+                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.TRADES")
                     if let card = newCard {
                         notificationContent.text = "You have just received The \(card) Progress Card from the Trades Deck...congratulations!"
                         self.view?.addSubview(notificationBanner)
