@@ -28,6 +28,8 @@ class Player {
     var gold = 10
     var goldTradeRatio = 4
     
+    var progressCards = [ProgressCardsType]()
+    
     var politicsImprovementLevel = -1
     var sciencesImprovementLevel = -1
     var tradesImprovementLevel = -1

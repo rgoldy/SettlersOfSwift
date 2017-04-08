@@ -1636,10 +1636,56 @@ class GameScene: SKScene {
             print ("successfully distributed resources to all players")
         }
         
-        //  TO IMPLEMENT _ check for progress card match and distribute
-        let eventDieOutcome = EventDieSides.init(rawValue: values[2])
-        //
-    }
+        let eventDieOutcome = EventDieSides.init(rawValue: values[2])!
+        switch eventDieOutcome {
+            case .BarbarianSideA:   break   //  NOT IMPLEMENTED
+            case .BarbarianSideB:   break   //  NOT IMPLEMENTED
+            case .BarbarianSideC:   break   //  NOT IMPLEMENTED
+            case .PoliticsSide:
+                if players[myPlayerIndex].politicsImprovementLevel + 3 > values[0] {
+                    let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Politics, fromDeck: &gameDeck)
+                    if let card = newCard {
+                        players[myPlayerIndex].progressCards.append(card)
+                        let message = "You have just received The \(card) Progress Card from the Politics Deck...congratulations!"
+                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    } else {
+                        let message = "Unfortunately, there is no Progress Card remaining from the Politics Deck...hurry up and finish the game!"
+                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                }   }
+            case .SciencesSide:
+                if players[myPlayerIndex].sciencesImprovementLevel + 3 > values[0] {
+                    let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Sciences, fromDeck: &gameDeck)
+                    if let card = newCard {
+                        players[myPlayerIndex].progressCards.append(card)
+                        let message = "You have just received The \(card) Progress Card from the Sciences Deck...congratulations!"
+                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    } else {
+                        let message = "Unfortunately, there is no Progress Card remaining from the Sciences Deck...hurry up and finish the game!"
+                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                }   }
+            case .TradesSide:
+                if players[myPlayerIndex].tradesImprovementLevel + 3 > values[0] {
+                    let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Trades, fromDeck: &gameDeck)
+                    if let card = newCard {
+                        players[myPlayerIndex].progressCards.append(card)
+                        let message = "You have just received The \(card) Progress Card from the Trades Deck...congratulations!"
+                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    } else {
+                        let message = "Unfortunately, there is no Progress Card remaining from the Trades Deck...hurry up and finish the game!"
+                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+    }   }       }   }
     
     func updateDice(red : Int, yellow: Int, event: Int) {
         DispatchQueue.main.async

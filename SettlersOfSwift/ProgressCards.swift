@@ -107,7 +107,7 @@ enum ProgressCardsType {
         return deck
     }
     
-    func getNextCardOfCategory(_ category: ProgressCardsCategory, fromDeck: inout [ProgressCardsType?]) -> ProgressCardsType? {
+    static func getNextCardOfCategory(_ category: ProgressCardsCategory, fromDeck: inout [ProgressCardsType?]) -> ProgressCardsType? {
         for index in 0..<54 {
             if fromDeck[index] != nil && ProgressCardsType.getCategoryOfCard(fromDeck[index]!) == category {
                 let removedCard = fromDeck.remove(at: index)

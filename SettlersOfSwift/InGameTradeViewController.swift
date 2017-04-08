@@ -138,8 +138,7 @@ class InGameTradeViewController: UIViewController {
                     let alert = UIAlertController(title: "Trade Notification", message: "The other player has refused your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
-                }            }
-        }
+        }   }   }
         updateOptions()
     }
     
