@@ -189,7 +189,7 @@ class GameScene: SKScene {
 //        buildShipButton.textAlignment = NSTextAlignment.center
 //        self.view?.addSubview(buildShipButton)
         
-        cancelButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/5, height: self.view!.bounds.height/14)
+        cancelButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/7, height: self.view!.bounds.height/14)
         cancelButton.text = "Cancel Action"
         cancelButton.font = UIFont(name: "Arial", size: 13)
         cancelButton.backgroundColor = UIColor.gray
@@ -1680,7 +1680,7 @@ class GameScene: SKScene {
         
         if knightStrength[0] + knightStrength[1] + knightStrength[2] < barbarianStrength {
             // determine weakest player(s)
-            var weakest = -1
+            var weakest = 100
             if !immune[0] { weakest = knightStrength[1] }
             if knightStrength[1] < weakest && !immune[1] { weakest = knightStrength[1] }
             if knightStrength[2] < weakest && !immune[2] { weakest = knightStrength[2] }
@@ -1720,6 +1720,8 @@ class GameScene: SKScene {
                     let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The barbarians have defeated the knights - choose which city they pillage", preferredStyle: UIAlertControllerStyle.alert)
                     let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         self.players[self.myPlayerIndex].nextAction = .WillDestroyCity
+                        let sent = self.appDelegate.networkManager.sendData(data: "intentions.\(self.myPlayerIndex).WillDestroyCity")
+                        if !sent {print("failed to send player intentions")}
                     }
                     alert.addAction(okay)
                     OperationQueue.main.addOperation { () -> Void in
@@ -2498,7 +2500,7 @@ class GameScene: SKScene {
         //  TEMPORARY TEST CODE FOR REWIRING FLIP CHART FUNCTIONALITIES TO BUTTON HANDLING CODE (RESET INTENTIONS AFTERWARDS)
         
         if (currGamePhase == .p1Turn || currGamePhase == .p2Turn || currGamePhase == .p3Turn) && currentPlayer == myPlayerIndex {
-        
+            
             switch players[myPlayerIndex].nextAction {
                 case .WillDoNothing: break
                 case .WillBuildRoad:

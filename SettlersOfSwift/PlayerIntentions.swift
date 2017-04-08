@@ -11,7 +11,7 @@
 //  VALUE OF PROPERTY IS SET IN FLIP CHART SCREEN AND CLEARED AT START OF EACH TURN
 //  VALUE IS PROCESSED BY GAME BOARD'S TOUCH HANDLING METHOD TO DETERMINE COURSE OF ACTION
 
-enum PlayerIntentions {
+enum PlayerIntentions : String {
     case WillDoNothing
     case WillBuildRoad
     case WillBuildRoadForFree

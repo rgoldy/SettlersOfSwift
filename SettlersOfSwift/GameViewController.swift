@@ -101,13 +101,16 @@ class GameViewController: UIViewController, NetworkDelegate {
             } catch { }
         }
         setAppearanceForMenuButton()
+        if readyPlayers > 1 && scenePort.players[scenePort.myPlayerIndex].nextAction != .WillDoNothing {
+            scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if backgroundMusicPlayer != nil {
-            backgroundMusicPlayer.stop()
-            backgroundMusicPlayer = nil
+            //backgroundMusicPlayer.stop()
+            //backgroundMusicPlayer = nil
         }
     }
 
@@ -361,6 +364,10 @@ class GameViewController: UIViewController, NetworkDelegate {
                         })
                     default: break
                 }
+            case "intentions":
+                let player = Int(message[1])!
+                let intent = PlayerIntentions(rawValue: message[2])
+                scenePort.players[player].nextAction = intent!
             default:
                 print("Unknown message")
         }
