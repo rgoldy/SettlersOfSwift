@@ -59,6 +59,39 @@ class GameViewController: UIViewController, NetworkDelegate {
         
     }
     
+    @IBAction func invokeActionsMenu(_ sender: Any) {
+        if (scenePort.currGamePhase == .p1Turn || scenePort.currGamePhase == .p2Turn || scenePort.currGamePhase == .p3Turn) && scenePort.currentPlayer == scenePort.myPlayerIndex {
+            let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+            let displaceKnight = UIAlertAction(title: "Displace Knight", style: .default) { action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillDisplaceKnight
+            }
+            actionSheet.addAction(displaceKnight)
+            let moveKnight = UIAlertAction(title: "Move Knight", style: .default) { action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveKnight
+            }
+            actionSheet.addAction(moveKnight)
+            let moveOutlaw = UIAlertAction(title: "Move Outlaw", style: .default) { action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveOutlaw
+            }
+            actionSheet.addAction(moveOutlaw)
+            let moveShip = UIAlertAction(title: "Move Ship", style: .default) { action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveShip
+            }
+            actionSheet.addAction(moveShip)
+            let never_mind_XD = UIAlertAction(title: "Cancel", style: .default) { action -> Void in }
+            actionSheet.addAction(never_mind_XD)
+            self.present(actionSheet, animated: true, completion: nil)
+        } else if scenePort.currGamePhase == .p1Turn || scenePort.currGamePhase == .p2Turn || scenePort.currGamePhase == .p3Turn {
+            let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+            let displaceKnight = UIAlertAction(title: "Displace Knight", style: .default) { action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillDisplaceKnight
+            }
+            actionSheet.addAction(displaceKnight)
+            let never_mind_XD = UIAlertAction(title: "Cancel", style: .default) { action -> Void in }
+            actionSheet.addAction(never_mind_XD)
+            self.present(actionSheet, animated: true, completion: nil)
+    }   }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
@@ -70,7 +103,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 backgroundMusicPlayer.play()
             } catch { }
         }
-//        setAppearanceForMenuButton()
+        setAppearanceForMenuButton()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -94,12 +127,14 @@ class GameViewController: UIViewController, NetworkDelegate {
     }
     
     func setAppearanceForMenuButton() {
-        let playerColor = scenePort.players[scenePort.myPlayerIndex].color
-        switch playerColor {
-            case .Blue: menuButton.backgroundColor = UIColor.blue
-            case .Orange: menuButton.backgroundColor = UIColor.orange
-            case .Red: menuButton.backgroundColor = UIColor.red
-        }
+        if scenePort.myPlayerIndex != -1 {
+            let playerColor = scenePort.players[scenePort.myPlayerIndex].color
+            switch playerColor {
+                case .Blue: menuButton.backgroundColor = UIColor.blue
+                case .Orange: menuButton.backgroundColor = UIColor.orange
+                case .Red: menuButton.backgroundColor = UIColor.red
+            }
+        } else { menuButton.backgroundColor = UIColor.black }
         //  CUSTOMIZES MENU BUTTON APPEARANCE
     }
     

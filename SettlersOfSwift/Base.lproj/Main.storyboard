@@ -190,6 +190,10 @@
                             </button>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <gestureRecognizers/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="gz5-YG-ySX" appends="YES" id="PWi-JV-l9A"/>
+                        </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9YK-BG-ZUu"/>
                     <connections>
@@ -199,6 +203,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uLg-jz-GzQ" sceneMemberID="firstResponder"/>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.80000000000000004" id="gz5-YG-ySX">
+                    <connections>
+                        <action selector="invokeActionsMenu:" destination="nnZ-Iz-im3" id="D9F-UA-FTr"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="-368" y="1086"/>
         </scene>

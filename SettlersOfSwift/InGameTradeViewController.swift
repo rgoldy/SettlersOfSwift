@@ -106,7 +106,7 @@ class InGameTradeViewController: UIViewController {
                 myPlayerIndex.tradeAccepted = nil
                 let message = "playerTradeRequest.\(otherPlayerIndex).\(myIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
-                let loadingView = UIActivityIndicatorView(frame: CGRect(x: 182, y: 343, width: 50, height: 50))
+                let loadingView = UIActivityIndicatorView(frame: CGRect(x: 343, y: 182, width: 50, height: 50))
                 loadingView.color = UIColor.gray
                 loadingView.startAnimating()
                 self.view.addSubview(loadingView)
@@ -296,7 +296,7 @@ class InGameTradeViewController: UIViewController {
             gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fetchedTargetData = false
             let message = "getTradeResources.\(targetIndex)"
             let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
-            let loadingView = UIActivityIndicatorView(frame: CGRect(x: 182, y: 343, width: 50, height: 50))
+            let loadingView = UIActivityIndicatorView(frame: CGRect(x: 343, y: 182, width: 50, height: 50))
             loadingView.color = UIColor.gray
             loadingView.startAnimating()
             self.view.addSubview(loadingView)
