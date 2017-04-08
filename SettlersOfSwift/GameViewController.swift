@@ -102,6 +102,9 @@ class GameViewController: UIViewController, NetworkDelegate {
             } catch { }
         }
         setAppearanceForMenuButton()
+        if readyPlayers > 1 && scenePort.players[scenePort.myPlayerIndex].nextAction != .WillDoNothing {
+            scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+        }
     }
 
     override var shouldAutorotate: Bool {
@@ -303,6 +306,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
                         })
+                        scenePort.barbarianAttack()
                         scenePort.barbariansDistanceFromCatan = 7
                     break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
                     case 1...2:
@@ -331,6 +335,10 @@ class GameViewController: UIViewController, NetworkDelegate {
                         })
                     default: break
                 }
+            case "intentions":
+                let player = Int(message[1])!
+                let intent = PlayerIntentions(rawValue: message[2])
+                scenePort.players[player].nextAction = intent!
             default:
                 print("Unknown message")
         }
