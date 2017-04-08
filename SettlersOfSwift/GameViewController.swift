@@ -34,6 +34,7 @@ class GameViewController: UIViewController, NetworkDelegate {
     //  PLAYS BACKGROUND MUSIC CONTAINED IN FILE NAMED background.mp3 (NOT TESTED)
     
     var backgroundMusicPlayer: AVAudioPlayer!
+    var muted = false
     
     // Added by Riley
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -92,7 +93,7 @@ class GameViewController: UIViewController, NetworkDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
-        if backgroundMusicPlayer == nil {
+        if backgroundMusicPlayer == nil && !muted {
             do {
                 let music = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "background.mp3", ofType: nil)!))
                 backgroundMusicPlayer = music
@@ -102,37 +103,7 @@ class GameViewController: UIViewController, NetworkDelegate {
         }
         setAppearanceForMenuButton()
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if backgroundMusicPlayer != nil {
-            backgroundMusicPlayer.stop()
-            backgroundMusicPlayer = nil
-        }
-    }
 
-    @IBAction func displayCurrentHoldings(_ sender: Any) {
-        let player = scenePort.players[scenePort.myPlayerIndex]
-        let notificationBanner = UIView(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
-        notificationBanner.isOpaque = false
-        notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.6)
-        let notificationContent = UILabel(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
-        notificationContent.isOpaque = false
-        notificationContent.font = UIFont(name: "Avenir-Roman", size: 11)
-        notificationContent.textColor = UIColor.darkGray
-        notificationContent.textAlignment = .center
-        notificationContent.numberOfLines = 0
-        notificationContent.lineBreakMode = .byWordWrapping
-        notificationContent.adjustsFontSizeToFitWidth = true
-        notificationContent.text = "Current Holdings:\n\n\n~ Resources ~\n\nBrick: \(player.brick)\nGold: \(player.gold)\nSheep: \(player.sheep)\nStone: \(player.stone)\nWheat: \(player.wheat)\nWood: \(player.wood)\n\n~ Commodities ~\n\nCloth: \(player.cloth)\nCoin: \(player.coin)\nPaper: \(player.paper)\n\nFish: \(player.fish)"
-        self.view?.addSubview(notificationBanner)
-        self.view?.addSubview(notificationContent)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-            notificationContent.removeFromSuperview()
-            notificationBanner.removeFromSuperview()
-        })
-    }
-    
     override var shouldAutorotate: Bool {
         return true
     }
@@ -372,11 +343,13 @@ class GameViewController: UIViewController, NetworkDelegate {
     }
     
     @IBAction func toggleMusicPlayback(_ sender: Any) {
-        if backgroundMusicPlayer != nil {
+        if backgroundMusicPlayer != nil && !muted {
+            muted = true
             backgroundMusicPlayer.stop()
             backgroundMusicPlayer = nil
         } else {
             do {
+                muted = false
                 let music = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "background.mp3", ofType: nil)!))
                 backgroundMusicPlayer = music
                 backgroundMusicPlayer.numberOfLoops = -1

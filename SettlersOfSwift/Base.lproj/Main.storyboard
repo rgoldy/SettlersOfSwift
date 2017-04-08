@@ -217,8 +217,6 @@
                         <gestureRecognizers/>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="gz5-YG-ySX" appends="YES" id="PWi-JV-l9A"/>
-                            <outletCollection property="gestureRecognizers" destination="xlr-xg-HlF" appends="YES" id="sJV-dq-SvO"/>
-                            <outletCollection property="gestureRecognizers" destination="LJP-Aq-M9S" appends="YES" id="wDV-z6-Cp6"/>
                         </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9YK-BG-ZUu"/>
@@ -236,17 +234,6 @@
                         <action selector="invokeActionsMenu:" destination="nnZ-Iz-im3" id="D9F-UA-FTr"/>
                     </connections>
                 </pongPressGestureRecognizer>
-                <screenEdgePanGestureRecognizer minimumNumberOfTouches="2" maximumNumberOfTouches="2" id="xlr-xg-HlF">
-                    <rectEdge key="edges" right="YES"/>
-                    <connections>
-                        <action selector="displayCurrentHoldings:" destination="nnZ-Iz-im3" id="f4d-Qz-Tdr"/>
-                    </connections>
-                </screenEdgePanGestureRecognizer>
-                <tapGestureRecognizer numberOfTapsRequired="3" numberOfTouchesRequired="0" id="LJP-Aq-M9S">
-                    <connections>
-                        <action selector="displayCurrentHoldings:" destination="nnZ-Iz-im3" id="KG4-Bk-HZp"/>
-                    </connections>
-                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="-368" y="1086"/>
         </scene>
