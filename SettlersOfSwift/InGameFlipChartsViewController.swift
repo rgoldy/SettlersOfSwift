@@ -161,6 +161,7 @@ class InGameFlipChartsViewController: UIViewController {
     
     func drawCurrentChartScene() {
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
+        
         var level = -1
         if chartsSceneIndex == 0 { level = playerReference.politicsImprovementLevel }
         if chartsSceneIndex == 1 { level = playerReference.sciencesImprovementLevel }

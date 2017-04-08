@@ -44,7 +44,7 @@ class GameScene: SKScene {
     var gameDeck = ProgressCardsType.generateNewGameDeck()
     
     let gameButton = UITextField()
-    let tradeButton = UITextField()
+    let cancelButton = UITextField()
     let buildUpgradeButton = UITextField()
     let buildRoadButton = UITextField()
     let buildShipButton = UITextField()
@@ -161,41 +161,41 @@ class GameScene: SKScene {
         gameButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(gameButton)
         
-        buildUpgradeButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5 - self.view!.bounds.width/10, y: self.view!.bounds.height/14.5 + self.view!.bounds.height/13.5 , width: self.view!.bounds.width/5, height: self.view!.bounds.height/14)
-        buildUpgradeButton.text = "Build/Upgrade Settlement"
-        buildUpgradeButton.font = UIFont(name: "Arial", size: 10)
-        buildUpgradeButton.backgroundColor = UIColor.gray
-        buildUpgradeButton.borderStyle = UITextBorderStyle.roundedRect
-        buildUpgradeButton.isUserInteractionEnabled = false
-        buildUpgradeButton.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(buildUpgradeButton)
+//        buildUpgradeButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5 - self.view!.bounds.width/10, y: self.view!.bounds.height/14.5 + self.view!.bounds.height/13.5 , width: self.view!.bounds.width/5, height: self.view!.bounds.height/14)
+//        buildUpgradeButton.text = "Build/Upgrade Settlement"
+//        buildUpgradeButton.font = UIFont(name: "Arial", size: 10)
+//        buildUpgradeButton.backgroundColor = UIColor.gray
+//        buildUpgradeButton.borderStyle = UITextBorderStyle.roundedRect
+//        buildUpgradeButton.isUserInteractionEnabled = false
+//        buildUpgradeButton.textAlignment = NSTextAlignment.center
+//        self.view?.addSubview(buildUpgradeButton)
+//        
+//        buildRoadButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+//        buildRoadButton.text = "Build Road"
+//        buildRoadButton.font = UIFont(name: "Arial", size: 10)
+//        buildRoadButton.backgroundColor = UIColor.gray
+//        buildRoadButton.borderStyle = UITextBorderStyle.roundedRect
+//        buildRoadButton.isUserInteractionEnabled = false
+//        buildRoadButton.textAlignment = NSTextAlignment.center
+//        self.view?.addSubview(buildRoadButton)
+//        
+//        buildShipButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+//        buildShipButton.text = "Build Ship"
+//        buildShipButton.font = UIFont(name: "Arial", size: 10)
+//        buildShipButton.backgroundColor = UIColor.gray
+//        buildShipButton.borderStyle = UITextBorderStyle.roundedRect
+//        buildShipButton.isUserInteractionEnabled = false
+//        buildShipButton.textAlignment = NSTextAlignment.center
+//        self.view?.addSubview(buildShipButton)
         
-        buildRoadButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        buildRoadButton.text = "Build Road"
-        buildRoadButton.font = UIFont(name: "Arial", size: 10)
-        buildRoadButton.backgroundColor = UIColor.gray
-        buildRoadButton.borderStyle = UITextBorderStyle.roundedRect
-        buildRoadButton.isUserInteractionEnabled = false
-        buildRoadButton.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(buildRoadButton)
-        
-        buildShipButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        buildShipButton.text = "Build Ship"
-        buildShipButton.font = UIFont(name: "Arial", size: 10)
-        buildShipButton.backgroundColor = UIColor.gray
-        buildShipButton.borderStyle = UITextBorderStyle.roundedRect
-        buildShipButton.isUserInteractionEnabled = false
-        buildShipButton.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(buildShipButton)
-        
-        tradeButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        tradeButton.text = "Trade"
-        tradeButton.font = UIFont(name: "Arial", size: 13)
-        tradeButton.backgroundColor = UIColor(red: 1.0, green: 175/255, blue: 63/255, alpha: 1.0)
-        tradeButton.borderStyle = UITextBorderStyle.roundedRect
-        tradeButton.isUserInteractionEnabled = false
-        tradeButton.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(tradeButton)
+        cancelButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/5, height: self.view!.bounds.height/14)
+        cancelButton.text = "Cancel Action"
+        cancelButton.font = UIFont(name: "Arial", size: 13)
+        cancelButton.backgroundColor = UIColor.gray
+        cancelButton.borderStyle = UITextBorderStyle.roundedRect
+        cancelButton.isUserInteractionEnabled = false
+        cancelButton.textAlignment = NSTextAlignment.center
+        self.view?.addSubview(cancelButton)
         
         redDiceUI.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
         redDiceUI.image = UIImage(named: "red1")
@@ -1144,7 +1144,7 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),true,\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),true)"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -2225,6 +2225,10 @@ class GameScene: SKScene {
                         rolled = true
                     }
                 }
+                if (cancelButton.frame.contains(targetLocationView)) {
+                    players[myPlayerIndex].nextAction = .WillDoNothing
+                    cancelButton.backgroundColor = UIColor.gray
+                }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
                         endTurn(player: currentPlayer)
@@ -2246,6 +2250,10 @@ class GameScene: SKScene {
                         rollDice()
                         rolled = true
                     }
+                }
+                if (cancelButton.frame.contains(targetLocationView)) {
+                    players[myPlayerIndex].nextAction = .WillDoNothing
+                    cancelButton.backgroundColor = UIColor.gray
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
@@ -2272,6 +2280,10 @@ class GameScene: SKScene {
                         rollDice()
                         rolled = true
                     }
+                }
+                if (cancelButton.frame.contains(targetLocationView)) {
+                    players[myPlayerIndex].nextAction = .WillDoNothing
+                    cancelButton.backgroundColor = UIColor.gray
                 }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     if (rolled && players[myPlayerIndex].nextAction == .WillDoNothing) {
@@ -2471,5 +2483,6 @@ class GameScene: SKScene {
 //    }
 //    
 //    override func update(_ currentTime: TimeInterval) {
-//    }    
+//    }  
+
 }
