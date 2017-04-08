@@ -298,10 +298,10 @@ class GameScene: SKScene {
             case .sheep: type = 3
             case .brick: type = 4
             case .gold: type = 5
-            case .harbour: type = 6
-            case .fish: type = 7
-            default: type = 8
+            case .fish: type = 6
+            default: type = 7
             }
+            
             board.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
         return board
@@ -327,21 +327,16 @@ class GameScene: SKScene {
                 case "3": type = .sheep
                 case "4": type = .brick
                 case "5": type = .gold
-                case "6": type = .harbour
-                case "7": type = .fish
+                case "6": type = .water
                 default: type = .water
             }
             
-            // Set hex types and values
-            for hex in handler.landHexArray {
-                if (hex.row == row && hex.column == column) {
-                    hex.type = type
-                    
-                    if(handler.landHexDictionary[value] == nil) { handler.landHexDictionary[value] = [] }
-                    handler.landHexDictionary[value]!.append((column!, row!))
-                    break
-                }
-            }
+            
+            let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+            hex?.type = type
+            
+            if(handler.landHexDictionary[value] == nil) { handler.landHexDictionary[value] = [] }
+            handler.landHexDictionary[value]!.append((column!, row!))
         }
     }
     
@@ -753,6 +748,23 @@ class GameScene: SKScene {
             distributeResourcesOnSetup(vertex: corner!)
         }
         
+        
+        //check if corner is a harbour, update the trade ratio
+        if corner!.isHarbour {
+            switch (corner!.harbourType!) {
+            case .Brick: players[currentPlayer].brickTradeRatio = 2
+            case .Wheat: players[currentPlayer].wheatTradeRatio = 2
+            case .Stone: players[currentPlayer].stoneTradeRatio = 2
+            case .Sheep: players[currentPlayer].sheepTradeRatio = 2
+            case .Wood: players[currentPlayer].woodTradeRatio = 2
+            case .General:  if(players[currentPlayer].brickTradeRatio == 4) { players[currentPlayer].brickTradeRatio = 3 }
+            if(players[currentPlayer].wheatTradeRatio == 4) { players[currentPlayer].wheatTradeRatio = 3 }
+            if(players[currentPlayer].stoneTradeRatio == 4) { players[currentPlayer].stoneTradeRatio = 3 }
+            if(players[currentPlayer].sheepTradeRatio == 4) { players[currentPlayer].sheepTradeRatio = 3 }
+            if(players[currentPlayer].woodTradeRatio == 4) { players[currentPlayer].woodTradeRatio = 3 }
+            }
+        }
+        
         return true
     }
     
@@ -812,6 +824,22 @@ class GameScene: SKScene {
         sendPlayerData(player: myPlayerIndex)
         DispatchQueue.main.async {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+        
+        //check if corner is a harbour, update the trade ratio
+        if corner!.isHarbour {
+            switch (corner!.harbourType!) {
+            case .Brick: players[currentPlayer].brickTradeRatio = 2
+            case .Wheat: players[currentPlayer].wheatTradeRatio = 2
+            case .Stone: players[currentPlayer].stoneTradeRatio = 2
+            case .Sheep: players[currentPlayer].sheepTradeRatio = 2
+            case .Wood: players[currentPlayer].woodTradeRatio = 2
+            case .General:  if(players[currentPlayer].brickTradeRatio == 4) { players[currentPlayer].brickTradeRatio = 3 }
+                            if(players[currentPlayer].wheatTradeRatio == 4) { players[currentPlayer].wheatTradeRatio = 3 }
+                            if(players[currentPlayer].stoneTradeRatio == 4) { players[currentPlayer].stoneTradeRatio = 3 }
+                            if(players[currentPlayer].sheepTradeRatio == 4) { players[currentPlayer].sheepTradeRatio = 3 }
+                            if(players[currentPlayer].woodTradeRatio == 4) { players[currentPlayer].woodTradeRatio = 3 }
+            }
         }
         
         return true

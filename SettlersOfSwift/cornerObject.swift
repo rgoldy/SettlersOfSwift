@@ -26,8 +26,6 @@ class cornerObject {
     var name : String = ""
     var type : cornerType
     var owner: Int
-    var isHarbour : Bool = false;
-    var harbourType : harbourType?
     
     // Vars pertaining only to knights
     var strength : Int

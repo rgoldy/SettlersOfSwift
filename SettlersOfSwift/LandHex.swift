@@ -16,7 +16,6 @@ enum hexType:String {
     case brick
     case gold
     case water
-    case harbour
     case fish
 }
 
@@ -30,6 +29,7 @@ class LandHex {
     var edges = [LandHexEdge]() //object on edge of hex i.e. boat or road, 0 is top, 1 is top right, 2 is bot right..
     var onMainIsland: Bool //bool to determine if a landhex is on the main island or not
     var water: Bool //bool to indicate if this tile is a water tile or not
+    var harbourType : harbourType?
     
     init(column:Int, row: Int, type : String, onMainIsland: Bool, water: Bool) {
         self.column = column
@@ -44,9 +44,9 @@ class LandHex {
         case "brick": self.type = hexType.brick
         case "gold": self.type = hexType.gold
         case "water": self.type = hexType.water
-        case "harbour": self.type = hexType.harbour
         default:
             self.type = nil
         }
+        harbourType = nil
     }
 }

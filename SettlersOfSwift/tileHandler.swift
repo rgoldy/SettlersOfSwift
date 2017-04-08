@@ -155,6 +155,8 @@ class tileHandler {
     
     //takes in a 2d int tile array and initialises and places the tile in landBackground with a valid tile type
     func placeTiles(tilesArray : [[Int]], onMainIsland: Bool, water: Bool, harbour: Bool) {
+        var harbourCounter = 0
+        
         for (row, rowArray) in tilesArray.enumerated() {
             let tileRow = NumRows - row - 1
             for (column, value) in rowArray.enumerated() {
@@ -165,11 +167,27 @@ class tileHandler {
                     }
                 } else if (harbour) {
                     if value == 1 {
-                        let currTile = terrainTiles.tileGroups[7]
-                        landBackground.setTileGroup(currTile, forColumn: column, row: tileRow)
-                        let hex = LandHex(column: column, row: tileRow, type : "harbour", onMainIsland: onMainIsland, water: false)
-                        landHexArray.remove(at: landHexArray.index(where: {$0.column == column && $0.row == row})!)
-                        landHexArray.append(hex)
+                        let hex = landHexArray.first(where: {$0.column == column && $0.row == tileRow})
+                        switch harbourCounter {
+                        case 0: hex?.harbourType = .General
+                                landBackground.setTileGroup(terrainTiles.tileGroups[8], forColumn: column, row: tileRow)
+                        case 1: hex?.harbourType = .Stone
+                                landBackground.setTileGroup(terrainTiles.tileGroups[10], forColumn: column, row: tileRow)
+                        case 2: hex?.harbourType = .Brick
+                                landBackground.setTileGroup(terrainTiles.tileGroups[13], forColumn: column, row: tileRow)
+                        case 3: hex?.harbourType = .Wheat
+                                landBackground.setTileGroup(terrainTiles.tileGroups[11], forColumn: column, row: tileRow)
+                        case 4: hex?.harbourType = .Wood
+                                landBackground.setTileGroup(terrainTiles.tileGroups[12], forColumn: column, row: tileRow)
+                        case 5: hex?.harbourType = .General
+                                landBackground.setTileGroup(terrainTiles.tileGroups[7], forColumn: column, row: tileRow)
+                        case 6: hex?.harbourType = .Sheep
+                                landBackground.setTileGroup(terrainTiles.tileGroups[9], forColumn: column, row: tileRow)
+                        case 7: hex?.harbourType = .General
+                                landBackground.setTileGroup(terrainTiles.tileGroups[7], forColumn: column, row: tileRow)
+                        default: break
+                        }
+                        harbourCounter+=1
                     }
                 } else {
                     if value == 1 {
@@ -335,6 +353,49 @@ class tileHandler {
                     }
                 }
             }
+            
+            //init harbour
+            var harbourCounter = 0
+            for _ in 0...5 {
+                if(hex.harbourType != nil) {
+                    switch harbourCounter {
+                    case 0: hex.corners[2].isHarbour = true
+                            hex.corners[2].harbourType = hex.harbourType
+                            hex.corners[3].isHarbour = true
+                            hex.corners[3].harbourType = hex.harbourType
+                    case 1: hex.corners[4].isHarbour = true
+                            hex.corners[4].harbourType = hex.harbourType
+                            hex.corners[5].isHarbour = true
+                            hex.corners[5].harbourType = hex.harbourType
+                    case 2: hex.corners[3].isHarbour = true
+                            hex.corners[3].harbourType = hex.harbourType
+                            hex.corners[4].isHarbour = true
+                            hex.corners[4].harbourType = hex.harbourType
+                    case 3: hex.corners[3].isHarbour = true
+                            hex.corners[3].harbourType = hex.harbourType
+                            hex.corners[4].isHarbour = true
+                            hex.corners[4].harbourType = hex.harbourType
+                    case 4: hex.corners[2].isHarbour = true
+                            hex.corners[2].harbourType = hex.harbourType
+                            hex.corners[3].isHarbour = true
+                            hex.corners[3].harbourType = hex.harbourType
+                    case 5: hex.corners[0].isHarbour = true
+                            hex.corners[0].harbourType = hex.harbourType
+                            hex.corners[1].isHarbour = true
+                            hex.corners[1].harbourType = hex.harbourType
+                    case 6: hex.corners[5].isHarbour = true
+                            hex.corners[5].harbourType = hex.harbourType
+                            hex.corners[0].isHarbour = true
+                            hex.corners[0].harbourType = hex.harbourType
+                    case 7: hex.corners[0].isHarbour = true
+                            hex.corners[0].harbourType = hex.harbourType
+                            hex.corners[1].isHarbour = true
+                            hex.corners[1].harbourType = hex.harbourType
+                    default: break
+                    }
+                    harbourCounter+=1
+                }
+            }
         }
         
         //init hex edges
@@ -443,9 +504,10 @@ class tileHandler {
             for (column, tileRow) in entry.value {
                 let numberTile = numberTiles.tileGroups.first(where: {$0.name == "\(entry.key)"})
                 Numbers.setTileGroup(numberTile, forColumn: column, row: tileRow)
-                let terrainType = landHexArray.first(where: {$0.column == column && $0.row == tileRow})?.type?.rawValue
-                let terrainTile = terrainTiles.tileGroups.first(where: {$0.name == terrainType})
-                landBackground.setTileGroup(terrainTile, forColumn: column, row: tileRow)
+                let hex = landHexArray.first(where: {$0.column == column && $0.row == tileRow})
+                let terrainType = hex?.type?.rawValue
+                let terrainTile = terrainTiles.tileGroups.first(where: {$0.name == terrainType!})
+                if(hex?.harbourType == nil) { landBackground.setTileGroup(terrainTile, forColumn: column, row: tileRow) }
             }
         }
     }

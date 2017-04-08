@@ -12,7 +12,7 @@ import MultipeerConnectivity
 class NewGameController: UITableViewController, NetworkDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    let numberOfPlayers = 2
+    let numberOfPlayers = 3
     
     @IBOutlet var tblView: UITableView!
     

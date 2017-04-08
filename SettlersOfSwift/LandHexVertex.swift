@@ -18,6 +18,8 @@ class LandHexVertex {
     var cornerObject : cornerObject?
     var neighbourVertices: [LandHexVertex?] = []//array of 3 neighbouring vertices
     var neighbourEdges: [LandHexEdge?] = [] //array of 3 neighbouring vertices
+    var isHarbour : Bool = false
+    var harbourType : harbourType?
 
     
     init(tile1: LandHex, column : Int, row : Int) {
