@@ -290,7 +290,7 @@
                         <action selector="showPreviousCards:" destination="rYV-nH-P3V" id="kGI-8C-C6u"/>
                     </connections>
                 </swipeGestureRecognizer>
-                <swipeGestureRecognizer direction="right" id="4p0-pE-bUF">
+                <swipeGestureRecognizer direction="left" id="4p0-pE-bUF">
                     <connections>
                         <action selector="showFollowingCards:" destination="rYV-nH-P3V" id="GZM-vn-5rP"/>
                     </connections>

@@ -297,29 +297,49 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "barbariansDistanceUpdate":
                 let distance = Int(message[1])!
                 scenePort.barbariansDistanceFromCatan = distance
+                let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                notificationBanner.isOpaque = false
+                notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.6)
+                let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                notificationContent.isOpaque = false
+                notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                notificationContent.textColor = UIColor.darkGray
+                notificationContent.textAlignment = .center
                 switch distance {
-                    case 0:
-                        let message = "The Barbarians have arrived, and are attacking...brace yourselves!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                case 0:
+                        notificationContent.text = "The Barbarians have arrived, and are attacking...brace yourselves!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                         scenePort.barbariansDistanceFromCatan = 7
-                        break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
+                    break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
                     case 1...2:
-                        let message = "The Barbarians are \(distance) roll" + (distance == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians are \(scenePort.barbariansDistanceFromCatan) roll" + (scenePort.barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                     case 3...5:
-                        let message = "The Barbarians are \(distance) rolls away from Catan, and will be attacking soon!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians are \(scenePort.barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                     case 6...7:
-                        let message = "The Barbarians are \(distance) rolls away from Catan, start preparing!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians are \(scenePort.barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                     default: break
                 }
             default:

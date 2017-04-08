@@ -62,14 +62,14 @@ class InGameCardsDeckViewController: UIViewController {
     }
     
     @IBAction func showPreviousCards(_ sender: Any) {
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count < 3 { updateCardsDisplayWithStartingIndex(0) }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count <= 3 { updateCardsDisplayWithStartingIndex(0) }
         else {
             currentDisplayIndex += gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count - 1
             updateCardsDisplayWithStartingIndex(currentDisplayIndex)
     }   }
     
     @IBAction func showFollowingCards(_ sender: Any) {
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count < 3 { updateCardsDisplayWithStartingIndex(0) }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count <= 3 { updateCardsDisplayWithStartingIndex(0) }
         else {
             currentDisplayIndex += 1
             updateCardsDisplayWithStartingIndex(currentDisplayIndex)
