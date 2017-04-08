@@ -36,17 +36,17 @@ class InGameCardsDeckViewController: UIViewController {
         if player.progressCards.count < 3 {
             switch player.progressCards.count {
                 case 0:
-                    firstCard.image = nil
-                    secondCard.image = nil
-                    thirdCard.image = nil
+                    firstCard.image = UIImage.init(named: "NoCard")
+                    secondCard.image = UIImage.init(named: "NoCard")
+                    thirdCard.image = UIImage.init(named: "NoCard")
                 case 1:
                     firstCard.image = UIImage.init(named: "\(player.progressCards[0])")
-                    secondCard.image = nil
-                    thirdCard.image = nil
+                    secondCard.image = UIImage.init(named: "NoCard")
+                    thirdCard.image = UIImage.init(named: "NoCard")
                 case 2:
                     firstCard.image = UIImage.init(named: "\(player.progressCards[0])")
                     secondCard.image = UIImage.init(named: "\(player.progressCards[1])")
-                    thirdCard.image = nil
+                    thirdCard.image = UIImage.init(named: "NoCard")
                 default: break
             }
         } else {
