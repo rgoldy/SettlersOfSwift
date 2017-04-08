@@ -113,9 +113,21 @@ class InGameTradeViewController: UIViewController {
                 while myPlayerIndex.tradeAccepted == nil { }
                 loadingView.removeFromSuperview()
                 if myPlayerIndex.tradeAccepted! {
-                    let alert = UIAlertController(title: "Trade Notification", message: "The other player has accepted your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
-                    self.present(alert, animated: true, completion: nil)
+                    let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationBanner.isOpaque = false
+                    notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                    let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationContent.isOpaque = false
+                    notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                    notificationContent.textColor = UIColor.lightGray
+                    notificationContent.textAlignment = .center
+                    notificationContent.text = "The other player has accepted your request for a trade!"
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(notificationContent)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                        notificationContent.removeFromSuperview()
+                        notificationBanner.removeFromSuperview()
+                    })
                     switch selectedSource {
                         case .Brick: myPlayerIndex.brick -= currentRatio
                         case .Gold: myPlayerIndex.gold -= currentRatio
@@ -135,9 +147,21 @@ class InGameTradeViewController: UIViewController {
                         case .None: break;
                     }
                 } else {
-                    let alert = UIAlertController(title: "Trade Notification", message: "The other player has refused your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
-                    self.present(alert, animated: true, completion: nil)
+                    let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationBanner.isOpaque = false
+                    notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                    let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationContent.isOpaque = false
+                    notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                    notificationContent.textColor = UIColor.lightGray
+                    notificationContent.textAlignment = .center
+                    notificationContent.text = "The other player has refused your request for a trade..."
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(notificationContent)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                        notificationContent.removeFromSuperview()
+                        notificationBanner.removeFromSuperview()
+                    })
         }   }   }
         updateOptions()
     }

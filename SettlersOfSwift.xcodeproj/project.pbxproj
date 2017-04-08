@@ -13,8 +13,8 @@
 		0E65BFA51E8F29AB00C5543B /* InGameCardsDeckViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA41E8F29AB00C5543B /* InGameCardsDeckViewController.swift */; };
 		0E65BFA71E8F29B400C5543B /* InGameTradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA61E8F29B400C5543B /* InGameTradeViewController.swift */; };
 		0E65BFA91E8F2B6500C5543B /* InGameStatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65BFA81E8F2B6500C5543B /* InGameStatisticsViewController.swift */; };
+		0ECDEAE81E9945C0007D6C67 /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0ECDEAE71E9945C0007D6C67 /* background.mp3 */; };
 		0EE1C4791E95D37A00A3EACE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */; };
-		0EE1C47B1E95D4A000A3EACE /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0EE1C47A1E95D4A000A3EACE /* background.mp3 */; };
 		0EE216E41E93664C004EADAC /* PlayerIntentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE216E31E93664C004EADAC /* PlayerIntentions.swift */; };
 		6C3DBEB41E81ACBD00EE07EF /* FishToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */; };
 		6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */; };
@@ -49,8 +49,8 @@
 		0E65BFA41E8F29AB00C5543B /* InGameCardsDeckViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameCardsDeckViewController.swift; sourceTree = "<group>"; };
 		0E65BFA61E8F29B400C5543B /* InGameTradeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameTradeViewController.swift; sourceTree = "<group>"; };
 		0E65BFA81E8F2B6500C5543B /* InGameStatisticsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InGameStatisticsViewController.swift; sourceTree = "<group>"; };
+		0ECDEAE71E9945C0007D6C67 /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
 		0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		0EE1C47A1E95D4A000A3EACE /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
 		0EE216E31E93664C004EADAC /* PlayerIntentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerIntentions.swift; sourceTree = "<group>"; };
 		6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FishToken.swift; sourceTree = "<group>"; };
 		6CCF9F611E395DF900AAEB79 /* SettlersOfSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettlersOfSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,7 +103,7 @@
 		0EE1C47C1E95D4A600A3EACE /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				0EE1C47A1E95D4A000A3EACE /* background.mp3 */,
+				0ECDEAE71E9945C0007D6C67 /* background.mp3 */,
 			);
 			name = Audio;
 			sourceTree = "<group>";
@@ -261,7 +261,7 @@
 				ACB54A331E3A9E920042461A /* Tiles.sks in Resources */,
 				AC648A511E6281B700E4BEA0 /* GameScene.sks in Resources */,
 				AC3F56651E68CF1B005CECC1 /* Main.storyboard in Resources */,
-				0EE1C47B1E95D4A000A3EACE /* background.mp3 in Resources */,
+				0ECDEAE81E9945C0007D6C67 /* background.mp3 in Resources */,
 				AC1FDC381E65386A00CD0723 /* Assets.xcassets in Resources */,
 				6CCF9F751E395DF900AAEB79 /* LaunchScreen.storyboard in Resources */,
 				6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */,

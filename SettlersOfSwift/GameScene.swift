@@ -1667,6 +1667,15 @@ class GameScene: SKScene {
         }
         
         let eventDieOutcome = EventDieSides.init(rawValue: values[2])!
+        //  REQUIRES ANIMATIONS
+        let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+        notificationBanner.isOpaque = false
+        notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.6)
+        let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+        notificationContent.isOpaque = false
+        notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+        notificationContent.textColor = UIColor.darkGray
+        notificationContent.textAlignment = .center
         switch eventDieOutcome {
             case .BarbarianSideA:   fallthrough
             case .BarbarianSideB:   fallthrough
@@ -1675,73 +1684,103 @@ class GameScene: SKScene {
                 let _ = appDelegate.networkManager.sendData(data: "barbariansDistanceUpdate.\(barbariansDistanceFromCatan)")
                 switch barbariansDistanceFromCatan {
                     case 0:
-                        let message = "The Barbarians have arrived, and are attacking...brace yourselves!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians have arrived, and are attacking...brace yourselves!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                         barbariansDistanceFromCatan = 7
                         break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
                     case 1...2:
-                        let message = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                     case 3...5:
-                        let message = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                     case 6...7:
-                        let message = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
-                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                     default: break
                 }
             case .PoliticsSide:
                 if players[myPlayerIndex].politicsImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Politics, fromDeck: &gameDeck)
                     if let card = newCard {
+                        notificationContent.text = "You have just received The \(card) Progress Card from the Politics Deck...congratulations!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                         players[myPlayerIndex].progressCards.append(card)
-                        let message = "You have just received The \(card) Progress Card from the Politics Deck...congratulations!"
-                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
                     } else {
-                        let message = "Unfortunately, there is no Progress Card remaining from the Politics Deck...hurry up and finish the game!"
-                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Politics Deck...hurry up and finish the game!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                 }   }
             case .SciencesSide:
                 if players[myPlayerIndex].sciencesImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Sciences, fromDeck: &gameDeck)
                     if let card = newCard {
+                        notificationContent.text = "You have just received The \(card) Progress Card from the Sciences Deck...congratulations!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                         players[myPlayerIndex].progressCards.append(card)
-                        let message = "You have just received The \(card) Progress Card from the Sciences Deck...congratulations!"
-                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
                     } else {
-                        let message = "Unfortunately, there is no Progress Card remaining from the Sciences Deck...hurry up and finish the game!"
-                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Sciences Deck...hurry up and finish the game!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                 }   }
             case .TradesSide:
                 if players[myPlayerIndex].tradesImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Trades, fromDeck: &gameDeck)
                     if let card = newCard {
+                        notificationContent.text = "You have just received The \(card) Progress Card from the Trades Deck...congratulations!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
                         players[myPlayerIndex].progressCards.append(card)
-                        let message = "You have just received The \(card) Progress Card from the Trades Deck...congratulations!"
-                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
                     } else {
-                        let message = "Unfortunately, there is no Progress Card remaining from the Trades Deck...hurry up and finish the game!"
-                        let alert = UIAlertController(title: "Progress Card", message: message, preferredStyle: UIAlertControllerStyle.alert)
-                        alert.addAction(UIAlertAction(title: "CONTINUE", style: UIAlertActionStyle.default, handler: nil))
-                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Trades Deck...hurry up and finish the game!"
+                        self.view?.addSubview(notificationBanner)
+                        self.view?.addSubview(notificationContent)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                            notificationContent.removeFromSuperview()
+                            notificationBanner.removeFromSuperview()
+                        })
     }   }       }   }
     
     func updateDice(red : Int, yellow: Int, event: Int) {
