@@ -42,6 +42,9 @@ class GameScene: SKScene {
     var currentPlayer = 0
     var myPlayerIndex = -1
     var fishDeck: [FishToken] = []
+    
+    //  NEED TO BE PASSED TO ALL PLAYERS TO ENSURE DECK CONSISTENCY
+    
     var gameDeck = ProgressCardsType.generateNewGameDeck()
     
     let gameButton = UITextField()
@@ -88,6 +91,8 @@ class GameScene: SKScene {
     var maximaSciencesImprovementReached = false
     var maximaTradesImprovementReached = false
     
+    var detailsStarted = false
+    
     //  END OF SEND TO ALL PLAYERS
     
     //init tile handler
@@ -132,7 +137,9 @@ class GameScene: SKScene {
         
         let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(self.handlePinch(recognizer:)))
         view.addGestureRecognizer(pinchGestureRecognizer)
-
+        let edgeSwipeGestureRecognizer = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(self.handleRightEdgeSwipe(recognizer:)))
+        edgeSwipeGestureRecognizer.edges = .right
+        view.addGestureRecognizer(edgeSwipeGestureRecognizer)
         //init UI
 //        gameText.font = UIFont(name: "Arial", size: 13)
 //        gameText.frame = CGRect(x: self.view!.bounds.width/2 - (self.view!.bounds.width/6), y: self.view!.bounds.height/8, width: self.view!.bounds.width/3, height: self.view!.bounds.height/12)
@@ -1823,6 +1830,9 @@ class GameScene: SKScene {
     // function that rolls the dice
     func rollDice() {
         let values = dice.rollDice()
+        if players[myPlayerIndex].progressCards.contains(.Alchemist) {
+            //  IMPLEMENT USE OF ALCHEMIST CARD TO SELECT DICE OUTCOMES
+        }
         updateDice(red: values[0], yellow: values[1], event: values[2])
         let diceData = "diceRoll.\(values[0]),\(values[1]),\(values[2])"
         
@@ -2327,6 +2337,30 @@ class GameScene: SKScene {
         //reset tranlation
         recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
     }
+    
+    func handleRightEdgeSwipe(recognizer: UIScreenEdgePanGestureRecognizer) {
+        if recognizer.state != .changed { return }
+            if !detailsStarted {
+                detailsStarted = true
+                let player = players[myPlayerIndex]
+                let notificationBanner = UIView(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
+                notificationBanner.isOpaque = false
+                notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.8)
+                let notificationContent = UILabel(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
+                notificationContent.isOpaque = false
+                notificationContent.font = UIFont(name: "Avenir-Roman", size: 11)
+                notificationContent.textColor = UIColor.darkGray
+                notificationContent.textAlignment = .center
+                notificationContent.numberOfLines = 0
+                notificationContent.text = "Current Holdings:\n\n\n~ Resources ~\n\nBrick: \(player.brick)\nGold: \(player.gold)\nSheep: \(player.sheep)\nStone: \(player.stone)\nWheat: \(player.wheat)\nWood: \(player.wood)\n\n~ Commodities ~\n\nCloth: \(player.cloth)\nCoin: \(player.coin)\nPaper: \(player.paper)\n\nFish: \(player.fish)"
+                self.view?.addSubview(notificationBanner)
+                self.view?.addSubview(notificationContent)
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                    notificationContent.removeFromSuperview()
+                    notificationBanner.removeFromSuperview()
+                    self.detailsStarted = false
+                })
+    }   }
     
     //function to handle pinch gestures for camera scaling
     func handlePinch(recognizer : UIPinchGestureRecognizer) {
