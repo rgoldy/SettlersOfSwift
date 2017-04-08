@@ -13,6 +13,11 @@ import GameplayKit
 import MultipeerConnectivity
 import AVFoundation
 
+enum AdditionalButtonActions {
+    case CancelPlayerIntention
+    case PlaceMetropolisOnMap
+}
+
 class GameViewController: UIViewController, NetworkDelegate {
     
     //  CUSTOM BUTTONS FOR DIFFERENT PURPOSES
@@ -20,6 +25,11 @@ class GameViewController: UIViewController, NetworkDelegate {
     @IBOutlet weak var menuButton: UIButton!
     @IBOutlet weak var backgroundMusicButton: UIButton!
     @IBOutlet weak var endCurrentTurnButton: UIButton!
+    @IBOutlet weak var additionalButtonA: UIButton!
+    @IBOutlet weak var additionalButtonB: UIButton!
+    
+    var additionalButtonAAction: AdditionalButtonActions? = nil
+    var additionalButtonBAction: AdditionalButtonActions? = nil
     
     //  PLAYS BACKGROUND MUSIC CONTAINED IN FILE NAMED background.mp3 (NOT TESTED)
     
@@ -274,6 +284,16 @@ class GameViewController: UIViewController, NetworkDelegate {
                 scenePort.players[scenePort.myPlayerIndex].fetchedTargetData = true
             case "displace":
                 scenePort.displaceKnight(data: message[1])
+            case "drewProgressCard":
+                switch message[1] {
+                    case "POLITICS":
+                        let _ = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &scenePort.gameDeck)
+                    case "SCIENCES":
+                        let _ = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &scenePort.gameDeck)
+                    case "TRADES":
+                        let _ = ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &scenePort.gameDeck)
+                    default: break
+                }
             case "barbariansDistanceUpdate":
                 let distance = Int(message[1])!
                 scenePort.barbariansDistanceFromCatan = distance
@@ -305,6 +325,12 @@ class GameViewController: UIViewController, NetworkDelegate {
             default:
                 print("Unknown message")
         }
+    }
+    
+    @IBAction func didInteractWithAdditionalButtonA(_ sender: Any) {
+    }
+    
+    @IBAction func didInteractWithAdditionalButtonB(_ sender: Any) {
     }
     
     @IBAction func toggleMusicPlayback(_ sender: Any) {

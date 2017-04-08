@@ -188,6 +188,30 @@
                                     <segue destination="xMA-Kh-dRn" kind="push" id="BBK-Md-516"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="FgW-qC-DT7">
+                                <rect key="frame" x="548" y="358" width="35.5" height="35.5"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="0.5" green="0.0" blue="0.5" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="didInteractWithAdditionalButtonA:" destination="nnZ-Iz-im3" eventType="touchUpInside" id="kVV-uu-6Fy"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="30h-Rq-iwT">
+                                <rect key="frame" x="504" y="358" width="35.5" height="35.5"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="0.60000002384185791" green="0.40000000596046448" blue="0.20000000298023224" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="didInteractWithAdditionalButtonB:" destination="nnZ-Iz-im3" eventType="touchUpInside" id="rVP-oK-jT0"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <gestureRecognizers/>
@@ -197,6 +221,8 @@
                     </view>
                     <navigationItem key="navigationItem" id="9YK-BG-ZUu"/>
                     <connections>
+                        <outlet property="additionalButtonA" destination="FgW-qC-DT7" id="Wr6-8c-xsb"/>
+                        <outlet property="additionalButtonB" destination="30h-Rq-iwT" id="Uja-4P-ape"/>
                         <outlet property="backgroundMusicButton" destination="P46-4l-kjd" id="6hD-R3-eK2"/>
                         <outlet property="endCurrentTurnButton" destination="AHV-5z-3ea" id="078-Xi-rSc"/>
                         <outlet property="menuButton" destination="qjr-zm-YcH" id="sOj-Iy-W3I"/>
@@ -219,7 +245,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="736" height="414"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="587-iv-vDI">
+                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="587-iv-vDI">
                                 <rect key="frame" x="258" y="20" width="220" height="325"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <gestureRecognizers/>
@@ -227,7 +253,7 @@
                                     <outletCollection property="gestureRecognizers" destination="8Xt-NJ-5ru" appends="YES" id="6Yp-4v-nz1"/>
                                 </connections>
                             </imageView>
-                            <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="seb-yy-rb4">
+                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="seb-yy-rb4">
                                 <rect key="frame" x="496" y="20" width="220" height="325"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <gestureRecognizers/>
@@ -235,7 +261,7 @@
                                     <outletCollection property="gestureRecognizers" destination="2V0-qX-bq3" appends="YES" id="ll4-88-LCD"/>
                                 </connections>
                             </imageView>
-                            <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="jVO-5c-JHk">
+                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="jVO-5c-JHk">
                                 <rect key="frame" x="20" y="20" width="220" height="325"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <gestureRecognizers/>
