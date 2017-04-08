@@ -15,17 +15,17 @@ enum playerColor:String {
 
 //class which represents each player and it's respective attributes
 class Player {
-    var wood = 0
+    var wood = 10
     var woodTradeRatio = 4
-    var wheat = 0
+    var wheat = 10
     var wheatTradeRatio = 4
-    var stone = 0
+    var stone = 10
     var stoneTradeRatio = 4
-    var sheep = 0
+    var sheep = 10
     var sheepTradeRatio = 4
-    var brick = 0
+    var brick = 10
     var brickTradeRatio = 4
-    var gold = 2
+    var gold = 10
     var goldTradeRatio = 4
     
     var politicsImprovementLevel = -1

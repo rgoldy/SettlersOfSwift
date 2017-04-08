@@ -101,82 +101,46 @@ class InGameTradeViewController: UIViewController {
             }
         } else {
             if selectedSource != .None, selectedTarget != .None {
-                let requestDefinition = "playerTradeRequest.\(gameDataReference.scenePort.myPlayerIndex + ((segmentSelector.selectedSegmentIndex == 1) ? 2 : 1)).\(gameDataReference.scenePort.myPlayerIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
-                if sendRequest(requestDefinition) {
-                    let otherPlayer: Player
-                    if segmentSelector.selectedSegmentIndex == 1 {
-                        otherPlayer = gameDataReference.scenePort.players[(gameDataReference.scenePort.myPlayerIndex + 1) % 3]
-                    } else {
-                        otherPlayer = gameDataReference.scenePort.players[(gameDataReference.scenePort.myPlayerIndex + 2) % 3]
-                    }
-                    switch selectedSource {
-                        case .Brick:
-                            myPlayerIndex.brick -= currentRatio
-                            otherPlayer.brick += currentRatio
-                        case .Gold:
-                            myPlayerIndex.gold -= currentRatio
-                            otherPlayer.gold += currentRatio
-                        case .Sheep:
-                            myPlayerIndex.sheep -= currentRatio
-                            otherPlayer.sheep += currentRatio
-                        case.Stone:
-                            myPlayerIndex.stone -= currentRatio
-                            otherPlayer.stone += currentRatio
-                        case .Wheat:
-                            myPlayerIndex.wheat -= currentRatio
-                            otherPlayer.wheat += currentRatio
-                        case .Wood:
-                            myPlayerIndex.wood -= currentRatio
-                            otherPlayer.wood += currentRatio
-                        case .None: break;
-                    }
-                    switch selectedTarget {
-                        case .Brick:
-                            myPlayerIndex.brick += 1
-                            otherPlayer.brick -= 1
-                        case .Gold:
-                            myPlayerIndex.gold += 1
-                            otherPlayer.gold -= 1
-                        case .Sheep:
-                            myPlayerIndex.sheep += 1
-                            otherPlayer.sheep -= 1
-                        case.Stone:
-                            myPlayerIndex.stone += 1
-                            otherPlayer.stone -= 1
-                        case .Wheat:
-                            myPlayerIndex.wheat += 1
-                            otherPlayer.wheat -= 1
-                        case .Wood:
-                            myPlayerIndex.wood += 1
-                            otherPlayer.wood -= 1
-                        case .None: break;
-                    }
+                let myIndex = gameDataReference.scenePort.myPlayerIndex
+                let otherPlayerIndex = (gameDataReference.scenePort.myPlayerIndex + (segmentSelector.selectedSegmentIndex == 1 ? 2 : 1)) % 3
+                myPlayerIndex.tradeAccepted = nil
+                let message = "playerTradeRequest.\(otherPlayerIndex).\(myIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
+                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
+                let loadingView = UIActivityIndicatorView(frame: CGRect(x: 182, y: 343, width: 50, height: 50))
+                loadingView.color = UIColor.gray
+                loadingView.startAnimating()
+                self.view.addSubview(loadingView)
+                while myPlayerIndex.tradeAccepted == nil { }
+                loadingView.removeFromSuperview()
+                if myPlayerIndex.tradeAccepted! {
                     let alert = UIAlertController(title: "Trade Notification", message: "The other player has accepted your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
+                    switch selectedSource {
+                        case .Brick: myPlayerIndex.brick -= currentRatio
+                        case .Gold: myPlayerIndex.gold -= currentRatio
+                        case .Sheep: myPlayerIndex.sheep -= currentRatio
+                        case.Stone: myPlayerIndex.stone -= currentRatio
+                        case .Wheat: myPlayerIndex.wheat -= currentRatio
+                        case .Wood: myPlayerIndex.wood -= currentRatio
+                        case .None: break;
+                    }
+                    switch selectedTarget {
+                        case .Brick: myPlayerIndex.brick += 1
+                        case .Gold: myPlayerIndex.gold += 1
+                        case .Sheep: myPlayerIndex.sheep += 1
+                        case.Stone: myPlayerIndex.stone += 1
+                        case .Wheat: myPlayerIndex.wheat += 1
+                        case .Wood: myPlayerIndex.wood += 1
+                        case .None: break;
+                    }
                 } else {
-                    let alert = UIAlertController(title: "Trade Notification", message: "The other player has declined your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
+                    let alert = UIAlertController(title: "Trade Notification", message: "The other player has refused your request for a trade...", preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
                     self.present(alert, animated: true, completion: nil)
-                }
-            } else {
-                let alert = UIAlertController(title: "Alert", message: "Please pick a source and a target resource prior to performing trade...", preferredStyle: UIAlertControllerStyle.alert)
-                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            }
+                }            }
         }
         updateOptions()
-    }
-    
-    //  OTHER PLAYER SHOULD RECEIVE AN ALERT BOX WITH TRADE SPECIFICATIONS
-    //  MAY ACCEPT OR DECLINE
-    
-    func sendRequest(_ definition: String) -> Bool {
-        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].tradeAccepted = nil
-        let messageHasBeenSent = gameDataReference.appDelegate.networkManager.sendData(data: definition)
-        if !messageHasBeenSent { return sendRequest(definition) }
-        while gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].tradeAccepted == nil { sleep(500) }
-        return gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].tradeAccepted!
     }
     
     @IBAction func selectedSourceAsBrick(_ sender: Any) {
@@ -184,6 +148,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceBrick.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Brick
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].brickTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
@@ -192,6 +157,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceGold.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Gold
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].goldTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
@@ -200,6 +166,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceSheep.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Sheep
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].sheepTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
@@ -208,6 +175,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceStone.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Stone
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].stoneTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
@@ -216,6 +184,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceWheat.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Wheat
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].wheatTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
@@ -224,6 +193,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceWood.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Wood
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].woodTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
@@ -232,6 +202,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetBrick.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Brick
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
     @IBAction func selectedTargetAsGold(_ sender: Any) {
@@ -239,6 +210,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetGold.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Gold
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
     @IBAction func selectedTargetAsSheep(_ sender: Any) {
@@ -246,6 +218,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetSheep.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Sheep
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
     @IBAction func selectedTargetAsStone(_ sender: Any) {
@@ -253,6 +226,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetStone.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Stone
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
     @IBAction func selectedTargetAsWheat(_ sender: Any) {
@@ -260,6 +234,7 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetWheat.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Wheat
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
     @IBAction func selectedTargetAsWood(_ sender: Any) {
@@ -267,11 +242,14 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetWood.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Wood
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
     func updateOptions() {
         selectedSource = .None
         selectedTarget = .None
+        performTrade.setTitleColor(UIColor.blue, for: UIControlState.normal)
+        performTrade.isEnabled = false
         let buttonsCollection: [UIButton] = [sourceBrick, targetBrick,
                                               sourceGold, targetGold,
                                              sourceSheep, targetSheep,
@@ -294,9 +272,9 @@ class InGameTradeViewController: UIViewController {
             ratioSelector.isEnabled = true
             let otherPlayer: Player
             if segmentSelector.selectedSegmentIndex == 1 {
-                otherPlayer = gameDataReference.scenePort.players[(gameDataReference.scenePort.myPlayerIndex + 1) % 3]
-            } else {
                 otherPlayer = gameDataReference.scenePort.players[(gameDataReference.scenePort.myPlayerIndex + 2) % 3]
+            } else {
+                otherPlayer = gameDataReference.scenePort.players[(gameDataReference.scenePort.myPlayerIndex + 1) % 3]
             }
             if myPlayerIndex.brick < currentRatio { sourceBrick.isEnabled = false } else { sourceBrick.isEnabled = true }
             if myPlayerIndex.gold < currentRatio { sourceGold.isEnabled = false } else { sourceGold.isEnabled = true }
@@ -318,8 +296,13 @@ class InGameTradeViewController: UIViewController {
             let targetIndex = (gameDataReference.scenePort.myPlayerIndex + ((segmentSelector.selectedSegmentIndex == 1) ? 2 : 1)) % 3
             gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fetchedTargetData = false
             let message = "getTradeResources.\(targetIndex)"
-            while !gameDataReference.appDelegate.networkManager.sendData(data: message) { }
-            while gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fetchedTargetData == false { sleep(500) }
+            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
+            let loadingView = UIActivityIndicatorView(frame: CGRect(x: 182, y: 343, width: 50, height: 50))
+            loadingView.color = UIColor.gray
+            loadingView.startAnimating()
+            self.view.addSubview(loadingView)
+            while self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].fetchedTargetData == false { }
+            loadingView.removeFromSuperview()
         }
         updateOptions()
     }

@@ -70,7 +70,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 backgroundMusicPlayer.play()
             } catch { }
         }
-        //setAppearanceForMenuButton()
+//        setAppearanceForMenuButton()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -186,33 +186,34 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "fishdeck":
                 scenePort.recievedFishDeck(encoding: message[1])
             case "playerTradeRequest":
-                if Int(message[1]) != nil && Int(message[1])! % 3 == scenePort.myPlayerIndex {
-                    let composedString = "Some player would like to trade \(message[3]) \(message[4])(s) for one of your \(message[5])...would you like to proceed?"
-                    let alert = UIAlertController(title: "Trade Notification", message: composedString, preferredStyle: .actionSheet)
-                    alert.addAction(UIAlertAction(title: "ACCEPT", style: .default, handler: { (action) in
+                if Int(message[1])! == scenePort.myPlayerIndex {
+                    let myReference = scenePort.players[scenePort.myPlayerIndex]
+                    let announcement = "Some player would like to trade \(message[3]) \(message[4])(s) for one of your \(message[5])...would you like to proceed?"
+                    let alert = UIAlertController(title: "Trade Notification", message: announcement, preferredStyle: .actionSheet)
+                    alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action) in
                         let receivedResourcesCount = Int(message[3])!
                         switch message[4] {
-                            case "BRICK": self.scenePort.players[self.scenePort.myPlayerIndex].brick += receivedResourcesCount
-                            case "GOLD": self.scenePort.players[self.scenePort.myPlayerIndex].gold += receivedResourcesCount
-                            case "SHEEP": self.scenePort.players[self.scenePort.myPlayerIndex].sheep += receivedResourcesCount
-                            case "STONE": self.scenePort.players[self.scenePort.myPlayerIndex].stone += receivedResourcesCount
-                            case "WHEAT": self.scenePort.players[self.scenePort.myPlayerIndex].wheat += receivedResourcesCount
-                            case "WOOD": self.scenePort.players[self.scenePort.myPlayerIndex].wood += receivedResourcesCount
+                            case "BRICK": myReference.brick += receivedResourcesCount
+                            case "GOLD": myReference.gold += receivedResourcesCount
+                            case "SHEEP": myReference.sheep += receivedResourcesCount
+                            case "STONE": myReference.stone += receivedResourcesCount
+                            case "WHEAT": myReference.wheat += receivedResourcesCount
+                            case "WOOD": myReference.wood += receivedResourcesCount
                             default: break
                         }
                         switch message[5] {
-                        case "BRICK": self.scenePort.players[self.scenePort.myPlayerIndex].brick -= 1
-                        case "GOLD": self.scenePort.players[self.scenePort.myPlayerIndex].gold -= 1
-                        case "SHEEP": self.scenePort.players[self.scenePort.myPlayerIndex].sheep -= 1
-                        case "STONE": self.scenePort.players[self.scenePort.myPlayerIndex].stone -= 1
-                        case "WHEAT": self.scenePort.players[self.scenePort.myPlayerIndex].wheat -= 1
-                        case "WOOD": self.scenePort.players[self.scenePort.myPlayerIndex].wood -= 1
-                        default: break
+                            case "BRICK": myReference.brick -= 1
+                            case "GOLD": myReference.gold -= 1
+                            case "SHEEP": myReference.sheep -= 1
+                            case "STONE": myReference.stone -= 1
+                            case "WHEAT": myReference.wheat -= 1
+                            case "WOOD": myReference.wood -= 1
+                            default: break
                         }
-                        while !self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).YES") { }   //  keep trying
+                        let _ = self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).YES")
                     }))
-                    alert.addAction(UIAlertAction(title: "DECLINE", style: .default, handler: { (action) in
-                        while !self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).NO") { }   //  keep trying
+                    alert.addAction(UIAlertAction(title: "Decline", style: .default, handler: { (action) in
+                        let _ = self.appDelegate.networkManager.sendData(data: "tradeAcknowledgement.\(message[2]).NO")
                     }))
                     self.present(alert, animated: true, completion: nil)
                 }
@@ -222,10 +223,10 @@ class GameViewController: UIViewController, NetworkDelegate {
                     if message[2] == "NO" { scenePort.players[scenePort.myPlayerIndex].tradeAccepted = false }
                 }
             case "getTradeResources":
-                if Int(message[1]) != nil && Int(message[1])! == scenePort.myPlayerIndex {
+                if Int(message[1])! == scenePort.myPlayerIndex {
                     let player = scenePort.players[scenePort.myPlayerIndex]
                     let message = "sendResourcesCount.\(scenePort.myPlayerIndex).\(player.brick).\(player.gold).\(player.sheep).\(player.stone).\(player.wheat).\(player.wood)"
-                    while !self.appDelegate.networkManager.sendData(data: message) { }
+                    let _ = self.appDelegate.networkManager.sendData(data: message)
                 }
             case "sendResourcesCount":
                 let player = scenePort.players[Int(message[1])!]
