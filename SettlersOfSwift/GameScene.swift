@@ -939,6 +939,7 @@ class GameScene: SKScene {
         if(!canMoveShip(edge: edge!)) { return false }
         
         handler.Edges.setTileGroup(nil, forColumn: column, row: row)
+        edge!.edgeObject = nil
         let index = players[currentPlayer].ownedEdges.index(where: {$0.column == column && $0.row == row})
         players[currentPlayer].ownedEdges.remove(at: index!)
         
@@ -965,7 +966,10 @@ class GameScene: SKScene {
         var neighbourCounter1 = 0
         var neighbourCounter2 = 0
         
-        for i in 0...3 {
+        if (edge.neighbourVertex1.cornerObject?.owner == myPlayerIndex) { neighbourCounter1 += 2 }
+        if (edge.neighbourVertex2.cornerObject?.owner == myPlayerIndex) { neighbourCounter2 += 2 }
+        
+        for i in 0...2 {
             let edgeObject1 = edge.neighbourVertex1.neighbourEdges[i]?.edgeObject
             let edgeObject2 = edge.neighbourVertex2.neighbourEdges[i]?.edgeObject
             
@@ -2333,7 +2337,8 @@ class GameScene: SKScene {
                     if (activated) { players[myPlayerIndex].nextAction = .WillDoNothing }
                 case .WillBuildMetropolis: return;   //  NOT IMPLEMENTED
                 case .WillRemoveOutlaw: return;   //  NOT IMPLEMENTED
-                case .WillMoveShip: return;   //  NOT IMPLEMENTED
+                case .WillMoveShip: let movedShip = moveShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), valid: rolled)
+                if !movedShip { players[myPlayerIndex].nextAction = .WillDoNothing }
                 case .WillMoveKnight:
                     let movedKnight = moveKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled)
                     if (movedKnight) { players[myPlayerIndex].nextAction = .WillBuildKnightForFree }
