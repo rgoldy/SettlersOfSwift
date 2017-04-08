@@ -41,6 +41,9 @@ class GameScene: SKScene {
     var currentPlayer = 0
     var myPlayerIndex = -1
     var fishDeck: [FishToken] = []
+    
+    //  NEED TO BE PASSED TO ALL PLAYERS TO ENSURE DECK CONSISTENCY
+    
     var gameDeck = ProgressCardsType.generateNewGameDeck()
     
     let gameButton = UITextField()
@@ -1652,6 +1655,9 @@ class GameScene: SKScene {
     // function that rolls the dice
     func rollDice() {
         let values = dice.rollDice()
+        if players[myPlayerIndex].progressCards.contains(.Alchemist) {
+            //  IMPLEMENT USE OF ALCHEMIST CARD TO SELECT DICE OUTCOMES
+        }
         updateDice(red: values[0], yellow: values[1], event: values[2])
         let diceData = "diceRoll.\(values[0]),\(values[1]),\(values[2])"
         

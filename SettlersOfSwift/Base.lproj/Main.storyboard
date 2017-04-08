@@ -218,6 +218,7 @@
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="gz5-YG-ySX" appends="YES" id="PWi-JV-l9A"/>
                             <outletCollection property="gestureRecognizers" destination="xlr-xg-HlF" appends="YES" id="sJV-dq-SvO"/>
+                            <outletCollection property="gestureRecognizers" destination="LJP-Aq-M9S" appends="YES" id="wDV-z6-Cp6"/>
                         </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9YK-BG-ZUu"/>
@@ -241,6 +242,11 @@
                         <action selector="displayCurrentHoldings:" destination="nnZ-Iz-im3" id="f4d-Qz-Tdr"/>
                     </connections>
                 </screenEdgePanGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="3" numberOfTouchesRequired="0" id="LJP-Aq-M9S">
+                    <connections>
+                        <action selector="displayCurrentHoldings:" destination="nnZ-Iz-im3" id="KG4-Bk-HZp"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="-368" y="1086"/>
         </scene>
@@ -525,7 +531,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="15"/>
                                 <state key="normal" title="COIN"/>
-                                <state key="disabled">
+                                <state key="disabled" title="N/A">
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -540,7 +546,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="15"/>
                                 <state key="normal" title="PAPER"/>
-                                <state key="disabled">
+                                <state key="disabled" title="N/A">
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -555,7 +561,7 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="15"/>
                                 <state key="normal" title="CLOTH"/>
-                                <state key="disabled">
+                                <state key="disabled" title="N/A">
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -667,7 +673,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="15"/>
                                 <state key="normal" title="COIN"/>
-                                <state key="disabled">
+                                <state key="disabled" title="N/A">
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -682,7 +688,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="15"/>
                                 <state key="normal" title="PAPER"/>
-                                <state key="disabled">
+                                <state key="disabled" title="N/A">
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -697,7 +703,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="15"/>
                                 <state key="normal" title="CLOTH"/>
-                                <state key="disabled">
+                                <state key="disabled" title="N/A">
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">

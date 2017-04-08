@@ -118,7 +118,7 @@ class GameViewController: UIViewController, NetworkDelegate {
         notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.6)
         let notificationContent = UILabel(frame: CGRect(x: 50.0, y: 50.0, width: self.view!.bounds.width - 100.0, height: self.view!.bounds.height - 100.0))
         notificationContent.isOpaque = false
-        notificationContent.font = UIFont(name: "Avenir-Roman", size: 9)
+        notificationContent.font = UIFont(name: "Avenir-Roman", size: 11)
         notificationContent.textColor = UIColor.darkGray
         notificationContent.textAlignment = .center
         notificationContent.numberOfLines = 0
