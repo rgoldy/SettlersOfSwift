@@ -274,6 +274,34 @@ class GameViewController: UIViewController, NetworkDelegate {
                 scenePort.players[scenePort.myPlayerIndex].fetchedTargetData = true
             case "displace":
                 scenePort.displaceKnight(data: message[1])
+            case "barbariansDistanceUpdate":
+                let distance = Int(message[1])!
+                scenePort.barbariansDistanceFromCatan = distance
+                switch distance {
+                    case 0:
+                        let message = "The Barbarians have arrived, and are attacking...brace yourselves!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        scenePort.barbariansDistanceFromCatan = 7
+                        break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
+                    case 1...2:
+                        let message = "The Barbarians are \(distance) roll" + (distance == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    case 3...5:
+                        let message = "The Barbarians are \(distance) rolls away from Catan, and will be attacking soon!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    case 6...7:
+                        let message = "The Barbarians are \(distance) rolls away from Catan, start preparing!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    default: break
+                }
             default:
                 print("Unknown message")
         }

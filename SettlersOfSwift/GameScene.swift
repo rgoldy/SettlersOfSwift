@@ -98,6 +98,8 @@ class GameScene: SKScene {
     var pirateRemoved = false
     var robberRemoved = false
     
+    var barbariansDistanceFromCatan = 7
+    
     override func didMove(to view: SKView) {
         //load tiles
         loadSceneNodes()
@@ -203,9 +205,9 @@ class GameScene: SKScene {
         yellowDiceUI.image = UIImage(named: "yellow1")
         self.view?.addSubview(yellowDiceUI)
         
-//        eventDiceUI.frame = CGRect(x: self.view!.bounds.width * 0.182 + self.view!.bounds.width * 0.025, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
-//        eventDiceUI.image = UIImage(named: "NEED ASSETS FOR THIS DICE")
-//        self.view?.addSubview(eventDiceUI)
+        eventDiceUI.frame = CGRect(x: self.view!.bounds.width * 0.182 + self.view!.bounds.width * 0.025, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
+        eventDiceUI.image = UIImage(named: "event1")
+        self.view?.addSubview(eventDiceUI)
     }
     
     func loadSceneNodes() {
@@ -1638,9 +1640,36 @@ class GameScene: SKScene {
         
         let eventDieOutcome = EventDieSides.init(rawValue: values[2])!
         switch eventDieOutcome {
-            case .BarbarianSideA:   break   //  NOT IMPLEMENTED
-            case .BarbarianSideB:   break   //  NOT IMPLEMENTED
-            case .BarbarianSideC:   break   //  NOT IMPLEMENTED
+            case .BarbarianSideA:   fallthrough
+            case .BarbarianSideB:   fallthrough
+            case .BarbarianSideC:
+                barbariansDistanceFromCatan -= 1
+                let _ = appDelegate.networkManager.sendData(data: "barbariansDistanceUpdate.\(barbariansDistanceFromCatan)")
+                switch barbariansDistanceFromCatan {
+                    case 0:
+                        let message = "The Barbarians have arrived, and are attacking...brace yourselves!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                        barbariansDistanceFromCatan = 7
+                        break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
+                    case 1...2:
+                        let message = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    case 3...5:
+                        let message = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    case 6...7:
+                        let message = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
+                        let alert = UIAlertController(title: "Barbarians Alert", message: message, preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "ACKNOWLEDGE", style: UIAlertActionStyle.default, handler: nil))
+                        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+                    default: break
+                }
             case .PoliticsSide:
                 if players[myPlayerIndex].politicsImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Politics, fromDeck: &gameDeck)
@@ -1692,7 +1721,7 @@ class GameScene: SKScene {
             {
             self.redDiceUI.image = UIImage(named: "red\(red)")!
             self.yellowDiceUI.image = UIImage(named: "yellow\(yellow)")!
-            //self.eventDiceUI.image = UIImage(named: "NEED ASSETS FOR EVENT DIE")!
+            self.eventDiceUI.image = UIImage(named: "event\(event)")!
         }
     }
     

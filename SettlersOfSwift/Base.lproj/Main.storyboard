@@ -675,13 +675,6 @@
                                 <rect key="frame" x="326.5" y="284" width="82" height="70"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </imageView>
-                            <textView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" text="CONTAINS A TEXTUAL DESCRIPTION OF THE BENEFITS ALLOWED BY CURRENT IMPROVEMENT" textAlignment="center" selectable="NO" id="kLz-od-c4w">
-                                <rect key="frame" x="326.5" y="284" width="82" height="70"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="6"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
                             <pageControl opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" id="bUZ-PT-B4D">
                                 <rect key="frame" x="0.0" y="340" width="736" height="37"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -843,7 +836,6 @@
                         <outlet property="fourthItemRequirementE" destination="lLc-qc-1uD" id="AFr-Zq-t00"/>
                         <outlet property="lastImprovement" destination="Vx8-F2-KA0" id="jjk-cx-7K3"/>
                         <outlet property="nextChartPreview" destination="La8-vQ-wuT" id="RzF-Tp-Aad"/>
-                        <outlet property="perksDescription" destination="kLz-od-c4w" id="tmi-DC-UvQ"/>
                         <outlet property="previousChartPreview" destination="pHA-1O-cIT" id="ydx-kl-pCw"/>
                         <outlet property="secondImprovement" destination="wRG-h9-gMV" id="WXf-u8-CfO"/>
                         <outlet property="secondItemButton" destination="jUE-mb-fEG" id="DKZ-jZ-OdT"/>

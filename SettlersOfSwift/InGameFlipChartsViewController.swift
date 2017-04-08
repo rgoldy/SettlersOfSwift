@@ -84,7 +84,6 @@ class InGameFlipChartsViewController: UIViewController {
     @IBOutlet weak var currentChartTitle: UILabel!
     @IBOutlet weak var currentChartSubtitle: UILabel!
     @IBOutlet weak var currentPageIndicator: UIPageControl!
-    @IBOutlet weak var perksDescription: UITextView!
     
     @IBOutlet weak var firstImprovement: UIImageView!
     @IBOutlet weak var secondImprovement: UIImageView!
@@ -167,13 +166,20 @@ class InGameFlipChartsViewController: UIViewController {
         if chartsSceneIndex == 1 { level = playerReference.sciencesImprovementLevel }
         if chartsSceneIndex == 2 { level = playerReference.tradesImprovementLevel }
         currentChartTitle.text = "BUILDING / " + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!) + " - THE " + ChartTypes.getImprovementDescription(level, chart: ChartTypes.init(rawValue: chartsSceneIndex)!)
-        currentChartSubtitle.text = ChartTypes.getChartDice(ChartTypes.init(rawValue: chartsSceneIndex)!) + " AND " + ChartTypes.getDicesCount(level) + " GIVES " + ChartTypes.getCardType(ChartTypes.init(rawValue: chartsSceneIndex)!)
-        //  ASSUMES IMAGES EXIST OF WITH NAMES leftOf_* AND rightOf_*
+        if level > 1 {
+            switch chartsSceneIndex {   //  TO IMPLEMENT EFFECTS
+                case 0: currentChartSubtitle.text = "You may promote strong knights to mighty knights!"
+                case 1: currentChartSubtitle.text = "You will always be able to receive resources given that 7 isn't rolled!"
+                case 2: currentChartSubtitle.text = "You may trade any commodity at a two-for-one rate!"
+                default: break
+            }
+        } else {
+            currentChartSubtitle.text = "Upgrade to THE " + ChartTypes.getImprovementDescription(level, chart: ChartTypes.init(rawValue: chartsSceneIndex)!) + " to unlock new benefits!"
+        }
         previousChartPreview.image = UIImage(named: "leftOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
         nextChartPreview.image = UIImage(named: "rightOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
         switch chartsSceneIndex {
             case 0:
-                perksDescription.text = "PERKS\nUNKNOWN"
                 firstImprovement.image = nil
                 secondImprovement.image = nil
                 thirdImprovement.image = nil
@@ -223,7 +229,6 @@ class InGameFlipChartsViewController: UIViewController {
                     if playerReference.coin < playerReference.politicsImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             case 1:
-                perksDescription.text = "PERKS\nUNKNOWN"
                 firstImprovement.image = nil
                 secondImprovement.image = nil
                 thirdImprovement.image = nil
@@ -284,7 +289,6 @@ class InGameFlipChartsViewController: UIViewController {
                     if playerReference.paper < playerReference.sciencesImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             case 2:
-                perksDescription.text = "PERKS\nUNKNOWN"
                 firstImprovement.image = nil
                 secondImprovement.image = nil
                 thirdImprovement.image = nil
