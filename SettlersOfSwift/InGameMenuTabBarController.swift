@@ -26,10 +26,10 @@ class InGameMenuTabBarController: UITabBarController {
         super.viewWillAppear(animated)
         gameDataReference = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as! GameViewController
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
-//        self.tabBar.items?[0].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows charts
-//        self.tabBar.items?[1].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows trade
-//        self.tabBar.items?[2].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows cards
-//        self.selectedViewController = self.viewControllers?[3]
+        self.tabBar.items?[0].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows charts
+        self.tabBar.items?[1].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows trade
+        self.tabBar.items?[2].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows cards
+        self.selectedViewController = self.viewControllers?[3]
         //  CUSTOMIZE TAB BAR APPEARANCE HERE
     }
 

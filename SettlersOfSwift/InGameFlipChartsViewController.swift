@@ -149,6 +149,7 @@ class InGameFlipChartsViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "menuBackground")!)
         chartsSceneIndex = 0
         drawCurrentChartScene()
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillDoNothing

@@ -15,7 +15,7 @@ enum SelectedItem: String {
     case Sheep = "SHEEP"
     case Stone = "STONE"
     case Wheat = "WHEAT"
-    case Wood = "WOOL"
+    case Wood = "WOOD"
     case Coin = "COIN"
     case Paper = "PAPER"
     case Cloth = "CLOTH"
@@ -69,6 +69,7 @@ class InGameTradeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "menuBackground")!)
         segmentSelector.selectedSegmentIndex = 0
         updateOptions()
         ratioSelector.setTitle("* : 1", for: UIControlState.disabled)

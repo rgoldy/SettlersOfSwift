@@ -27,6 +27,7 @@ class InGameCardsDeckViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "menuBackground")!)
         currentDisplayIndex = 0
         updateCardsDisplayWithStartingIndex(currentDisplayIndex)
     }

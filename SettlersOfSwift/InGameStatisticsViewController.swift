@@ -30,6 +30,7 @@ class InGameStatisticsViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "menuBackground")!)
         let playerIndex = gameDataReference.scenePort.myPlayerIndex
         firstPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 14)
         firstPlayerDescription.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
