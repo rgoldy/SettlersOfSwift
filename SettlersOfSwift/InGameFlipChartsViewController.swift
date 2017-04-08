@@ -175,7 +175,7 @@ class InGameFlipChartsViewController: UIViewController {
                 default: break
             }
         } else {
-            currentChartSubtitle.text = "Upgrade to THE " + ChartTypes.getImprovementDescription(level, chart: ChartTypes.init(rawValue: chartsSceneIndex)!) + " to unlock new benefits!"
+            currentChartSubtitle.text = "Upgrade to THE " + ChartTypes.getImprovementDescription(2, chart: ChartTypes.init(rawValue: chartsSceneIndex)!) + " to unlock new benefits!"
         }
         previousChartPreview.image = UIImage(named: "leftOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
         nextChartPreview.image = UIImage(named: "rightOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
@@ -432,6 +432,11 @@ class InGameFlipChartsViewController: UIViewController {
                     //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
                     //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
                     //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                }
+                if playerReference.tradesImprovementLevel >= 2 {
+                    playerReference.coinTradeRatio = 2
+                    playerReference.paperTradeRatio = 2
+                    playerReference.clothTradeRatio = 2
                 }
             default: break
         }
