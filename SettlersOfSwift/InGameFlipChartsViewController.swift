@@ -433,6 +433,11 @@ class InGameFlipChartsViewController: UIViewController {
                     //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
                     //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
                 }
+                if playerReference.tradesImprovementLevel >= 2 {
+                    playerReference.coinTradeRatio = 2
+                    playerReference.paperTradeRatio = 2
+                    playerReference.clothTradeRatio = 2
+                }
             default: break
         }
         drawCurrentChartScene()

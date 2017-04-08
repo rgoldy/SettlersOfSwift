@@ -41,8 +41,11 @@ class Player {
     var nextAction: PlayerIntentions = .WillDoNothing
     
     var paper = 0
+    var paperTradeRatio = 4
     var cloth = 0
+    var clothTradeRatio = 4
     var coin = 0
+    var coinTradeRatio = 4
     
     var fish = 0
     var hasOldBoot = false

@@ -16,6 +16,9 @@ enum SelectedItem: String {
     case Stone = "STONE"
     case Wheat = "WHEAT"
     case Wood = "WOOL"
+    case Coin = "COIN"
+    case Paper = "PAPER"
+    case Cloth = "CLOTH"
 }
 
 class InGameTradeViewController: UIViewController {
@@ -30,12 +33,18 @@ class InGameTradeViewController: UIViewController {
     @IBOutlet weak var sourceStone: UIButton!
     @IBOutlet weak var sourceWheat: UIButton!
     @IBOutlet weak var sourceWood: UIButton!
+    @IBOutlet weak var sourceCoin: UIButton!
+    @IBOutlet weak var sourcePaper: UIButton!
+    @IBOutlet weak var sourceCloth: UIButton!
     @IBOutlet weak var targetBrick: UIButton!
     @IBOutlet weak var targetGold: UIButton!
     @IBOutlet weak var targetSheep: UIButton!
     @IBOutlet weak var targetStone: UIButton!
     @IBOutlet weak var targetWheat: UIButton!
     @IBOutlet weak var targetWood: UIButton!
+    @IBOutlet weak var targetCoin: UIButton!
+    @IBOutlet weak var targetPaper: UIButton!
+    @IBOutlet weak var targetCloth: UIButton!
     
     @IBOutlet weak var performTrade: UIButton!
     
@@ -60,8 +69,8 @@ class InGameTradeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateOptions()
         segmentSelector.selectedSegmentIndex = 0
+        updateOptions()
         ratioSelector.setTitle("* : 1", for: UIControlState.disabled)
         ratioSelector.isEnabled = false
     }
@@ -83,6 +92,9 @@ class InGameTradeViewController: UIViewController {
                     case.Stone: myPlayerIndex.stone -= myPlayerIndex.stoneTradeRatio
                     case .Wheat: myPlayerIndex.wheat -= myPlayerIndex.wheatTradeRatio
                     case .Wood: myPlayerIndex.wood -= myPlayerIndex.woodTradeRatio
+                    case .Coin: myPlayerIndex.coin -= myPlayerIndex.coinTradeRatio
+                    case .Paper: myPlayerIndex.paper -= myPlayerIndex.paperTradeRatio
+                    case .Cloth: myPlayerIndex.cloth -= myPlayerIndex.clothTradeRatio
                     case .None: break;
                 }
                 switch selectedTarget {
@@ -92,6 +104,9 @@ class InGameTradeViewController: UIViewController {
                     case.Stone: myPlayerIndex.stone += 1
                     case .Wheat: myPlayerIndex.wheat += 1
                     case .Wood: myPlayerIndex.wood += 1
+                    case .Coin: myPlayerIndex.coin += 1
+                    case .Paper: myPlayerIndex.paper += 1
+                    case .Cloth: myPlayerIndex.cloth += 1
                     case .None: break;
                 }
             } else {
@@ -135,6 +150,9 @@ class InGameTradeViewController: UIViewController {
                         case.Stone: myPlayerIndex.stone -= currentRatio
                         case .Wheat: myPlayerIndex.wheat -= currentRatio
                         case .Wood: myPlayerIndex.wood -= currentRatio
+                        case .Coin: myPlayerIndex.coin -= currentRatio
+                        case .Paper: myPlayerIndex.paper -= currentRatio
+                        case .Cloth: myPlayerIndex.cloth -= currentRatio
                         case .None: break;
                     }
                     switch selectedTarget {
@@ -144,6 +162,9 @@ class InGameTradeViewController: UIViewController {
                         case.Stone: myPlayerIndex.stone += 1
                         case .Wheat: myPlayerIndex.wheat += 1
                         case .Wood: myPlayerIndex.wood += 1
+                        case .Coin: myPlayerIndex.coin += 1
+                        case .Paper: myPlayerIndex.paper += 1
+                        case .Cloth: myPlayerIndex.cloth += 1
                         case .None: break;
                     }
                 } else {
@@ -167,7 +188,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedSourceAsBrick(_ sender: Any) {
-        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceBrick.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Brick
@@ -176,7 +197,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedSourceAsGold(_ sender: Any) {
-        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceGold.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Gold
@@ -185,7 +206,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedSourceAsSheep(_ sender: Any) {
-        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceSheep.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Sheep
@@ -194,7 +215,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedSourceAsStone(_ sender: Any) {
-        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceStone.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Stone
@@ -203,7 +224,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedSourceAsWheat(_ sender: Any) {
-        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceWheat.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Wheat
@@ -212,7 +233,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedSourceAsWood(_ sender: Any) {
-        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood]
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         sourceWood.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Wood
@@ -220,8 +241,35 @@ class InGameTradeViewController: UIViewController {
         if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].woodTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
+    @IBAction func selectedSourceAsCoin(_ sender: Any) {
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
+        for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
+        sourceCoin.setTitleColor(UIColor.orange, for: UIControlState.normal)
+        selectedSource = .Coin
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].coinTradeRatio) : 1", for: UIControlState.disabled) }
+    }
+    
+    @IBAction func selectedSourceAsPaper(_ sender: Any) {
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
+        for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
+        sourcePaper.setTitleColor(UIColor.orange, for: UIControlState.normal)
+        selectedSource = .Paper
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].paperTradeRatio) : 1", for: UIControlState.disabled) }
+    }
+    
+    @IBAction func selectedSourceAsCloth(_ sender: Any) {
+        let buttonsCollection = [sourceBrick, sourceGold, sourceSheep, sourceStone, sourceWheat, sourceWood, sourceCoin, sourcePaper, sourceCloth]
+        for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
+        sourceCloth.setTitleColor(UIColor.orange, for: UIControlState.normal)
+        selectedSource = .Cloth
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].clothTradeRatio) : 1", for: UIControlState.disabled) }
+    }
+    
     @IBAction func selectedTargetAsBrick(_ sender: Any) {
-        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood]
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetBrick.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Brick
@@ -229,7 +277,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedTargetAsGold(_ sender: Any) {
-        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood]
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetGold.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Gold
@@ -237,7 +285,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedTargetAsSheep(_ sender: Any) {
-        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood]
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetSheep.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Sheep
@@ -245,7 +293,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedTargetAsStone(_ sender: Any) {
-        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood]
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetStone.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Stone
@@ -253,7 +301,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedTargetAsWheat(_ sender: Any) {
-        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood]
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetWheat.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Wheat
@@ -261,10 +309,34 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func selectedTargetAsWood(_ sender: Any) {
-        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood]
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
         for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         targetWood.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedTarget = .Wood
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
+    }
+    
+    @IBAction func selectedTargetAsCoin(_ sender: Any) {
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
+        for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
+        targetCoin.setTitleColor(UIColor.orange, for: UIControlState.normal)
+        selectedTarget = .Coin
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
+    }
+    
+    @IBAction func selectedTargetAsPaper(_ sender: Any) {
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
+        for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
+        targetPaper.setTitleColor(UIColor.orange, for: UIControlState.normal)
+        selectedTarget = .Paper
+        performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
+    }
+    
+    @IBAction func selectedTargetAsCloth(_ sender: Any) {
+        let buttonsCollection = [targetBrick, targetGold, targetSheep, targetStone, targetWheat, targetWood, targetCoin, targetPaper, targetCloth]
+        for item in buttonsCollection { item?.setTitleColor(UIColor.blue, for: UIControlState.normal) }
+        targetCloth.setTitleColor(UIColor.orange, for: UIControlState.normal)
+        selectedTarget = .Cloth
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
     }
     
@@ -278,7 +350,10 @@ class InGameTradeViewController: UIViewController {
                                              sourceSheep, targetSheep,
                                              sourceStone, targetStone,
                                              sourceWheat, targetWheat,
-                                              sourceWood, targetWood]
+                                              sourceWood, targetWood,
+                                              sourceCoin, targetCoin,
+                                             sourcePaper, targetPaper,
+                                             sourceCloth, targetCloth]
         for item in buttonsCollection { item.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         let myPlayerIndex = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         if segmentSelector.selectedSegmentIndex == 0 {
@@ -288,6 +363,9 @@ class InGameTradeViewController: UIViewController {
             if myPlayerIndex.stone < myPlayerIndex.stoneTradeRatio { sourceStone.isEnabled = false } else { sourceStone.isEnabled = true }
             if myPlayerIndex.wheat < myPlayerIndex.wheatTradeRatio { sourceWheat.isEnabled = false } else { sourceWheat.isEnabled = true }
             if myPlayerIndex.wood < myPlayerIndex.woodTradeRatio { sourceWood.isEnabled = false } else { sourceWood.isEnabled = true }
+            if myPlayerIndex.coin < myPlayerIndex.coinTradeRatio { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
+            if myPlayerIndex.paper < myPlayerIndex.paperTradeRatio { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
+            if myPlayerIndex.cloth < myPlayerIndex.clothTradeRatio { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
             ratioSelector.setTitle("* : 1", for: UIControlState.disabled)
             ratioSelector.isEnabled = false
         } else {
@@ -305,12 +383,18 @@ class InGameTradeViewController: UIViewController {
             if myPlayerIndex.stone < currentRatio { sourceStone.isEnabled = false } else { sourceStone.isEnabled = true }
             if myPlayerIndex.wheat < currentRatio { sourceWheat.isEnabled = false } else { sourceWheat.isEnabled = true }
             if myPlayerIndex.wood < currentRatio { sourceWood.isEnabled = false } else { sourceWood.isEnabled = true }
+            if myPlayerIndex.coin < currentRatio { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
+            if myPlayerIndex.paper < currentRatio { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
+            if myPlayerIndex.cloth < currentRatio { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
             if otherPlayer.brick == 0 { targetBrick.isEnabled = false } else { targetBrick.isEnabled = true }
             if otherPlayer.gold == 0 { targetGold.isEnabled = false } else { targetGold.isEnabled = true }
             if otherPlayer.sheep == 0 { targetSheep.isEnabled = false } else { targetSheep.isEnabled = true }
             if otherPlayer.stone == 0 { targetStone.isEnabled = false } else { targetStone.isEnabled = true }
             if otherPlayer.wheat == 0 { targetWheat.isEnabled = false } else { targetWheat.isEnabled = true }
             if otherPlayer.wood == 0 { targetWood.isEnabled = false } else { targetWood.isEnabled = true }
+            if otherPlayer.coin == 0 { targetCoin.isEnabled = false } else { targetCoin.isEnabled = true }
+            if otherPlayer.paper == 0 { targetPaper.isEnabled = false } else { targetPaper.isEnabled = true }
+            if otherPlayer.cloth == 0 { targetCloth.isEnabled = false } else { targetCloth.isEnabled = true }
     }   }
     
     @IBAction func didChangeSegment(_ sender: Any) {
