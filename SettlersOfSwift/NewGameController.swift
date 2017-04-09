@@ -82,6 +82,10 @@ class NewGameController: UITableViewController, NetworkDelegate {
     
     func recievedData(data: String) {
         print("Received: \(data)")
+        let message = data.components(separatedBy: ".")
+        if (message[0] == "readyToPlay") {
+            appDelegate.networkManager.readyPlayers += 1
+        }
     }
     
     override func didReceiveMemoryWarning() {

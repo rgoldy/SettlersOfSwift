@@ -34,7 +34,6 @@ enum EventDieSides: Int {
 class GameScene: SKScene {
     
     //init scene nodes
-    //var vw: UIViewController
     var cam:SKCameraNode!
     var currGamePhase = GamePhase.Setup
     let dice = Dice()
@@ -62,6 +61,9 @@ class GameScene: SKScene {
     var buildSettlement : Bool = false
     var buildRoad : Bool = false
     var buildShip: Bool = false
+    
+    var oldBootButton = UIImageView()
+    var showingBootMenu : Bool = false
     
     let tradeBackground = UITextField()
     let lWood = UITextField()
@@ -216,6 +218,9 @@ class GameScene: SKScene {
         eventDiceUI.frame = CGRect(x: self.view!.bounds.width * 0.182 + self.view!.bounds.width * 0.025, y: self.view!.bounds.height - self.view!.bounds.width/12, width: self.view!.bounds.width/12, height: self.view!.bounds.width/12)
         eventDiceUI.image = UIImage(named: "event1")
         self.view?.addSubview(eventDiceUI)
+        
+        oldBootButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5 + self.view!.bounds.height/13.5, width: self.view!.bounds.width/8, height: self.view!.bounds.width/12)
+        oldBootButton.image = UIImage(named: "oldBoot")
     }
     
     func loadSceneNodes() {
@@ -852,6 +857,11 @@ class GameScene: SKScene {
             }
         }
         
+        players[currentPlayer].victoryPoints += 1
+        let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
+        let sentVP = appDelegate.networkManager.sendData(data: message)
+        if !sentVP { print("failed to sync victory points") }
+        
         return true
     }
     
@@ -1036,6 +1046,11 @@ class GameScene: SKScene {
             print ("successful sync cornerObject")
         }
 
+        players[currentPlayer].victoryPoints += 1
+        let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
+        let sentVP = appDelegate.networkManager.sendData(data: message)
+        if !sentVP { print("failed to sync victory points") }
+        
         return true
     }
     
@@ -1044,7 +1059,7 @@ class GameScene: SKScene {
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false}
         if (corner?.cornerObject != nil) { return false }
-        if (!canPlaceKnight(corner: corner!)) { return false }
+        //if (!canPlaceKnight(corner: corner!)) { return false }
         if (!hasResourcesToBuildKnight()) { return false }
         
         var nextToRoad : Bool = false
@@ -1060,6 +1075,9 @@ class GameScene: SKScene {
         players[currentPlayer].ownedKnights.append(corner!)
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))"})
+        
+        if tileGroup == nil {print("Unable to find knight asset - \(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner?.cornerObject!.isActive))")}
+        
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
         let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(String(describing: corner?.cornerObject!.isActive)),\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),\(String(describing: corner?.cornerObject!.didActionThisTurn))"
@@ -1115,10 +1133,14 @@ class GameScene: SKScene {
         }
         
         // Inform other players of knight change
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? true)"
+        var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if !sent { print("failed to sync knight") }
+        
+        cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.Knight.rawValue),\(corner?.cornerObject?.strength ?? 1),\(corner?.cornerObject?.isActive ?? false),\(corner?.cornerObject?.hasBeenUpgradedThisTurn ?? false),\(corner?.cornerObject?.didActionThisTurn ?? true)"
         
         // Send object info to other players
-        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         if (!sent) {
             print ("failed to sync cornerObject")
         }
@@ -1154,12 +1176,16 @@ class GameScene: SKScene {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
         }
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),true,\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),true)"
+        var cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),nil"
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {print ("failed to sync knight")}
+        
+        cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),true,\(String(describing: corner?.cornerObject!.hasBeenUpgradedThisTurn)),true)"
         
         // Send object info to other players
-        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         if (!sent) {
-            print ("failed to sync cornerObject")
+            print ("failed to sync knight")
         }
         
         return true
@@ -1199,7 +1225,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false}
-        if (!canPlaceKnight(corner: corner!)) { return false }
+        //if (!canPlaceKnight(corner: corner!)) { return false }
         
         if (corner?.cornerObject != nil && !displacable) { return false }
         else if (corner?.cornerObject != nil) {
@@ -1274,7 +1300,9 @@ class GameScene: SKScene {
         let strength = Int(info[3])!
         let active = Bool(info[4])!
         
-        if !replacementExists(row: row, col: col) { return }
+        if !replacementExists(row: row, col: col) {
+            return
+        }
         
         players[player].movingKnightFromCol = col
         players[player].movingKnightFromRow = row
@@ -1534,6 +1562,11 @@ class GameScene: SKScene {
             }
             else {
                 players[currPlayerNumber].ownedCorners.append(corner!)
+                
+                players[currentPlayer].victoryPoints += 1
+                let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
+                let sentVP = appDelegate.networkManager.sendData(data: message)
+                if !sentVP { print("failed to sync victory points") }
             }
             
             var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
@@ -1752,10 +1785,13 @@ class GameScene: SKScene {
             
             if num == 1 {
                 if knightStrength[myPlayerIndex] == strongest {
-                    players[myPlayerIndex].victoryPoints += 1
+ 
                     let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The knights have defeated the barbarians! You are the \"Defender of Catan\", and receive one victory point!", preferredStyle: UIAlertControllerStyle.alert)
                     let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         self.players[self.myPlayerIndex].victoryPoints += 1
+                        let message = "victoryPoints.\(self.myPlayerIndex).\(self.players[self.myPlayerIndex].victoryPoints)"
+                        let sent = self.appDelegate.networkManager.sendData(data: message)
+                        if !sent { print("failed to sync victory points") }
                     }
                     alert.addAction(okay)
                     OperationQueue.main.addOperation { () -> Void in
@@ -1823,6 +1859,11 @@ class GameScene: SKScene {
         sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         
         if !sent { print ("Failed to update others on city destruction") }
+        
+        players[myPlayerIndex].victoryPoints -= 2
+        let message = "victoryPoints.\(myPlayerIndex).\(players[myPlayerIndex].victoryPoints)"
+        let sentVP = appDelegate.networkManager.sendData(data: message)
+        if !sentVP { print("failed to sync victory points") }
         
         return true
     }
@@ -1950,8 +1991,8 @@ class GameScene: SKScene {
         var numberResources : Int = 0
         let producingCoords = handler.landHexDictionary[dice]
         for (col, row) in producingCoords! {
-            for player in players { // for each player...
-                for vertex in player.ownedCorners { // distribute resources if vertex touches hex
+            for player in 0..<players.count { // for each player...
+                for vertex in players[player].ownedCorners { // distribute resources if vertex touches hex
                     if (vertex.cornerObject?.type == cornerType.City) {
                         numberResources = 2
                     } else {
@@ -1962,48 +2003,48 @@ class GameScene: SKScene {
                         switch vertex.tile1.type! {
                             case .wood:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.wood += 1; print("\(player.name) mined wood")
-                                    player.paper += 1; print("\(player.name) produced paper")
+                                    players[player].wood += 1; print("\(players[player].name) mined wood")
+                                    players[player].paper += 1; print("\(players[player].name) produced paper")
                                 }
                                 else {
-                                    player.wood += 1; print("\(player.name) mined wood")
+                                    players[player].wood += 1; print("\(players[player].name) mined wood")
                                 }
-                            case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                            case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.stone += 1; print("\(player.name) mined stone")
-                                    player.coin += 1; print("\(player.name) produced coin")
+                                    players[player].stone += 1; print("\(players[player].name) mined stone")
+                                    players[player].coin += 1; print("\(players[player].name) produced coin")
                                 }
                                 else {
-                                    player.stone += 1; print("\(player.name) mined stone")
+                                    players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.sheep += 1; print("\(player.name) mined sheep")
-                                    player.cloth += 1; print("\(player.name) produced cloth")
+                                    players[player].sheep += 1; print("\(players[player].name) mined sheep")
+                                    players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
                                 else {
-                                    player.coin += 1; print("\(player.name) mined sheep")
+                                    players[player].coin += 1; print("\(players[player].name) mined sheep")
                                 }
-                            case .brick: player.brick += numberResources; print("\(player.name) mined brick")
-                            case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
+                            case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
                                 var newFish = drawFishCard()
                         
                                 if (newFish == -1) { /* Deck is empty */ }
                                 else if (newFish == 0) {
-                                   player.hasOldBoot = true
+                                    receivedOldBoot(player: player)
                                 }
                                 else {
-                                    player.fish += newFish
+                                    players[player].fish += newFish
                                     if (vertex.cornerObject?.type == cornerType.City) {
                                         newFish = drawFishCard()
                                         if (newFish == -1) { /* Deck is empty */ }
                                         else if (newFish == 0) {
-                                            player.hasOldBoot = true
+                                            receivedOldBoot(player: player)
                                         }
                                         else {
-                                            player.fish += newFish
+                                            players[player].fish += newFish
                                         }
                                     }
                                 }
@@ -2015,48 +2056,48 @@ class GameScene: SKScene {
                         switch vertex.tile2!.type! {
                             case .wood:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.wood += 1; print("\(player.name) mined wood")
-                                    player.paper += 1; print("\(player.name) produced paper")
+                                    players[player].wood += 1; print("\(players[player].name) mined wood")
+                                    players[player].paper += 1; print("\(players[player].name) produced paper")
                                 }
                                 else {
-                                    player.wood += 1; print("\(player.name) mined wood")
+                                    players[player].wood += 1; print("\(players[player].name) mined wood")
                                 }
-                            case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                            case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.stone += 1; print("\(player.name) mined stone")
-                                    player.coin += 1; print("\(player.name) produced coin")
+                                    players[player].stone += 1; print("\(players[player].name) mined stone")
+                                    players[player].coin += 1; print("\(players[player].name) produced coin")
                                 }
                                 else {
-                                    player.stone += 1; print("\(player.name) mined stone")
+                                    players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.sheep += 1; print("\(player.name) mined sheep")
-                                    player.cloth += 1; print("\(player.name) produced cloth")
+                                    players[player].sheep += 1; print("\(players[player].name) mined sheep")
+                                    players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
                                 else {
-                                    player.coin += 1; print("\(player.name) mined sheep")
+                                    players[player].coin += 1; print("\(players[player].name) mined sheep")
                                 }
-                            case .brick: player.brick += numberResources; print("\(player.name) mined brick")
-                            case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
+                            case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
                              var newFish = drawFishCard()
                              
                              if (newFish == -1) { /* Deck is empty */ }
                              else if (newFish == 0) {
-                                player.hasOldBoot = true
+                                receivedOldBoot(player: player)
                              }
                              else {
-                                player.fish += newFish
+                                players[player].fish += newFish
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     newFish = drawFishCard()
                                     if (newFish == -1) { /* Deck is empty */ }
                                     else if (newFish == 0) {
-                                        player.hasOldBoot = true
+                                        receivedOldBoot(player: player)
                                     }
                                     else {
-                                        player.fish += newFish
+                                        players[player].fish += newFish
                                     }
                                 }
                              }
@@ -2068,48 +2109,48 @@ class GameScene: SKScene {
                         switch vertex.tile3!.type! {
                             case .wood:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.wood += 1; print("\(player.name) mined wood")
-                                    player.paper += 1; print("\(player.name) produced paper")
+                                    players[player].wood += 1; print("\(players[player].name) mined wood")
+                                    players[player].paper += 1; print("\(players[player].name) produced paper")
                                 }
                                 else {
-                                    player.wood += 1; print("\(player.name) mined wood")
+                                    players[player].wood += 1; print("\(players[player].name) mined wood")
                                 }
-                            case .wheat: player.wheat += numberResources; print("\(player.name) mined wheat")
+                            case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.stone += 1; print("\(player.name) mined stone")
-                                    player.coin += 1; print("\(player.name) produced coin")
+                                    players[player].stone += 1; print("\(players[player].name) mined stone")
+                                    players[player].coin += 1; print("\(players[player].name) produced coin")
                                 }
                                 else {
-                                    player.stone += 1; print("\(player.name) mined stone")
+                                    players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
                                 if (vertex.cornerObject?.type == cornerType.City) {
-                                    player.sheep += 1; print("\(player.name) mined sheep")
-                                    player.cloth += 1; print("\(player.name) produced cloth")
+                                    players[player].sheep += 1; print("\(players[player].name) mined sheep")
+                                    players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
                                 else {
-                                    player.coin += 1; print("\(player.name) mined sheep")
+                                    players[player].coin += 1; print("\(players[player].name) mined sheep")
                                 }
-                            case .brick: player.brick += numberResources; print("\(player.name) mined brick")
-                            case .gold: player.gold += (numberResources*2); print("\(player.name) mined gold")
+                            case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
+                            case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
                              var newFish = drawFishCard()
                              
                              if (newFish == -1) { /* Deck is empty */ }
                              else if (newFish == 0) {
-                                player.hasOldBoot = true
+                                receivedOldBoot(player: player)
                              }
                              else {
-                                player.fish += newFish
+                                players[player].fish += newFish
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     newFish = drawFishCard()
                                     if (newFish == -1) { /* Deck is empty */ }
                                     else if (newFish  == 0) {
-                                        player.hasOldBoot = true
+                                        receivedOldBoot(player: player)
                                     }
                                     else {
-                                        player.fish += newFish
+                                        players[player].fish += newFish
                                     }
                                 }
                              }
@@ -2122,6 +2163,130 @@ class GameScene: SKScene {
         print(players[myPlayerIndex].getPlayerText())
         DispatchQueue.main.async {
             self.playerInfo.text = self.players[self.myPlayerIndex].getPlayerText()
+        }
+    }
+    
+    func receivedOldBoot(player: Int) {
+        players[player].hasOldBoot = true
+        
+        let bootNofication = "oldBoot.\(player).true"
+        let sentBoot = appDelegate.networkManager.sendData(data: bootNofication)
+        if !sentBoot { print("failed to send boot") }
+        
+        if (player == myPlayerIndex) {
+            self.view?.addSubview(oldBootButton)
+        }
+        
+        let alert = UIAlertController(title: "You Have Received The Old Boot", message: "The old boot adds one victory point you need to win the game. You can give the boot to anyone who has more victory points, or the same number of victory points as you.", preferredStyle: UIAlertControllerStyle.alert)
+        let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+            // Do nothing
+        }
+        alert.addAction(okay)
+        
+        OperationQueue.main.addOperation { () -> Void in
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func bootFromMessage(player: Int, hasBoot: Bool) {
+        players[player].hasOldBoot = hasBoot
+        
+        print("\(players[player].name) has received boot (\(hasBoot))")
+        
+        if (player == myPlayerIndex && hasBoot) {
+            
+            DispatchQueue.main.async {
+                self.view?.addSubview(self.oldBootButton)
+            }
+            
+            let alert = UIAlertController(title: "You Have Received The Old Boot", message: "The old boot adds one victory point you need to win the game. You can give the boot to anyone who has more or the same number of victory points as you.", preferredStyle: UIAlertControllerStyle.alert)
+            let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                // Do nothing
+            }
+            alert.addAction(okay)
+            
+            OperationQueue.main.addOperation { () -> Void in
+                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
+        }
+        else if (player == myPlayerIndex) {
+            DispatchQueue.main.async {
+                self.oldBootButton.removeFromSuperview()
+            }
+
+        }
+        else if (hasBoot) {
+            let alert = UIAlertController(title: "Old Boot", message: "\(players[player].name) (\(players[player].color.rawValue)) now has the old boot", preferredStyle: UIAlertControllerStyle.alert)
+            let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                // Do nothing
+            }
+            alert.addAction(okay)
+            
+            OperationQueue.main.addOperation { () -> Void in
+                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    func canGiveBoot(to: Int) -> Bool {
+        if players[to].victoryPoints >= players[myPlayerIndex].victoryPoints {
+            return true
+        }
+        return false
+    }
+    func giveOldBootAway(to: Int) {
+        players[myPlayerIndex].hasOldBoot = false
+        players[to].hasOldBoot = true
+        
+        var bootNofication = "oldBoot.\(myPlayerIndex).false"
+        var sentBoot = appDelegate.networkManager.sendData(data: bootNofication)
+        if !sentBoot { print("failed to send boot") }
+        
+        DispatchQueue.main.async {
+            self.oldBootButton.removeFromSuperview()
+        }
+        
+        bootNofication = "oldBoot.\(to).true"
+        sentBoot = appDelegate.networkManager.sendData(data: bootNofication)
+        if !sentBoot { print("failed to send boot") }
+
+    }
+    func showBootMenu() {
+        //if (!players[myPlayerIndex].hasOldBoot || showingBootMenu) { return }
+        
+        showingBootMenu = true
+        
+        let alert = UIAlertController(title: "Send Old Boot", message: "Select a player to send the boot to.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let p1 = (myPlayerIndex + 1) % players.count
+        var p2 = myPlayerIndex - 1; if (p2 == -1) {p2 = players.count - 1}
+        
+        let player1: UIAlertAction = UIAlertAction(title: "\(players[p1].color.rawValue) player", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+            self.giveOldBootAway(to: p1)
+            self.showingBootMenu = false
+        }
+        let player2 = UIAlertAction(title: "\(players[p2].color.rawValue) player", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+            self.giveOldBootAway(to: p2)
+            self.showingBootMenu = false
+        }
+        let noPlayer = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+            self.showingBootMenu = false
+        }
+
+        var valid = 0
+        if (canGiveBoot(to: p1)) {
+            alert.addAction(player1)
+            valid += 1
+        }
+        if (canGiveBoot(to: p2) && players.count > 2) {
+            alert.addAction(player2)
+            valid += 1
+        }
+        
+        alert.addAction(noPlayer)
+        
+        OperationQueue.main.addOperation { () -> Void in
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -2432,7 +2597,7 @@ class GameScene: SKScene {
                     }
                 }
             case .p1Turn :
-                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView) || eventDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
                         rollDice()
                         rolled = true
@@ -2442,12 +2607,17 @@ class GameScene: SKScene {
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
+                if (oldBootButton.frame.contains(targetLocationView)) {
+                    if (!showingBootMenu && players[myPlayerIndex].hasOldBoot) {
+                        showBootMenu()
+                    }
+                }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     var ready = true
                     for p in players {
                         if p.nextAction != .WillDoNothing {ready = false; break}
                     }
-                    if (rolled && ready) {
+                    if (rolled && ready && !showingBootMenu) {
                         endTurn(player: currentPlayer)
                         currentPlayer = currentPlayer + 1
                         currGamePhase = GamePhase.p2Turn
@@ -2462,7 +2632,7 @@ class GameScene: SKScene {
                 handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
                 
             case .p2Turn :
-                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView) || eventDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
                         rollDice()
                         rolled = true
@@ -2472,12 +2642,17 @@ class GameScene: SKScene {
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
+                if (oldBootButton.frame.contains(targetLocationView)) {
+                    if (!showingBootMenu && players[myPlayerIndex].hasOldBoot) {
+                        showBootMenu()
+                    }
+                }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     var ready = true
                     for p in players {
                         if p.nextAction != .WillDoNothing {ready = false; break}
                     }
-                    if (rolled && ready) {
+                    if (rolled && ready && !showingBootMenu) {
                         endTurn(player: currentPlayer)
                         currentPlayer = (currentPlayer + 1) % players.count
                         if (currentPlayer == 2) {
@@ -2496,7 +2671,7 @@ class GameScene: SKScene {
                 handleButtonTouches(targetLocationView: targetLocationView, targetLocation: targetLocation)
                 
             case .p3Turn :
-                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView)) {
+                if (redDiceUI.frame.contains(targetLocationView) || yellowDiceUI.frame.contains(targetLocationView) || eventDiceUI.frame.contains(targetLocationView)) {
                     if(!rolled) {
                         rollDice()
                         rolled = true
@@ -2506,12 +2681,17 @@ class GameScene: SKScene {
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
+                if (oldBootButton.frame.contains(targetLocationView)) {
+                    if (!showingBootMenu && players[myPlayerIndex].hasOldBoot) {
+                        showBootMenu()
+                    }
+                }
                 if (self.gameButton.frame.contains(targetLocationView)) {
                     var ready = true
                     for p in players {
                         if p.nextAction != .WillDoNothing {ready = false; break}
                     }
-                    if (rolled && ready) {
+                    if (rolled && ready && !showingBootMenu) {
                         endTurn(player: currentPlayer)
                         currentPlayer = 0
                         currGamePhase = GamePhase.p1Turn

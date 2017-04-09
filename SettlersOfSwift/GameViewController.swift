@@ -40,7 +40,6 @@ class GameViewController: UIViewController, NetworkDelegate {
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var viewPort: SKView!
     var scenePort: GameScene!
-    var readyPlayers = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,7 +101,7 @@ class GameViewController: UIViewController, NetworkDelegate {
             } catch { }
         }
         setAppearanceForMenuButton()
-        if readyPlayers > 1 && scenePort.players[scenePort.myPlayerIndex].nextAction != .WillDoNothing {
+        if scenePort.players.count > 1 && scenePort.players[scenePort.myPlayerIndex].nextAction != .WillDoNothing {
             scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
         }
     }
@@ -134,7 +133,7 @@ class GameViewController: UIViewController, NetworkDelegate {
     func syncBoard() {
         if (appDelegate.networkManager.isHost) {
             // Wait for all players to be ready
-            while (readyPlayers < appDelegate.networkManager.session.connectedPeers.count) { /* wait */}
+            while (appDelegate.networkManager.readyPlayers < appDelegate.networkManager.session.connectedPeers.count) { /* wait */}
             
             // Distribute board layout to others
             let boardEncoding = scenePort.getBoardLayout()
@@ -175,10 +174,10 @@ class GameViewController: UIViewController, NetworkDelegate {
                 print("Updated Scene")
             case "readyToPlay": // data informs others whether player is ready
                 if (message[1] == "true") {
-                    readyPlayers += 1
+                    appDelegate.networkManager.readyPlayers += 1
                 }
                 else {
-                    readyPlayers -= 1
+                    appDelegate.networkManager.readyPlayers -= 1
                 }
             case "playerData": // data represents players' information
                 scenePort.setPlayers(info: message[1])
@@ -294,6 +293,14 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let player = Int(message[1])!
                 let intent = PlayerIntentions(rawValue: message[2])
                 scenePort.players[player].nextAction = intent!
+            case "victoryPoints":
+                let player = Int(message[1])!
+                let value = Int(message[2])!
+                scenePort.players[player].victoryPoints = value
+        case "oldBoot":
+                let player = Int(message[1])!
+                let hasBoot = Bool(message[2])!
+                scenePort.bootFromMessage(player: player, hasBoot: hasBoot)
             default:
                 print("Unknown message")
         }

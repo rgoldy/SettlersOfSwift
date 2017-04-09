@@ -24,6 +24,7 @@ class NetworkConnection : NSObject {
     private var myServiceType = "settlersofswift"
     
     public var isHost: Bool
+    public var readyPlayers: Int = 0
     
     // List of all users you can see
     var nearbyUsers = [MCPeerID]()
