@@ -145,26 +145,69 @@ class InGameCardsDeckViewController: UIViewController {
             case .Saboteur: //  NOT IMPLEMENTED
                 break
                 //
-            case .Spy:  //  IN PROGRESS
+            case .Spy:
                 let announcement = "Would you like to use The Spy Progress Card...?"
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].receivedPeersCards = false
+                    let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3)")
+                    let loadingView = UIActivityIndicatorView(frame: CGRect(x: 343, y: 182, width: 50, height: 50))
+                    loadingView.color = UIColor.gray
+                    loadingView.startAnimating()
+                    self.view.addSubview(loadingView)
+                    while self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].receivedPeersCards == false { }
+                    loadingView.removeFromSuperview()
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].receivedPeersCards = false
+                    let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3)")
+                    let nextLoadingView = UIActivityIndicatorView(frame: CGRect(x: 343, y: 182, width: 50, height: 50))
+                    nextLoadingView.color = UIColor.gray
+                    nextLoadingView.startAnimating()
+                    self.view.addSubview(nextLoadingView)
+                    while self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].receivedPeersCards == false { }
+                    loadingView.removeFromSuperview()
                     if self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].progressCards.count == 0 && self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].progressCards.count == 0 {
                         let newAlert = UIAlertController(title: nil, message: "Unfortunately, no one has any Progress Card to spare...", preferredStyle: .alert)
                         newAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                         self.present(newAlert, animated: true, completion: nil)
                     } else {
                         let newAlert = UIAlertController(title: nil, message: "Who would you like to steal from...?", preferredStyle: .alert)
-                        newAlert.addAction(UIAlertAction(title: "Previous Player", style: .default, handler: nil))  //  CONTINUE HERE
-                        newAlert.addAction(UIAlertAction(title: "Next Player", style: .default, handler: nil))  //  CONTINUE HERE
+                        if self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].progressCards.count != 0 {
+                            newAlert.addAction(UIAlertAction(title: "Previous Player", style: .default, handler: { action -> Void in
+                                let newSheet = UIAlertController(title: "", message: "Select a Progress Card...", preferredStyle: .actionSheet)
+                                for card in self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].progressCards {
+                                    newSheet.addAction(UIAlertAction(title: card.rawValue, style: .default, handler: { action -> Void in
+                                        self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.append(card)
+                                        let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stoleProgressCard.\(card.rawValue).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3)")
+                                        for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                                            if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                                                break
+                                            }   }
+                                        self.currentDisplayIndex = 0
+                                        self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                                    }))
+                                }
+                            }))
+                        }
+                        if self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].progressCards.count != 0 {
+                            newAlert.addAction(UIAlertAction(title: "Next Player", style: .default, handler: { action -> Void in
+                                let newSheet = UIAlertController(title: "", message: "Select a Progress Card...", preferredStyle: .actionSheet)
+                                for card in self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].progressCards {
+                                    newSheet.addAction(UIAlertAction(title: card.rawValue, style: .default, handler: { action -> Void in
+                                        self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.append(card)
+                                        let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stoleProgressCard.\(card.rawValue).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3)")
+                                        for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                                            if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                                                break
+                                            }   }
+                                        self.currentDisplayIndex = 0
+                                        self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                                    }))
+                                }
+                            }))
+                        }
                         self.present(newAlert, animated: true, completion: nil)
-                        for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
-                            if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
-                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
-                                break
-                        }   }
-                        self.currentDisplayIndex = 0
-                        self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
                     }
                 }))
                 alert.addAction(UIAlertAction(title: "NO", style: .default, handler: nil))

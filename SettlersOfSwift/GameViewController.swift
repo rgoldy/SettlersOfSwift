@@ -261,6 +261,32 @@ class GameViewController: UIViewController, NetworkDelegate {
                     let message = "sendResourcesCount.\(scenePort.myPlayerIndex).\(player.brick).\(player.gold).\(player.sheep).\(player.stone).\(player.wheat).\(player.wood).\(player.coin).\(player.paper).\(player.cloth)"
                     let _ = self.appDelegate.networkManager.sendData(data: message)
                 }
+            case "broadcastProgressCards":
+                if scenePort.myPlayerIndex == Int(message[1])! {
+                    var message = "myProgressCards.\(scenePort.myPlayerIndex)."
+                    for card in scenePort.players[scenePort.myPlayerIndex].progressCards {
+                        message += card.rawValue + "."
+                    }
+                    message += "nil"
+                    let _ = appDelegate.networkManager.sendData(data: message)
+                }
+            case "myProgressCards":
+                let playerReference = scenePort.players[Int(message[1])!]
+                var index = 2
+                playerReference.progressCards = [ProgressCardsType]()
+                while message[index] != "nil" {
+                    playerReference.progressCards.append(ProgressCardsType(rawValue: message[index])!)
+                    index += 1
+                }
+                scenePort.players[scenePort.myPlayerIndex].receivedPeersCards = true
+            case "stoleProgressCard":
+                if scenePort.myPlayerIndex == Int(message[2])! {
+                    let stolenProgressCard = ProgressCardsType(rawValue: message[1])
+                    for index in 0..<scenePort.players[scenePort.myPlayerIndex].progressCards.count {
+                        if scenePort.players[scenePort.myPlayerIndex].progressCards[index] == stolenProgressCard {
+                            scenePort.players[scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                }   }   }
             case "sendResourcesCount":
                 let player = scenePort.players[Int(message[1])!]
                 player.brick = Int(message[2])!
