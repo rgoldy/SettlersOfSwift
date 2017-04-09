@@ -266,6 +266,32 @@ class GameViewController: UIViewController, NetworkDelegate {
                     let message = "sendResourcesCount.\(scenePort.myPlayerIndex).\(player.brick).\(player.gold).\(player.sheep).\(player.stone).\(player.wheat).\(player.wood).\(player.coin).\(player.paper).\(player.cloth)"
                     let _ = self.appDelegate.networkManager.sendData(data: message)
                 }
+            case "broadcastProgressCards":
+                if scenePort.myPlayerIndex == Int(message[1])! {
+                    var message = "myProgressCards.\(scenePort.myPlayerIndex)."
+                    for card in scenePort.players[scenePort.myPlayerIndex].progressCards {
+                        message += card.rawValue + "."
+                    }
+                    message += "nil"
+                    let _ = appDelegate.networkManager.sendData(data: message)
+                }
+            case "myProgressCards":
+                let playerReference = scenePort.players[Int(message[1])!]
+                var index = 2
+                playerReference.progressCards = [ProgressCardsType]()
+                while message[index] != "nil" {
+                    playerReference.progressCards.append(ProgressCardsType(rawValue: message[index])!)
+                    index += 1
+                }
+                scenePort.players[scenePort.myPlayerIndex].receivedPeersCards = true
+            case "stoleProgressCard":
+                if scenePort.myPlayerIndex == Int(message[2])! {
+                    let stolenProgressCard = ProgressCardsType(rawValue: message[1])
+                    for index in 0..<scenePort.players[scenePort.myPlayerIndex].progressCards.count {
+                        if scenePort.players[scenePort.myPlayerIndex].progressCards[index] == stolenProgressCard {
+                            scenePort.players[scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                }   }   }
             case "sendResourcesCount":
                 let player = scenePort.players[Int(message[1])!]
                 player.brick = Int(message[2])!
@@ -314,6 +340,103 @@ class GameViewController: UIViewController, NetworkDelegate {
                         //  END GAME AND RETURN TO MAIN MENU
                     }))
                 self.present(alert, animated: true, completion: nil)
+            case "sendCommodityOrResource":
+                if Int(message[2])! == scenePort.myPlayerIndex {
+                    let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationBanner.isOpaque = false
+                    notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.8)
+                    let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationContent.isOpaque = false
+                    notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                    notificationContent.textColor = UIColor.lightGray
+                    notificationContent.textAlignment = .center
+                    switch message[1] {
+                        case "BRICK":
+                            scenePort.players[scenePort.myPlayerIndex].brick += 1
+                            notificationContent.text = "You have just received some BRICK...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "GOLD":
+                            scenePort.players[scenePort.myPlayerIndex].gold += 1
+                            notificationContent.text = "You have just received some GOLD...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "SHEEP":
+                            scenePort.players[scenePort.myPlayerIndex].sheep += 1
+                            notificationContent.text = "You have just received some SHEEP...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "STONE":
+                            scenePort.players[scenePort.myPlayerIndex].stone += 1
+                            notificationContent.text = "You have just received some STONE...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "WHEAT":
+                            scenePort.players[scenePort.myPlayerIndex].wheat += 1
+                            notificationContent.text = "You have just received some WHEAT...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "WOOD":
+                            scenePort.players[scenePort.myPlayerIndex].wood += 1
+                            notificationContent.text = "You have just received some WOOD...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "COIN":
+                            scenePort.players[scenePort.myPlayerIndex].coin += 1
+                            notificationContent.text = "You have just received some COIN...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "PAPER":
+                            scenePort.players[scenePort.myPlayerIndex].paper += 1
+                            notificationContent.text = "You have just received some PAPER...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        case "CLOTH":
+                            scenePort.players[scenePort.myPlayerIndex].cloth += 1
+                            notificationContent.text = "You have just received some CLOTH...congratulations!"
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                        default: break
+                    }
+                }
+            case "weddingCard":
+                if scenePort.players[scenePort.myPlayerIndex].victoryPoints > scenePort.players[Int(message[1])!].victoryPoints { scenePort.weddingCardDiscard(receiverIndex: Int(message[1])!) }
             case "resourcesHasBeenStolen":
                 switch message[1] {
                     case "BRICK":

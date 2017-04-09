@@ -233,7 +233,7 @@ class InGameFlipChartsViewController: UIViewController {
                     fourthItemRequirementC.image = playerReference.politicsImprovementLevel > +0 ? UIImage(named: "COIN_REQ") : nil
                     fourthItemRequirementD.image = playerReference.politicsImprovementLevel > +1 ? UIImage(named: "COIN_REQ") : nil
                     fourthItemRequirementE.image = playerReference.politicsImprovementLevel > +2 ? UIImage(named: "COIN_REQ") : nil
-                    if playerReference.coin < playerReference.politicsImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
+                    if playerReference.coin < playerReference.politicsImprovementLevel + 2 || (playerReference.coin < playerReference.politicsImprovementLevel + 1 && playerReference.progressCards.contains(.Crane)) { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             case 1:
                 firstImprovement.image = UIImage.init(named: "SCIENCES_1")
@@ -298,7 +298,7 @@ class InGameFlipChartsViewController: UIViewController {
                     fourthItemRequirementC.image = playerReference.sciencesImprovementLevel > +0 ? UIImage(named: "PAPER_REQ") : nil
                     fourthItemRequirementD.image = playerReference.sciencesImprovementLevel > +1 ? UIImage(named: "PAPER_REQ") : nil
                     fourthItemRequirementE.image = playerReference.sciencesImprovementLevel > +2 ? UIImage(named: "PAPER_REQ") : nil
-                    if playerReference.paper < playerReference.sciencesImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
+                    if playerReference.paper < playerReference.sciencesImprovementLevel + 2 || (playerReference.paper < playerReference.sciencesImprovementLevel + 1 && playerReference.progressCards.contains(.Crane)) { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             case 2:
                 firstImprovement.image = UIImage.init(named: "TRADES_1")
@@ -352,7 +352,7 @@ class InGameFlipChartsViewController: UIViewController {
                     fourthItemRequirementC.image = playerReference.tradesImprovementLevel > +0 ? UIImage(named: "CLOTH_REQ") : nil
                     fourthItemRequirementD.image = playerReference.tradesImprovementLevel > +1 ? UIImage(named: "CLOTH_REQ") : nil
                     fourthItemRequirementE.image = playerReference.tradesImprovementLevel > +2 ? UIImage(named: "CLOTH_REQ") : nil
-                    if playerReference.cloth < playerReference.tradesImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
+                    if playerReference.cloth < playerReference.tradesImprovementLevel + 2 || (playerReference.cloth < playerReference.tradesImprovementLevel + 1 && playerReference.progressCards.contains(.Crane)) { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             default: break;
         }
@@ -394,9 +394,39 @@ class InGameFlipChartsViewController: UIViewController {
     
     @IBAction func improveCurrentChart(_ sender: Any) {
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
-        switch chartsSceneIndex {
+        if playerReference.progressCards.contains(.Crane) {
+            let announcement = "Looks like you have The Crane card...would you like to use it?"
+            let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "YES", style: .default, handler: { (action) in
+                self.continueImprovingCharts(self.chartsSceneIndex, offset: 1)
+                for index in 0..<playerReference.progressCards.count {
+                    if playerReference.progressCards[index] == .Crane {
+                        playerReference.progressCards.remove(at: index)
+                        break
+                }   }
+            }))
+            alert.addAction(UIAlertAction(title: "NO", style: .default, handler: { (action) in
+                switch self.chartsSceneIndex {
+                    case 0: playerReference.coin < playerReference.politicsImprovementLevel + 2 ? self.blockImprovement() : self.continueImprovingCharts(self.chartsSceneIndex, offset: 0)
+                    case 1: playerReference.paper < playerReference.sciencesImprovementLevel + 2 ? self.blockImprovement() : self.continueImprovingCharts(self.chartsSceneIndex, offset: 0)
+                    case 2: playerReference.cloth < playerReference.tradesImprovementLevel + 2 ? self.blockImprovement() : self.continueImprovingCharts(self.chartsSceneIndex, offset: 0)
+                    default: break
+                }
+            }))
+            self.present(alert, animated: true, completion: nil)
+        } else { continueImprovingCharts(chartsSceneIndex, offset: 0) }
+        drawCurrentChartScene()
+    }
+    
+    func blockImprovement() {
+        
+    }
+    
+    func continueImprovingCharts(_ index: Int, offset: Int) {
+        let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
+        switch index {
             case 0:
-                playerReference.coin -= playerReference.politicsImprovementLevel + 2
+                playerReference.coin -= playerReference.politicsImprovementLevel + 2 - offset
                 playerReference.politicsImprovementLevel += 1
                 //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
                 if playerReference.politicsImprovementLevel == 3 && !gameDataReference.scenePort.politicsMetropolisPlaced {
@@ -414,7 +444,7 @@ class InGameFlipChartsViewController: UIViewController {
                     //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
                 }
             case 1:
-                playerReference.paper -= playerReference.sciencesImprovementLevel + 2
+                playerReference.paper -= playerReference.sciencesImprovementLevel + 2 - offset
                 playerReference.sciencesImprovementLevel += 1
                 //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
                 if playerReference.sciencesImprovementLevel == 3 && !gameDataReference.scenePort.sciencesMetropolisPlaced {
@@ -432,7 +462,7 @@ class InGameFlipChartsViewController: UIViewController {
                     //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
                 }
             case 2:
-                playerReference.cloth -= playerReference.tradesImprovementLevel + 2
+                playerReference.cloth -= playerReference.tradesImprovementLevel + 2 - offset
                 playerReference.tradesImprovementLevel += 1
                 //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
                 if playerReference.tradesImprovementLevel == 3 && !gameDataReference.scenePort.tradesMetropolisPlaced {
@@ -455,9 +485,7 @@ class InGameFlipChartsViewController: UIViewController {
                     playerReference.clothTradeRatio = 2
                 }
             default: break
-        }
-        drawCurrentChartScene()
-    }
+    }   }
     
     
     /*

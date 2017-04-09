@@ -29,6 +29,7 @@ class Player {
     var goldTradeRatio = 2
     
     var progressCards = [ProgressCardsType]()
+    var receivedPeersCards = false
     
     var politicsImprovementLevel = -1
     var sciencesImprovementLevel = -1
