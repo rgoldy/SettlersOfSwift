@@ -1867,44 +1867,7 @@ class GameScene: SKScene {
             case .BarbarianSideC:
                 barbariansDistanceFromCatan -= 1
                 let _ = appDelegate.networkManager.sendData(data: "barbariansDistanceUpdate.\(barbariansDistanceFromCatan)")
-                switch barbariansDistanceFromCatan {
-                    case 0:
-                        notificationContent.text = "The Barbarians have arrived, and are attacking...brace yourselves!"
-                        self.view?.addSubview(notificationBanner)
-                        self.view?.addSubview(notificationContent)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                            notificationContent.removeFromSuperview()
-                            notificationBanner.removeFromSuperview()
-                        })
-                        barbarianAttack()
-                        barbariansDistanceFromCatan = 7
-                        break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
-                    case 1...2:
-                        notificationContent.text = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
-                        self.view?.addSubview(notificationBanner)
-                        self.view?.addSubview(notificationContent)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                            notificationContent.removeFromSuperview()
-                            notificationBanner.removeFromSuperview()
-                        })
-                    case 3...5:
-                        notificationContent.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
-                        self.view?.addSubview(notificationBanner)
-                        self.view?.addSubview(notificationContent)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                            notificationContent.removeFromSuperview()
-                            notificationBanner.removeFromSuperview()
-                        })
-                    case 6...7:
-                        notificationContent.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
-                        self.view?.addSubview(notificationBanner)
-                        self.view?.addSubview(notificationContent)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                            notificationContent.removeFromSuperview()
-                            notificationBanner.removeFromSuperview()
-                        })
-                    default: break
-                }
+                alertAboutBarbarians()
             case .PoliticsSide:
                 if players[myPlayerIndex].politicsImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Politics, fromDeck: &gameDeck)
@@ -2381,6 +2344,53 @@ class GameScene: SKScene {
         //reset scale
         recognizer.scale = 1
     }
+    
+    func alertAboutBarbarians() {
+        let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+        notificationBanner.isOpaque = false
+        notificationBanner.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.6)
+        let barbarianAlert = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+        barbarianAlert.isOpaque = false
+        barbarianAlert.font = UIFont(name: "Avenir-Roman", size: 14)
+        barbarianAlert.textColor = UIColor.darkGray
+        barbarianAlert.textAlignment = .center
+        switch barbariansDistanceFromCatan {
+        case 0:
+            barbarianAttack()
+            barbariansDistanceFromCatan = 7
+        break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
+        case 1...2:
+            barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
+            DispatchQueue.main.async {
+                self.view?.addSubview(notificationBanner)
+                self.view?.addSubview(barbarianAlert)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                barbarianAlert.removeFromSuperview()
+                notificationBanner.removeFromSuperview()
+            })
+        case 3...5:
+            barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
+            DispatchQueue.main.async {
+                self.view?.addSubview(notificationBanner)
+                self.view?.addSubview(barbarianAlert)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                barbarianAlert.removeFromSuperview()
+                notificationBanner.removeFromSuperview()
+            })
+        case 6...7:
+            barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
+            DispatchQueue.main.async {
+                self.view?.addSubview(notificationBanner)
+                self.view?.addSubview(barbarianAlert)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                barbarianAlert.removeFromSuperview()
+                notificationBanner.removeFromSuperview()
+            })
+        default: break
+    }   }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }

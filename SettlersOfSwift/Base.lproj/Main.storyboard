@@ -360,10 +360,10 @@
             </objects>
             <point key="canvasLocation" x="2436" y="1953"/>
         </scene>
-        <!--In Game Menu Tab Bar Controller-->
+        <!--Tab Bar Controller-->
         <scene sceneID="K9B-LG-WiK">
             <objects>
-                <tabBarController id="xMA-Kh-dRn" customClass="InGameMenuTabBarController" customModule="SettlersOfSwift" customModuleProvider="target" sceneMemberID="viewController">
+                <tabBarController id="xMA-Kh-dRn" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="P0K-Kp-NFa"/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" backgroundImage="tabBar" id="neY-RE-ioh">

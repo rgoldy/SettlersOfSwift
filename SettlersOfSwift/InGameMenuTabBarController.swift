@@ -29,6 +29,7 @@ class InGameMenuTabBarController: UITabBarController {
         self.tabBar.items?[0].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows charts
         self.tabBar.items?[1].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows trade
         self.tabBar.items?[2].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows cards
+        self.tabBar.items?[4].isEnabled = gameDataReference.scenePort.myPlayerIndex == gameDataReference.scenePort.currentPlayer    //  disallows cards
         self.selectedViewController = self.viewControllers?[3]
         //  CUSTOMIZE TAB BAR APPEARANCE HERE
     }
