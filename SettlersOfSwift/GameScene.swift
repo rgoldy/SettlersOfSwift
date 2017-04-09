@@ -2355,41 +2355,35 @@ class GameScene: SKScene {
         barbarianAlert.textColor = UIColor.darkGray
         barbarianAlert.textAlignment = .center
         switch barbariansDistanceFromCatan {
-        case 0:
-            barbarianAttack()
-            barbariansDistanceFromCatan = 7
-        break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
-        case 1...2:
-            barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
-            DispatchQueue.main.async {
-                self.view?.addSubview(notificationBanner)
-                self.view?.addSubview(barbarianAlert)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                barbarianAlert.removeFromSuperview()
-                notificationBanner.removeFromSuperview()
-            })
-        case 3...5:
-            barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
-            DispatchQueue.main.async {
-                self.view?.addSubview(notificationBanner)
-                self.view?.addSubview(barbarianAlert)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                barbarianAlert.removeFromSuperview()
-                notificationBanner.removeFromSuperview()
-            })
-        case 6...7:
-            barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
-            DispatchQueue.main.async {
-                self.view?.addSubview(notificationBanner)
-                self.view?.addSubview(barbarianAlert)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                barbarianAlert.removeFromSuperview()
-                notificationBanner.removeFromSuperview()
-            })
-        default: break
+            case 0:
+                barbarianAttack()
+                barbariansDistanceFromCatan = 7
+            break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
+            case 1...2:
+                barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
+                DispatchQueue.main.async { self.view?.addSubview(notificationBanner) }
+                DispatchQueue.main.async { self.view?.addSubview(barbarianAlert) }
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                    barbarianAlert.removeFromSuperview()
+                    notificationBanner.removeFromSuperview()
+                })
+            case 3...5:
+                barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
+                DispatchQueue.main.async { self.view?.addSubview(notificationBanner) }
+                DispatchQueue.main.async { self.view?.addSubview(barbarianAlert) }
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                    barbarianAlert.removeFromSuperview()
+                    notificationBanner.removeFromSuperview()
+                })
+            case 6...7:
+                barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
+                DispatchQueue.main.async { self.view?.addSubview(notificationBanner) }
+                DispatchQueue.main.async { self.view?.addSubview(barbarianAlert) }
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                    barbarianAlert.removeFromSuperview()
+                    notificationBanner.removeFromSuperview()
+                })
+            default: break
     }   }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
