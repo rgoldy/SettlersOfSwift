@@ -3296,16 +3296,92 @@ class GameScene: SKScene {
             }))
             self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
     }   }
+
+    func weddingCardDiscard(amount: Int = 2, receiverIndex: Int) {
+        if amount == 2 {
+            let alert = UIAlertController(title: "Wedding Card", message: "Someone has played The Wedding Progress Card on you!", preferredStyle: .alert)
+            let alertAction = UIAlertAction(title: "CONTINUE", style: .default, handler: { action -> Void in
+                self.weddingCardDiscard(amount: 1, receiverIndex: receiverIndex)
+            })
+            alert.addAction(alertAction)
+        } else {
+            var invalidCounter = 0
+            let actionSheet = UIAlertController(title: nil, message: "Please select " + (amount == 0 ? "another " : "a ") + "resource or " + (amount == 0 ? "another " : "a ") + "commodity to discard...", preferredStyle: .actionSheet)
+            if players[myPlayerIndex].brick > 0 {
+                let brickAction = UIAlertAction(title: "BRICK", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].brick -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.BRICK.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(brickAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].gold > 0 {
+                let goldAction = UIAlertAction(title: "GOLD", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].gold -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.GOLD.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(goldAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].sheep > 0 {
+                let sheepAction = UIAlertAction(title: "SHEEP", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].sheep -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.SHEEP.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(sheepAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].stone > 0 {
+                let stoneAction = UIAlertAction(title: "STONE", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].stone -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.STONE.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(stoneAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].wheat > 0 {
+                let wheatAction = UIAlertAction(title: "WHEAT", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].wheat -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.WHEAT.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(wheatAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].wood > 0 {
+                let woodAction = UIAlertAction(title: "WOOD", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].wood -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.WOOD.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(woodAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].coin > 0 {
+                let coinAction = UIAlertAction(title: "COIN", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].coin -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.COIN.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(coinAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].paper > 0 {
+                let paperAction = UIAlertAction(title: "PAPER", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].paper -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.PAPER.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(paperAction)
+            } else { invalidCounter += 1 }
+            if players[myPlayerIndex].cloth > 0 {
+                let clothAction = UIAlertAction(title: "CLOTH", style: .default, handler: { action -> Void in
+                    self.players[self.myPlayerIndex].cloth -= 1
+                    let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.CLOTH.\(receiverIndex)")
+                    if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
+                })
+                actionSheet.addAction(clothAction)
+            } else { invalidCounter += 1 }
+            if invalidCounter == 9 { return } else { self.view?.window?.rootViewController?.present(actionSheet, animated: true, completion: nil) }
+    }   }
     
-    //  a -1 input argument means half rounded down
-    //  a positive value means up to that amount depending on how many cards player has in his or her possession
-    //  returns the types of cards discarded
-    
-    func performDiscardOperation(cardsCount: Int) -> [SelectedItem]? {
-        return nil
-    }
-    
-//
 //
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else { return }
