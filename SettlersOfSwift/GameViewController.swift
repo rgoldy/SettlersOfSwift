@@ -297,10 +297,53 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let player = Int(message[1])!
                 let value = Int(message[2])!
                 scenePort.players[player].victoryPoints = value
-        case "oldBoot":
+                scenePort.checkWinningConditions()
+            case "oldBoot":
                 let player = Int(message[1])!
                 let hasBoot = Bool(message[2])!
                 scenePort.bootFromMessage(player: player, hasBoot: hasBoot)
+            case "gameOver":
+                let announcement = "Unfortunately, you have lost...better luck next time!"
+                let alert = UIAlertController(title: "GAME OVER", message: announcement, preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: { (action) in
+                        //  END GAME AND RETURN TO MAIN MENU
+                    }))
+                self.present(alert, animated: true, completion: nil)
+            case "resourcesHasBeenStolen":
+                switch message[1] {
+                    case "BRICK":
+                        if scenePort.players[scenePort.myPlayerIndex].brick > 1 { scenePort.players[scenePort.myPlayerIndex].brick -= 2 }
+                        else if scenePort.players[scenePort.myPlayerIndex].brick > 0 { scenePort.players[scenePort.myPlayerIndex].brick -= 1 }
+                    case "SHEEP":
+                        if scenePort.players[scenePort.myPlayerIndex].sheep > 1 { scenePort.players[scenePort.myPlayerIndex].sheep -= 2 }
+                        else if scenePort.players[scenePort.myPlayerIndex].sheep > 0 { scenePort.players[scenePort.myPlayerIndex].sheep -= 1 }
+                    case "STONE":
+                        if scenePort.players[scenePort.myPlayerIndex].stone > 1 { scenePort.players[scenePort.myPlayerIndex].stone -= 2 }
+                        else if scenePort.players[scenePort.myPlayerIndex].stone > 0 { scenePort.players[scenePort.myPlayerIndex].stone -= 1 }
+                    case "WHEAT":
+                        if scenePort.players[scenePort.myPlayerIndex].wheat > 1 { scenePort.players[scenePort.myPlayerIndex].wheat -= 2 }
+                        else if scenePort.players[scenePort.myPlayerIndex].wheat > 0 { scenePort.players[scenePort.myPlayerIndex].wheat -= 1 }
+                    case "WOOD":
+                        if scenePort.players[scenePort.myPlayerIndex].wood > 1 { scenePort.players[scenePort.myPlayerIndex].wood -= 2 }
+                        else if scenePort.players[scenePort.myPlayerIndex].wood > 0 { scenePort.players[scenePort.myPlayerIndex].wood -= 1 }
+                    case "COIN": if scenePort.players[scenePort.myPlayerIndex].coin > 0 { scenePort.players[scenePort.myPlayerIndex].coin -= 1 }
+                    case "PAPER": if scenePort.players[scenePort.myPlayerIndex].paper > 0 { scenePort.players[scenePort.myPlayerIndex].paper -= 1 }
+                    case "CLOTH": if scenePort.players[scenePort.myPlayerIndex].cloth > 0 { scenePort.players[scenePort.myPlayerIndex].cloth -= 1 }
+                    default: break
+                }
+                switch message[2] {
+                    case "1":
+                        let announcement = "Someone has used a Commodity Monopoly card on you over " + message[1] + "..."
+                        let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .actionSheet)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
+                    case "2":
+                        let announcement = "Someone has used a Resource Monopoly card on you over " + message[1] + "..."
+                        let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .actionSheet)
+                        alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                        self.present(alert, animated: true, completion: nil)
+                    default: break
+                }
             default:
                 print("Unknown message")
         }

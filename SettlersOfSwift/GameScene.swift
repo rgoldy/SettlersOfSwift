@@ -97,6 +97,8 @@ class GameScene: SKScene {
     
     //  END OF SEND TO ALL PLAYERS
     
+    var requiredVictoryPoints = 13
+    
     //init tile handler
     var handler : tileHandler!
     
@@ -2526,24 +2528,30 @@ class GameScene: SKScene {
             break   //  PERFORM SCENARIO AND RESET DISTANCE TO 7 AND SEND NEW DATA TO OTHER PLAYERS
             case 1...2:
                 barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) roll" + (barbariansDistanceFromCatan == 2 ? "s" : "") + " away from Catan, and will be attacking shortly!"
-                DispatchQueue.main.async { self.view?.addSubview(notificationBanner) }
-                DispatchQueue.main.async { self.view?.addSubview(barbarianAlert) }
+                DispatchQueue.main.async {
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(barbarianAlert)
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                     barbarianAlert.removeFromSuperview()
                     notificationBanner.removeFromSuperview()
                 })
             case 3...5:
                 barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, and will be attacking soon!"
-                DispatchQueue.main.async { self.view?.addSubview(notificationBanner) }
-                DispatchQueue.main.async { self.view?.addSubview(barbarianAlert) }
+                DispatchQueue.main.async {
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(barbarianAlert)
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                     barbarianAlert.removeFromSuperview()
                     notificationBanner.removeFromSuperview()
                 })
             case 6...7:
                 barbarianAlert.text = "The Barbarians are \(barbariansDistanceFromCatan) rolls away from Catan, start preparing!"
-                DispatchQueue.main.async { self.view?.addSubview(notificationBanner) }
-                DispatchQueue.main.async { self.view?.addSubview(barbarianAlert) }
+                DispatchQueue.main.async {
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(barbarianAlert)
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                     barbarianAlert.removeFromSuperview()
                     notificationBanner.removeFromSuperview()
@@ -2880,6 +2888,19 @@ class GameScene: SKScene {
 //            }
 //        }
     }
+    
+    func checkWinningConditions() {
+        var reqVP = requiredVictoryPoints
+        if (players[myPlayerIndex].hasOldBoot) { reqVP += 1 }
+        if reqVP <= players[myPlayerIndex].victoryPoints {
+            let _ = appDelegate.networkManager.sendData(data: "gameOver")
+            let announcement = "You have conquered Catan...congratulations!"
+            let alert = UIAlertController(title: "Congratulations!", message: announcement, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: { (action) in
+                //  END GAME AND RETURN TO MAIN MENU
+            }))
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+    }   }
     
 //
 //

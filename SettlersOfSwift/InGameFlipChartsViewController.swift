@@ -182,11 +182,16 @@ class InGameFlipChartsViewController: UIViewController {
         nextChartPreview.image = UIImage(named: "rightOf_" + ChartTypes.getDescription(ChartTypes.init(rawValue: chartsSceneIndex)!))
         switch chartsSceneIndex {
             case 0:
-                firstImprovement.image = nil
-                secondImprovement.image = nil
-                thirdImprovement.image = nil
-                fourthImprovement.image = nil
-                lastImprovement.image = nil
+                firstImprovement.image = UIImage.init(named: "POLITICS_1")
+                if playerReference.politicsImprovementLevel < 0 { firstImprovement.alpha = 0.4 } else { firstImprovement.alpha = 1.0 }
+                secondImprovement.image = UIImage.init(named: "POLITICS_2")
+                if playerReference.politicsImprovementLevel < 1 { secondImprovement.alpha = 0.4 } else { secondImprovement.alpha = 1.0 }
+                thirdImprovement.image = UIImage.init(named: "POLITICS_3")
+                if playerReference.politicsImprovementLevel < 2 { thirdImprovement.alpha = 0.4 } else { thirdImprovement.alpha = 1.0 }
+                fourthImprovement.image = UIImage.init(named: "POLITICS_4")
+                if playerReference.politicsImprovementLevel < 3 { fourthImprovement.alpha = 0.4 } else { fourthImprovement.alpha = 1.0 }
+                lastImprovement.image = UIImage.init(named: "POLITICS_5")
+                if playerReference.politicsImprovementLevel < 4 { lastImprovement.alpha = 0.4 } else { lastImprovement.alpha = 1.0 }
                 firstItemButton.setTitle("BUILD CITY", for: UIControlState.normal)
                 firstItemButton.setTitle("BUILD CITY", for: UIControlState.disabled)
                 firstItemRequirementA.image = UIImage(named: "STONE_REQ")
@@ -231,11 +236,16 @@ class InGameFlipChartsViewController: UIViewController {
                     if playerReference.coin < playerReference.politicsImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             case 1:
-                firstImprovement.image = nil
-                secondImprovement.image = nil
-                thirdImprovement.image = nil
-                fourthImprovement.image = nil
-                lastImprovement.image = nil
+                firstImprovement.image = UIImage.init(named: "SCIENCES_1")
+                if playerReference.sciencesImprovementLevel < 0 { firstImprovement.alpha = 0.4 } else { firstImprovement.alpha = 1.0 }
+                secondImprovement.image = UIImage.init(named: "SCIENCES_2")
+                if playerReference.sciencesImprovementLevel < 1 { secondImprovement.alpha = 0.4 } else { secondImprovement.alpha = 1.0 }
+                thirdImprovement.image = UIImage.init(named: "SCIENCES_3")
+                if playerReference.sciencesImprovementLevel < 2 { thirdImprovement.alpha = 0.4 } else { thirdImprovement.alpha = 1.0 }
+                fourthImprovement.image = UIImage.init(named: "SCIENCES_4")
+                if playerReference.sciencesImprovementLevel < 3 { fourthImprovement.alpha = 0.4 } else { fourthImprovement.alpha = 1.0 }
+                lastImprovement.image = UIImage.init(named: "SCIENCES_5")
+                if playerReference.sciencesImprovementLevel < 4 { lastImprovement.alpha = 0.4 } else { lastImprovement.alpha = 1.0 }
                 firstItemButton.setTitle("BUILD KNIGHT", for: UIControlState.normal)
                 firstItemButton.setTitle("BUILD KNIGHT", for: UIControlState.disabled)
                 firstItemRequirementA.image = UIImage(named: "STONE_REQ")
@@ -291,11 +301,16 @@ class InGameFlipChartsViewController: UIViewController {
                     if playerReference.paper < playerReference.sciencesImprovementLevel + 2 { fourthItemButton.isEnabled = false } else { fourthItemButton.isEnabled = true }
                 }
             case 2:
-                firstImprovement.image = nil
-                secondImprovement.image = nil
-                thirdImprovement.image = nil
-                fourthImprovement.image = nil
-                lastImprovement.image = nil
+                firstImprovement.image = UIImage.init(named: "TRADES_1")
+                if playerReference.tradesImprovementLevel < 0 { firstImprovement.alpha = 0.4 } else { firstImprovement.alpha = 1.0 }
+                secondImprovement.image = UIImage.init(named: "TRADES_2")
+                if playerReference.tradesImprovementLevel < 1 { secondImprovement.alpha = 0.4 } else { secondImprovement.alpha = 1.0 }
+                thirdImprovement.image = UIImage.init(named: "TRADES_3")
+                if playerReference.tradesImprovementLevel < 2 { thirdImprovement.alpha = 0.4 } else { thirdImprovement.alpha = 1.0 }
+                fourthImprovement.image = UIImage.init(named: "TRADES_4")
+                if playerReference.tradesImprovementLevel < 3 { fourthImprovement.alpha = 0.4 } else { fourthImprovement.alpha = 1.0 }
+                lastImprovement.image = UIImage.init(named: "TRADES_5")
+                if playerReference.tradesImprovementLevel < 4 { lastImprovement.alpha = 0.4 } else { lastImprovement.alpha = 1.0 }
                 firstItemButton.setTitle("BUILD ROAD", for: UIControlState.normal)
                 firstItemButton.setTitle("BUILD ROAD", for: UIControlState.disabled)
                 firstItemRequirementA.image = UIImage(named: "BRICK_REQ")
