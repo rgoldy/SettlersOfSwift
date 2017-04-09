@@ -14,7 +14,7 @@ enum ProgressCardsCategory {
     case Trades
 }
 
-enum ProgressCardsType {
+enum ProgressCardsType: String {
     case Alchemist
     case Crane
     case Engineer
@@ -114,6 +114,19 @@ enum ProgressCardsType {
                 return removedCard
         }   }
         return nil  //  no more cards remaining in deck
+    }
+    
+    static func getDescriptionOf(deck: inout [ProgressCardsType?]) -> String {
+        var descriptionString = "deckDescription"
+        for index in 0..<54 { descriptionString += "." + (deck[index] == nil ? "nil" : deck[index]!.rawValue)  }
+        return descriptionString
+    }
+    
+    static func reconstructFrom(description: String) -> [ProgressCardsType?] {
+        let components = description.components(separatedBy: ".")
+        var deck = [ProgressCardsType?]()
+        for index in 1...54 { deck.append(components[index] == "nil" ? nil : ProgressCardsType(rawValue: components[index])) }
+        return deck
     }
     
 }
