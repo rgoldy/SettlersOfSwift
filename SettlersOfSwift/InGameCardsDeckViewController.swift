@@ -99,11 +99,15 @@ class InGameCardsDeckViewController: UIViewController {
         var cardHasBeenUsed = false
         switch card {
             case .Alchemist:
-                break
-                //
+                let announcement = "This card may only be used when rolling the dice..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             case .Crane:
-                break
-                //
+                let announcement = "This card may only be used from the flip charts screen when performing a city improvement..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             case .Engineer:
                 break
                 //
@@ -119,9 +123,7 @@ class InGameCardsDeckViewController: UIViewController {
             case .Mining:
                 break
                 //
-            case .Printer:
-                break
-                //
+            case .Printer: break
             case .RoadBuilding:
                 break
                 //
@@ -131,9 +133,7 @@ class InGameCardsDeckViewController: UIViewController {
             case .Bishop:
                 break
                 //
-            case .Constitution:
-                break
-                //
+            case .Constitution: break
             case .Deserter:
                 break
                 //

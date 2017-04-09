@@ -1872,10 +1872,416 @@ class GameScene: SKScene {
     
     // function that rolls the dice
     func rollDice() {
-        let values = dice.rollDice()
+        var values = dice.rollDice()
         if players[myPlayerIndex].progressCards.contains(.Alchemist) {
-            //  IMPLEMENT USE OF ALCHEMIST CARD TO SELECT DICE OUTCOMES
-        }
+            let announcement = "Looks like you have The Alchemist card...would you like to use it?"
+            let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "YES", style: .default, handler: { (action) in
+                let actionSheetRed = UIAlertController(title: nil, message: "Select a value for the red dice...", preferredStyle: .alert)
+                let selectedOneRed = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                    values[0] = 1
+                    let actionSheetYellow = UIAlertController(title: nil, message: "Select a value for the yellow dice...", preferredStyle: .alert)
+                    let selectedOneYellow = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                        values[1] = 1
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedOneYellow)
+                    let selectedTwoYellow = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                        values[1] = 2
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedTwoYellow)
+                    let selectedThreeYellow = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                        values[1] = 3
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                            }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedThreeYellow)
+                    let selectedFourYellow = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                        values[1] = 4
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFourYellow)
+                    let selectedFiveYellow = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                        values[1] = 5
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFiveYellow)
+                    let selectedSixYellow = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                        values[1] = 6
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedSixYellow)
+                    self.view?.window?.rootViewController?.present(actionSheetYellow, animated: true, completion: nil)
+                }
+                actionSheetRed.addAction(selectedOneRed)
+                let selectedTwoRed = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                    values[0] = 2
+                    let actionSheetYellow = UIAlertController(title: nil, message: "Select a value for the yellow dice...", preferredStyle: .alert)
+                    let selectedOneYellow = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                        values[1] = 1
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedOneYellow)
+                    let selectedTwoYellow = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                        values[1] = 2
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedTwoYellow)
+                    let selectedThreeYellow = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                        values[1] = 3
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedThreeYellow)
+                    let selectedFourYellow = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                        values[1] = 4
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFourYellow)
+                    let selectedFiveYellow = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                        values[1] = 5
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFiveYellow)
+                    let selectedSixYellow = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                        values[1] = 6
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedSixYellow)
+                    self.view?.window?.rootViewController?.present(actionSheetYellow, animated: true, completion: nil)
+                }
+                actionSheetRed.addAction(selectedTwoRed)
+                let selectedThreeRed = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                    values[0] = 3
+                    let actionSheetYellow = UIAlertController(title: nil, message: "Select a value for the yellow dice...", preferredStyle: .alert)
+                    let selectedOneYellow = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                        values[1] = 1
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedOneYellow)
+                    let selectedTwoYellow = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                        values[1] = 2
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedTwoYellow)
+                    let selectedThreeYellow = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                        values[1] = 3
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedThreeYellow)
+                    let selectedFourYellow = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                        values[1] = 4
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFourYellow)
+                    let selectedFiveYellow = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                        values[1] = 5
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFiveYellow)
+                    let selectedSixYellow = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                        values[1] = 6
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedSixYellow)
+                    self.view?.window?.rootViewController?.present(actionSheetYellow, animated: true, completion: nil)
+                }
+                actionSheetRed.addAction(selectedThreeRed)
+                let selectedFourRed = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                    values[0] = 4
+                    let actionSheetYellow = UIAlertController(title: nil, message: "Select a value for the yellow dice...", preferredStyle: .alert)
+                    let selectedOneYellow = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                        values[1] = 1
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedOneYellow)
+                    let selectedTwoYellow = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                        values[1] = 2
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedTwoYellow)
+                    let selectedThreeYellow = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                        values[1] = 3
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedThreeYellow)
+                    let selectedFourYellow = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                        values[1] = 4
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFourYellow)
+                    let selectedFiveYellow = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                        values[1] = 5
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFiveYellow)
+                    let selectedSixYellow = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                        values[1] = 6
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedSixYellow)
+                    self.view?.window?.rootViewController?.present(actionSheetYellow, animated: true, completion: nil)
+                }
+                actionSheetRed.addAction(selectedFourRed)
+                let selectedFiveRed = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                    values[0] = 5
+                    let actionSheetYellow = UIAlertController(title: nil, message: "Select a value for the yellow dice...", preferredStyle: .alert)
+                    let selectedOneYellow = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                        values[1] = 1
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedOneYellow)
+                    let selectedTwoYellow = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                        values[1] = 2
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedTwoYellow)
+                    let selectedThreeYellow = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                        values[1] = 3
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedThreeYellow)
+                    let selectedFourYellow = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                        values[1] = 4
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFourYellow)
+                    let selectedFiveYellow = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                        values[1] = 5
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFiveYellow)
+                    let selectedSixYellow = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                        values[1] = 6
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedSixYellow)
+                    self.view?.window?.rootViewController?.present(actionSheetYellow, animated: true, completion: nil)
+                }
+                actionSheetRed.addAction(selectedFiveRed)
+                let selectedSixRed = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                    values[0] = 6
+                    let actionSheetYellow = UIAlertController(title: nil, message: "Select a value for the yellow dice...", preferredStyle: .alert)
+                    let selectedOneYellow = UIAlertAction(title: "ONE", style: .default) { action -> Void in
+                        values[1] = 1
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedOneYellow)
+                    let selectedTwoYellow = UIAlertAction(title: "TWO", style: .default) { action -> Void in
+                        values[1] = 2
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedTwoYellow)
+                    let selectedThreeYellow = UIAlertAction(title: "THREE", style: .default) { action -> Void in
+                        values[1] = 3
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedThreeYellow)
+                    let selectedFourYellow = UIAlertAction(title: "FOUR", style: .default) { action -> Void in
+                        values[1] = 4
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFourYellow)
+                    let selectedFiveYellow = UIAlertAction(title: "FIVE", style: .default) { action -> Void in
+                        values[1] = 5
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedFiveYellow)
+                    let selectedSixYellow = UIAlertAction(title: "SIX", style: .default) { action -> Void in
+                        values[1] = 6
+                        for index in 0..<self.players[self.myPlayerIndex].progressCards.count {
+                            if self.players[self.myPlayerIndex].progressCards[index] == .Alchemist {
+                                self.players[self.myPlayerIndex].progressCards.remove(at: index)
+                                break
+                        }   }
+                        self.continueDiceRoll(values)
+                    }
+                    actionSheetYellow.addAction(selectedSixYellow)
+                    self.view?.window?.rootViewController?.present(actionSheetYellow, animated: true, completion: nil)
+                }
+                actionSheetRed.addAction(selectedSixRed)
+                self.view?.window?.rootViewController?.present(actionSheetRed, animated: true, completion: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "NO", style: .default, handler: { (action) in self.continueDiceRoll(values) }))
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        } else { continueDiceRoll(values) }
+    }
+    
+    func continueDiceRoll(_ values: [Int]) {
         updateDice(red: values[0], yellow: values[1], event: values[2])
         let diceData = "diceRoll.\(values[0]),\(values[1]),\(values[2])"
         
@@ -1923,7 +2329,10 @@ class GameScene: SKScene {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
                         })
-                        players[myPlayerIndex].progressCards.append(card)
+                        if card == .Constitution {
+                            players[myPlayerIndex].victoryPoints += 1
+                            checkWinningConditions()
+                        } else { players[myPlayerIndex].progressCards.append(card) }
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Politics Deck...hurry up and finish the game!"
                         self.view?.addSubview(notificationBanner)
@@ -1931,7 +2340,7 @@ class GameScene: SKScene {
                         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
-                        })
+                    })
                 }   }
             case .SciencesSide:
                 if players[myPlayerIndex].sciencesImprovementLevel + 3 > values[0] {
@@ -1945,7 +2354,10 @@ class GameScene: SKScene {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
                         })
-                        players[myPlayerIndex].progressCards.append(card)
+                        if card == .Printer {
+                            players[myPlayerIndex].victoryPoints += 1
+                            checkWinningConditions()
+                        } else { players[myPlayerIndex].progressCards.append(card) }
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Sciences Deck...hurry up and finish the game!"
                         self.view?.addSubview(notificationBanner)
@@ -1953,7 +2365,7 @@ class GameScene: SKScene {
                         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
-                        })
+                    })
                 }   }
             case .TradesSide:
                 if players[myPlayerIndex].tradesImprovementLevel + 3 > values[0] {
@@ -1966,7 +2378,7 @@ class GameScene: SKScene {
                         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
-                        })
+                    })
                         players[myPlayerIndex].progressCards.append(card)
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Trades Deck...hurry up and finish the game!"
@@ -1975,7 +2387,7 @@ class GameScene: SKScene {
                         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
                             notificationContent.removeFromSuperview()
                             notificationBanner.removeFromSuperview()
-                        })
+                    })
     }   }       }   }
     
     func updateDice(red : Int, yellow: Int, event: Int) {
@@ -2901,6 +3313,14 @@ class GameScene: SKScene {
             }))
             self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
     }   }
+    
+    //  a -1 input argument means half rounded down
+    //  a positive value means up to that amount depending on how many cards player has in his or her possession
+    //  returns the types of cards discarded
+    
+    func performDiscardOperation(cardsCount: Int) -> [SelectedItem]? {
+        return nil
+    }
     
 //
 //
