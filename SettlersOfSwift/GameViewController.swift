@@ -297,7 +297,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let player = Int(message[1])!
                 let value = Int(message[2])!
                 scenePort.players[player].victoryPoints = value
-                scenePort.checkWinningConditions()
+                //scenePort.checkWinningConditions()
             case "oldBoot":
                 let player = Int(message[1])!
                 let hasBoot = Bool(message[2])!
