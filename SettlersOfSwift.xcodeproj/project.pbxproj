@@ -18,6 +18,7 @@
 		0EE1C4791E95D37A00A3EACE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */; };
 		0EE216E41E93664C004EADAC /* PlayerIntentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE216E31E93664C004EADAC /* PlayerIntentions.swift */; };
 		6C3DBEB41E81ACBD00EE07EF /* FishToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */; };
+		6C6AA3431E9AA82B00B09EEF /* LoadGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6AA3421E9AA82B00B09EEF /* LoadGameViewController.swift */; };
 		6CCF9F651E395DF900AAEB79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */; };
 		6CCF9F691E395DF900AAEB79 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CCF9F681E395DF900AAEB79 /* Actions.sks */; };
 		6CCF9F6B1E395DF900AAEB79 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF9F6A1E395DF900AAEB79 /* GameScene.swift */; };
@@ -55,6 +56,7 @@
 		0EE1C4781E95D37A00A3EACE /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		0EE216E31E93664C004EADAC /* PlayerIntentions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerIntentions.swift; sourceTree = "<group>"; };
 		6C3DBEB31E81ACBD00EE07EF /* FishToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FishToken.swift; sourceTree = "<group>"; };
+		6C6AA3421E9AA82B00B09EEF /* LoadGameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadGameViewController.swift; sourceTree = "<group>"; };
 		6CCF9F611E395DF900AAEB79 /* SettlersOfSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SettlersOfSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CCF9F641E395DF900AAEB79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6CCF9F681E395DF900AAEB79 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 				AC3F56591E68CDF4005CECC1 /* NewGameController.swift */,
 				AC3F565A1E68CDF4005CECC1 /* PlayerListController.swift */,
 				AC3F565B1E68CDF4005CECC1 /* StartScreenController.swift */,
+				6C6AA3421E9AA82B00B09EEF /* LoadGameViewController.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C6AA3431E9AA82B00B09EEF /* LoadGameViewController.swift in Sources */,
 				0E65BFA31E8F299F00C5543B /* InGameFlipChartsViewController.swift in Sources */,
 				AC1FDC361E65115A00CD0723 /* tileHandler.swift in Sources */,
 				AC3F4B511E4C831A0000E5F6 /* LandHexEdge.swift in Sources */,

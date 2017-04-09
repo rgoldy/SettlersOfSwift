@@ -13,6 +13,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let numberOfPlayers = 2
+    var players : [String] = []
     
     @IBOutlet var tblView: UITableView!
     
@@ -26,6 +27,8 @@ class NewGameController: UITableViewController, NetworkDelegate {
         
         tblView.dataSource = self
         tblView.delegate = self
+        
+        players = extractPlayerNames(appDelegate.networkManager.loadData)
         
         if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
         {
@@ -47,32 +50,65 @@ class NewGameController: UITableViewController, NetworkDelegate {
     
     // Invitation recieved
     func invitationWasReceived(fromPeer: MCPeerID) {
-        let alert = UIAlertController(title: "", message: "\(fromPeer.displayName) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
-        
-        let acceptAction: UIAlertAction = UIAlertAction(title: "Accept", style: UIAlertActionStyle.default) { (alertAction) -> Void in
-            self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
-            //self.appDelegate.networkManager.serviceBrowser.invitePeer(fromPeer, to: self.appDelegate.networkManager.session, withContext: nil, timeout: 10)
+        if (appDelegate.networkManager.loadData == "nil") {
+            let alert = UIAlertController(title: "", message: "\(fromPeer.displayName) wants to play Catan with you.", preferredStyle: UIAlertControllerStyle.alert)
+            
+            let acceptAction: UIAlertAction = UIAlertAction(title: "Accept", style: UIAlertActionStyle.default) { (alertAction) -> Void in
+                self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
+            }
+            
+            let declineAction = UIAlertAction(title: "Decline", style: UIAlertActionStyle.cancel) { (alertAction) -> Void in
+                self.appDelegate.networkManager.invitationHandler(false, nil)
+            }
+            
+            alert.addAction(acceptAction)
+            alert.addAction(declineAction)
+            
+            OperationQueue.main.addOperation { () -> Void in
+                self.present(alert, animated: true, completion: nil)
+            }
         }
-        
-        let declineAction = UIAlertAction(title: "Decline", style: UIAlertActionStyle.cancel) { (alertAction) -> Void in
+        else {
+            for name in players {
+                if name == fromPeer.displayName {
+                    self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
+                    return
+                }
+            }
             self.appDelegate.networkManager.invitationHandler(false, nil)
         }
-        
-        alert.addAction(acceptAction)
-        alert.addAction(declineAction)
-        
-        OperationQueue.main.addOperation { () -> Void in
-            self.present(alert, animated: true, completion: nil)
+    }
+    
+    func extractPlayerNames(_ data: String) -> [String] {
+        if data == "nil" { return []}
+        let gameState = appDelegate.networkManager.loadData
+        let unitData = gameState.components(separatedBy: ".")
+        for unit in unitData {
+            let data = unit.components(separatedBy: "|")
+            if (data[0] == "PLAYER") {
+                let name = data[1]
+                players.append(name)
+            }
         }
+        return players
     }
     
     // Connected with a peer
     func connectedWithPeer(peerID: MCPeerID) {
         tblView.reloadData()
-        
-        if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
-        {
-            startGame()
+
+        if appDelegate.networkManager.loadData == "nil" {
+            if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
+            {
+                startGame()
+            }
+        }
+        else {
+            let _ = appDelegate.networkManager.sendData(data: appDelegate.networkManager.loadData)
+            if (appDelegate.networkManager.session.connectedPeers.count == players.count-1)
+            {
+                startGame()
+            }
         }
     }
     
@@ -81,10 +117,12 @@ class NewGameController: UITableViewController, NetworkDelegate {
     }
     
     func recievedData(data: String) {
-        print("Received: \(data)")
         let message = data.components(separatedBy: ".")
         if (message[0] == "readyToPlay") {
             appDelegate.networkManager.readyPlayers += 1
+        }
+        else {
+            appDelegate.networkManager.loadData = data
         }
     }
     

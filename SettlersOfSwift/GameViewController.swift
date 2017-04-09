@@ -131,34 +131,39 @@ class GameViewController: UIViewController, NetworkDelegate {
     }
     
     func syncBoard() {
-        if (appDelegate.networkManager.isHost) {
-            // Wait for all players to be ready
-            while (appDelegate.networkManager.readyPlayers < appDelegate.networkManager.session.connectedPeers.count) { /* wait */}
-            
-            // Distribute board layout to others
-            let boardEncoding = scenePort.getBoardLayout()
-            let sent = appDelegate.networkManager.sendData(data: boardEncoding)
-            if (!sent) {
-                print("Failed to sync board layout")
+        if (appDelegate.networkManager.loadData == "nil") {
+            if (appDelegate.networkManager.isHost) {
+                // Wait for all players to be ready
+                while (appDelegate.networkManager.readyPlayers < appDelegate.networkManager.session.connectedPeers.count) { /* wait */}
+                
+                // Distribute board layout to others
+                let boardEncoding = scenePort.getBoardLayout()
+                let sent = appDelegate.networkManager.sendData(data: boardEncoding)
+                if (!sent) {
+                    print("Failed to sync board layout")
+                }
+                else {
+                    print("Board Sync Data Sent")
+                }
+                
+                // Create player objects and send to non-hosts
+                scenePort.initPlayers()
+                // Create and shuffle fish deck then send to non-hosts
+                scenePort.initFish()
             }
-            else {
-                print("Board Sync Data Sent")
+            else
+            {
+                let sent = appDelegate.networkManager.sendData(data: "readyToPlay.true")
+                if (!sent) {
+                    print ("Unable to notify players of status")
+                }
+                else {
+                    print ("Players notified of status")
+                }
             }
-            
-            // Create player objects and send to non-hosts
-            scenePort.initPlayers()
-            // Create and shuffle fish deck then send to non-hosts
-            scenePort.initFish()
         }
-        else
-        {
-            let sent = appDelegate.networkManager.sendData(data: "readyToPlay.true")
-            if (!sent) {
-                print ("Unable to notify players of status")
-            }
-            else {
-                print ("Players notified of status")
-            }
+        else {
+            scenePort.loadGame()
         }
     }
 
@@ -297,7 +302,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let player = Int(message[1])!
                 let value = Int(message[2])!
                 scenePort.players[player].victoryPoints = value
-                //scenePort.checkWinningConditions()
+                scenePort.checkWinningConditions(who: player)
             case "oldBoot":
                 let player = Int(message[1])!
                 let hasBoot = Bool(message[2])!
@@ -375,7 +380,7 @@ class GameViewController: UIViewController, NetworkDelegate {
         //  CURRENTLY DOES NOTHING AT ALL
     }
     
-    // Do nothing
+    
     func foundPeer() {}
     func lostPeer() {}
     
@@ -384,5 +389,14 @@ class GameViewController: UIViewController, NetworkDelegate {
     // Will never connect
     func connectedWithPeer(peerID: MCPeerID) {}
     // If a player leaves the game...
-    func lostConnectionWith(peerID: MCPeerID) { /* TODO? */ }
+    func lostConnectionWith(peerID: MCPeerID) {
+        let date = Date()
+        let form = DateFormatter()
+        form.timeStyle = .medium
+        form.dateStyle = .medium
+        let file = form.string(from: date)
+        
+        print ("LOST PEER: autosaving")
+        scenePort.saveGame(filename: file)
+    }
 }

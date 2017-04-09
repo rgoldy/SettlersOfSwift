@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16F43c" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" colorMatched="YES" initialViewController="nga-iz-Uqm">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" colorMatched="YES" initialViewController="nga-iz-Uqm">
     <device id="retina5_5" orientation="landscape">
         <adaptation id="fullscreen"/>
     </device>
@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="736" height="414"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="catan-background" id="Fql-Tp-hyK">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="StartScreen" image="catan-background" id="Fql-Tp-hyK">
                                 <rect key="frame" x="0.0" y="0.0" width="736" height="414"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
@@ -39,6 +39,9 @@
                                 <state key="normal" title="Load">
                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <segue destination="QVY-hW-03y" kind="push" id="JZX-LT-pgr"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="LiA-jC-BGK">
                                 <rect key="frame" x="323.5" y="202.5" width="89" height="30"/>
@@ -143,6 +146,39 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JiF-OX-eFb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1734" y="-294"/>
+        </scene>
+        <!--Load Game-->
+        <scene sceneID="jn6-5O-Ijd">
+            <objects>
+                <tableViewController restorationIdentifier="loadGame" storyboardIdentifier="loadGame" title="Load Game" id="QVY-hW-03y" customClass="LoadGameViewController" customModule="SettlersOfSwift" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="0lz-4V-OcQ">
+                        <rect key="frame" x="0.0" y="0.0" width="736" height="414"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="idGame" selectionStyle="default" indentationWidth="10" reuseIdentifier="idGame" id="u5d-uI-KNA">
+                                <rect key="frame" x="0.0" y="28" width="736" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="u5d-uI-KNA" id="HKa-kO-W91">
+                                    <rect key="frame" x="0.0" y="0.0" width="736" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="QVY-hW-03y" id="z5s-IV-Tc9"/>
+                            <outlet property="delegate" destination="QVY-hW-03y" id="M4b-Bk-6s3"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Load Game" prompt="Showing Saved Games" id="Nwk-9D-vGC"/>
+                    <connections>
+                        <outlet property="tblView" destination="0lz-4V-OcQ" id="Tvt-zO-mH9"/>
+                        <segue destination="e7x-EC-9xm" kind="push" identifier="goToGameLobby" id="Cdi-LK-Rlh"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UY8-pd-6Lf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1355" y="501"/>
         </scene>
         <!--Game View Controller-->
         <scene sceneID="dGX-wc-JJu">
@@ -1037,6 +1073,6 @@
         <simulatedScreenMetrics key="destination" type="retina5_5.fullscreen"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="cEy-cw-XBJ"/>
+        <segue reference="Cdi-LK-Rlh"/>
     </inferredMetricsTieBreakers>
 </document>

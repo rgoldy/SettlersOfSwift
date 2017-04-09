@@ -25,6 +25,7 @@ class NetworkConnection : NSObject {
     
     public var isHost: Bool
     public var readyPlayers: Int = 0
+    public var loadData: String = "nil"
     
     // List of all users you can see
     var nearbyUsers = [MCPeerID]()

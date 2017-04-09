@@ -31,16 +31,6 @@ class PlayerListController: UITableViewController, NetworkDelegate {
         // self.clearsSelectionOnViewWillAppear = false
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        appDelegate.networkManager.disconnect()
-        appDelegate.networkManager.setInvisible()
-        appDelegate.networkManager.startBrowsing()
-        
-        appDelegate.networkManager.delegate = self
-    }
-    
     func foundPeer() { tblView.reloadData() }
     func lostPeer() { tblView.reloadData() }
     
@@ -120,7 +110,7 @@ class PlayerListController: UITableViewController, NetworkDelegate {
     }
     
     func recievedData(data: String) {
-        // do nothing
+        appDelegate.networkManager.loadData = data
     }
     
     func lostConnectionWith(peerID: MCPeerID)

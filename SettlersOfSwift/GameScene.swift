@@ -64,20 +64,6 @@ class GameScene: SKScene {
     var oldBootButton = UIImageView()
     var showingBootMenu : Bool = false
     
-    let tradeBackground = UITextField()
-    let lWood = UITextField()
-    let lSheep = UITextField()
-    let lWheat = UITextField()
-    let lBrick = UITextField()
-    let lStone = UITextField()
-    let lGold = UITextField()
-    
-    let rWood = UITextField()
-    let rSheep = UITextField()
-    let rWheat = UITextField()
-    let rBrick = UITextField()
-    let rStone = UITextField()
-    
     var tradeOpen : Bool = false
     var leftTradeItem : hexType?
     var rightTradeItem : hexType?
@@ -143,18 +129,10 @@ class GameScene: SKScene {
         let edgeSwipeGestureRecognizer = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(self.handleRightEdgeSwipe(recognizer:)))
         edgeSwipeGestureRecognizer.edges = .right
         view.addGestureRecognizer(edgeSwipeGestureRecognizer)
-        //init UI
-//        gameText.font = UIFont(name: "Arial", size: 13)
-//        gameText.frame = CGRect(x: self.view!.bounds.width/2 - (self.view!.bounds.width/6), y: self.view!.bounds.height/8, width: self.view!.bounds.width/3, height: self.view!.bounds.height/12)
-//        gameText.text = "Test"
-//        gameText.textAlignment = NSTextAlignment.center
-//        gameText.isHidden = true
-//        gameText.backgroundColor = UIColor.gray
-//        gameText.borderStyle = UITextBorderStyle.roundedRect
-//        gameText.isUserInteractionEnabled = false
-//        self.view?.addSubview(gameText)
         
-        gameButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
+        //init UI
+        
+        gameButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/20.5, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
         gameButton.text = "End Turn"
         gameButton.font = UIFont(name: "Arial", size: 13)
         gameButton.backgroundColor = UIColor.gray
@@ -163,34 +141,7 @@ class GameScene: SKScene {
         gameButton.textAlignment = NSTextAlignment.center
         self.view?.addSubview(gameButton)
         
-//        buildUpgradeButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5 - self.view!.bounds.width/10, y: self.view!.bounds.height/14.5 + self.view!.bounds.height/13.5 , width: self.view!.bounds.width/5, height: self.view!.bounds.height/14)
-//        buildUpgradeButton.text = "Build/Upgrade Settlement"
-//        buildUpgradeButton.font = UIFont(name: "Arial", size: 10)
-//        buildUpgradeButton.backgroundColor = UIColor.gray
-//        buildUpgradeButton.borderStyle = UITextBorderStyle.roundedRect
-//        buildUpgradeButton.isUserInteractionEnabled = false
-//        buildUpgradeButton.textAlignment = NSTextAlignment.center
-//        self.view?.addSubview(buildUpgradeButton)
-//        
-//        buildRoadButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-//        buildRoadButton.text = "Build Road"
-//        buildRoadButton.font = UIFont(name: "Arial", size: 10)
-//        buildRoadButton.backgroundColor = UIColor.gray
-//        buildRoadButton.borderStyle = UITextBorderStyle.roundedRect
-//        buildRoadButton.isUserInteractionEnabled = false
-//        buildRoadButton.textAlignment = NSTextAlignment.center
-//        self.view?.addSubview(buildRoadButton)
-//        
-//        buildShipButton.frame = CGRect(x: self.view!.bounds.width/12 * 10.5, y: self.view!.bounds.height/14.5 + (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-//        buildShipButton.text = "Build Ship"
-//        buildShipButton.font = UIFont(name: "Arial", size: 10)
-//        buildShipButton.backgroundColor = UIColor.gray
-//        buildShipButton.borderStyle = UITextBorderStyle.roundedRect
-//        buildShipButton.isUserInteractionEnabled = false
-//        buildShipButton.textAlignment = NSTextAlignment.center
-//        self.view?.addSubview(buildShipButton)
-        
-        cancelButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5, width: self.view!.bounds.width/7, height: self.view!.bounds.height/14)
+        cancelButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/20.5, width: self.view!.bounds.width/7, height: self.view!.bounds.height/14)
         cancelButton.text = "Cancel Action"
         cancelButton.font = UIFont(name: "Arial", size: 13)
         cancelButton.backgroundColor = UIColor.gray
@@ -211,7 +162,7 @@ class GameScene: SKScene {
         eventDiceUI.image = UIImage(named: "event1")
         self.view?.addSubview(eventDiceUI)
         
-        oldBootButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/14.5 + self.view!.bounds.height/13.5, width: self.view!.bounds.width/8, height: self.view!.bounds.width/12)
+        oldBootButton.frame = CGRect(x: self.view!.bounds.width * 0.025, y: self.view!.bounds.height/20.5 + self.view!.bounds.height/13.5, width: self.view!.bounds.width/8, height: self.view!.bounds.width/12)
         oldBootButton.image = UIImage(named: "oldBoot")
     }
     
@@ -303,8 +254,8 @@ class GameScene: SKScene {
             case .sheep: type = 3
             case .brick: type = 4
             case .gold: type = 5
-            case .fish: type = 6
-            default: type = 7
+            case .fish: type = 7
+            default: type = 6
             }
             
             board.append("\(hex.column),\(hex.row),\(type!),\(value);")
@@ -333,6 +284,7 @@ class GameScene: SKScene {
                 case "4": type = .brick
                 case "5": type = .gold
                 case "6": type = .water
+                case "7": type = .fish
                 default: type = .water
             }
             
@@ -407,241 +359,6 @@ class GameScene: SKScene {
         
         currGamePhase = GamePhase.placeFirstSettlement
         gameText.text = "Place First Settlement"
-    }
-    
-    //funciton that inits the trade menu
-    func presentTradeMenu() {
-        tradeOpen = true
-        
-        tradeBackground.frame = CGRect(x: self.view!.bounds.width * 0.3, y: self.view!.bounds.height/4, width: self.view!.bounds.width/2.5, height: self.view!.bounds.height/2)
-        tradeBackground.backgroundColor = UIColor.lightGray
-        tradeBackground.borderStyle = UITextBorderStyle.roundedRect
-        tradeBackground.isUserInteractionEnabled = false
-        tradeBackground.textAlignment = NSTextAlignment.center
-        tradeBackground.text = "Maritime Trade"
-        tradeBackground.font = UIFont(name: "Arial", size: 13)
-        self.view?.addSubview(tradeBackground)
-        
-        lWood.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        lWood.text = "Wood"
-        lWood.font = UIFont(name: "Arial", size: 13)
-        lWood.backgroundColor = UIColor.gray
-        lWood.borderStyle = UITextBorderStyle.roundedRect
-        lWood.isUserInteractionEnabled = false
-        lWood.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(lWood)
-        
-        lSheep.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        lSheep.text = "Sheep"
-        lSheep.font = UIFont(name: "Arial", size: 13)
-        lSheep.backgroundColor = UIColor.gray
-        lSheep.borderStyle = UITextBorderStyle.roundedRect
-        lSheep.isUserInteractionEnabled = false
-        lSheep.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(lSheep)
-        
-        lWheat.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        lWheat.text = "Wheat"
-        lWheat.font = UIFont(name: "Arial", size: 13)
-        lWheat.backgroundColor = UIColor.gray
-        lWheat.borderStyle = UITextBorderStyle.roundedRect
-        lWheat.isUserInteractionEnabled = false
-        lWheat.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(lWheat)
-        
-        lBrick.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        lBrick.text = "Brick"
-        lBrick.font = UIFont(name: "Arial", size: 13)
-        lBrick.backgroundColor = UIColor.gray
-        lBrick.borderStyle = UITextBorderStyle.roundedRect
-        lBrick.isUserInteractionEnabled = false
-        lBrick.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(lBrick)
-        
-        lStone.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 + (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        lStone.text = "Stone"
-        lStone.font = UIFont(name: "Arial", size: 13)
-        lStone.backgroundColor = UIColor.gray
-        lStone.borderStyle = UITextBorderStyle.roundedRect
-        lStone.isUserInteractionEnabled = false
-        lStone.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(lStone)
-        
-        lGold.frame = CGRect(x: self.view!.bounds.width/3, y: self.view!.bounds.height/2 + (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        lGold.text = "Gold"
-        lGold.font = UIFont(name: "Arial", size: 13)
-        lGold.backgroundColor = UIColor.gray
-        lGold.borderStyle = UITextBorderStyle.roundedRect
-        lGold.isUserInteractionEnabled = false
-        lGold.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(lGold)
-        
-        rWood.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 3), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        rWood.text = "Wood"
-        rWood.font = UIFont(name: "Arial", size: 13)
-        rWood.backgroundColor = UIColor.gray
-        rWood.borderStyle = UITextBorderStyle.roundedRect
-        rWood.isUserInteractionEnabled = false
-        rWood.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(rWood)
-        
-        rSheep.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5 * 2), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        rSheep.text = "Sheep"
-        rSheep.font = UIFont(name: "Arial", size: 13)
-        rSheep.backgroundColor = UIColor.gray
-        rSheep.borderStyle = UITextBorderStyle.roundedRect
-        rSheep.isUserInteractionEnabled = false
-        rSheep.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(rSheep)
-        
-        rWheat.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 - (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        rWheat.text = "Wheat"
-        rWheat.font = UIFont(name: "Arial", size: 13)
-        rWheat.backgroundColor = UIColor.gray
-        rWheat.borderStyle = UITextBorderStyle.roundedRect
-        rWheat.isUserInteractionEnabled = false
-        rWheat.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(rWheat)
-        
-        rBrick.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2, width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        rBrick.text = "Brick"
-        rBrick.font = UIFont(name: "Arial", size: 13)
-        rBrick.backgroundColor = UIColor.gray
-        rBrick.borderStyle = UITextBorderStyle.roundedRect
-        rBrick.isUserInteractionEnabled = false
-        rBrick.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(rBrick)
-        
-        rStone.frame = CGRect(x: self.view!.bounds.width/3 * 2 - self.view!.bounds.width/10, y: self.view!.bounds.height/2 + (self.view!.bounds.height/13.5), width: self.view!.bounds.width/10, height: self.view!.bounds.height/14)
-        rStone.text = "Stone"
-        rStone.font = UIFont(name: "Arial", size: 13)
-        rStone.backgroundColor = UIColor.gray
-        rStone.borderStyle = UITextBorderStyle.roundedRect
-        rStone.isUserInteractionEnabled = false
-        rStone.textAlignment = NSTextAlignment.center
-        self.view?.addSubview(rStone)
-    }
-    
-    //function that removes all trademenu ui elements
-    func closeTradeMenu() {
-        tradeOpen = false
-        lWood.removeFromSuperview()
-        lSheep.removeFromSuperview()
-        lWheat.removeFromSuperview()
-        lBrick.removeFromSuperview()
-        lStone.removeFromSuperview()
-        lGold.removeFromSuperview()
-        rWood.removeFromSuperview()
-        rSheep.removeFromSuperview()
-        rWheat.removeFromSuperview()
-        rBrick.removeFromSuperview()
-        rStone.removeFromSuperview()
-        tradeBackground.removeFromSuperview()
-    }
-    
-    //function that will handle touches when trade menu is open
-    func tradeMenuTouches(target : CGPoint) {
-        
-        if (leftTradeItem == nil) {
-            if (self.lWood.frame.contains(target) && players[myPlayerIndex].wood >= 4) {
-                DispatchQueue.main.async {
-                    self.lWood.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                leftTradeItem = hexType.wood
-            }
-            if (self.lSheep.frame.contains(target) && players[myPlayerIndex].sheep >= 4) {
-                DispatchQueue.main.async {
-                    self.lSheep.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                leftTradeItem = hexType.sheep
-            }
-            if (self.lBrick.frame.contains(target) && players[myPlayerIndex].brick >= 4) {
-                DispatchQueue.main.async {
-                    self.lBrick.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                leftTradeItem = hexType.brick
-            }
-            if (self.lStone.frame.contains(target) && players[myPlayerIndex].stone >= 4) {
-                DispatchQueue.main.async {
-                    self.lStone.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                leftTradeItem = hexType.stone
-            }
-            if (self.lWheat.frame.contains(target) && players[myPlayerIndex].wheat >= 4) {
-                DispatchQueue.main.async {
-                    self.lWheat.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                leftTradeItem = hexType.wheat
-            }
-            if (self.lGold.frame.contains(target) && players[myPlayerIndex].gold >= 2) {
-                DispatchQueue.main.async {
-                    self.lGold.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                leftTradeItem = hexType.gold
-            }
-        }
-        
-        if (rightTradeItem == nil) {
-            if (self.rWood.frame.contains(target)) {
-                DispatchQueue.main.async {
-                    self.rWood.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                rightTradeItem = hexType.wood
-            }
-            if (self.rSheep.frame.contains(target)) {
-                DispatchQueue.main.async {
-                    self.rSheep.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                rightTradeItem = hexType.sheep
-            }
-            if (self.rBrick.frame.contains(target)) {
-                DispatchQueue.main.async {
-                    self.rBrick.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                rightTradeItem = hexType.brick
-            }
-            if (self.rStone.frame.contains(target)) {
-                DispatchQueue.main.async {
-                    self.rStone.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                rightTradeItem = hexType.stone
-            }
-            if (self.rWheat.frame.contains(target)) {
-                DispatchQueue.main.async {
-                    self.rWheat.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-                }
-                rightTradeItem = hexType.wheat
-            }
-        }
-        
-        
-        if (leftTradeItem != nil && rightTradeItem != nil) {
-            switch leftTradeItem! {
-            case .wood : players[myPlayerIndex].wood -= 4
-            case .wheat : players[myPlayerIndex].wheat -= 4
-            case .brick : players[myPlayerIndex].brick -= 4
-            case .stone : players[myPlayerIndex].stone -= 4
-            case .sheep : players[myPlayerIndex].sheep -= 4
-            case .gold : players[myPlayerIndex].gold -= 2
-            default: break
-            }
-            
-            switch rightTradeItem! {
-            case .wood : players[myPlayerIndex].wood += 1
-            case .wheat : players[myPlayerIndex].wheat += 1
-            case .brick : players[myPlayerIndex].brick += 1
-            case .stone : players[myPlayerIndex].stone += 1
-            case .sheep : players[myPlayerIndex].sheep += 1
-            default : break
-            }
-            
-            leftTradeItem = nil
-            rightTradeItem = nil
-            
-            sendPlayerData(player: myPlayerIndex)
-            
-            closeTradeMenu()
-        }
     }
     
     //method to send message to other players and update the currentplayer
@@ -764,17 +481,10 @@ class GameScene: SKScene {
         }
         
         if corner!.cornerObject!.type == .Settlement {
-            players[currentPlayer].victoryPoints += 1
-            let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
-            let sentVP = appDelegate.networkManager.sendData(data: message)
-            if !sentVP { print("failed to sync victory points") }
+            give(victoryPoints: 1, to: currentPlayer)
         }
         else if corner!.cornerObject!.type == .City {
-            players[currentPlayer].victoryPoints += 2
-            let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
-            let sentVP = appDelegate.networkManager.sendData(data: message)
-            if !sentVP { print("failed to sync victory points") }
-        }
+            give(victoryPoints: 2, to: currentPlayer)        }
         
         return true
     }
@@ -850,10 +560,7 @@ class GameScene: SKScene {
             }
         }
         
-        players[currentPlayer].victoryPoints += 1
-        let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
-        let sentVP = appDelegate.networkManager.sendData(data: message)
-        if !sentVP { print("failed to sync victory points") }
+        give(victoryPoints: 1, to: currentPlayer)
         
         return true
     }
@@ -1529,10 +1236,7 @@ class GameScene: SKScene {
             else {
                 players[who].ownedCorners.append(corner!)
                 
-                players[who].victoryPoints += 1
-                let message = "victoryPoints.\(who).\(players[who].victoryPoints)"
-                let sentVP = appDelegate.networkManager.sendData(data: message)
-                if !sentVP { print("failed to sync victory points") }
+                give(victoryPoints: 1, to: who)
             }
             
             var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
@@ -1754,10 +1458,7 @@ class GameScene: SKScene {
  
                     let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The knights have defeated the barbarians! You are the \"Defender of Catan\", and receive one victory point!", preferredStyle: UIAlertControllerStyle.alert)
                     let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
-                        self.players[self.myPlayerIndex].victoryPoints += 1
-                        let message = "victoryPoints.\(self.myPlayerIndex).\(self.players[self.myPlayerIndex].victoryPoints)"
-                        let sent = self.appDelegate.networkManager.sendData(data: message)
-                        if !sent { print("failed to sync victory points") }
+                        self.give(victoryPoints: 1, to: self.myPlayerIndex)
                     }
                     alert.addAction(okay)
                     OperationQueue.main.addOperation { () -> Void in
@@ -1836,10 +1537,7 @@ class GameScene: SKScene {
         print("DestroyCity \(cornerObjectInfo)")
         if !sent { print ("Failed to update others on city destruction") }
         
-        players[who].victoryPoints -= 2
-        let message = "victoryPoints.\(who).\(players[who].victoryPoints)"
-        let sentVP = appDelegate.networkManager.sendData(data: message)
-        if !sentVP { print("failed to sync victory points") }
+        give(victoryPoints: -2, to: who)
         
         cornerObjectInfo = "cornerData.\(who),\(column),\(row),\(cornerType.Settlement)"
         sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -2777,127 +2475,287 @@ class GameScene: SKScene {
         if players[myPlayerIndex].nextAction == .WillDoNothing {
             cancelButton.backgroundColor = UIColor.gray
         }
-        
-        
-//        if (self.tradeButton.frame.contains(targetLocationView) && rolled && !buildRoad && !buildSettlement && !buildShip) {
-//            if (tradeOpen) {
-//                closeTradeMenu()
-//            } else {
-//                presentTradeMenu()
-//            }
-//        }
-//        if(tradeOpen) {
-//            tradeMenuTouches(target: targetLocationView)
-//        }
-//        if (self.buildUpgradeButton.frame.contains(targetLocationView) && rolled && (hasResourcesForNewSettlement() || hasResourcesToUpgradeSettlement()) && !tradeOpen && !buildRoad && !buildShip) {
-//            if(buildSettlement) {
-//                buildSettlement = false
-//                DispatchQueue.main.async {
-//                    self.buildUpgradeButton.backgroundColor = UIColor.gray
-//                }
-//            } else {
-//                buildSettlement = true
-//                DispatchQueue.main.async {
-//                    self.buildUpgradeButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-//                }
-//            }
-//        }
-//        if (self.buildRoadButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewRoad() && !tradeOpen && !buildSettlement && !buildShip
-//            ) {
-//            if (buildRoad) {
-//                buildRoad = false
-//                DispatchQueue.main.async {
-//                    self.buildRoadButton.backgroundColor = UIColor.gray
-//                }
-//            } else {
-//                buildRoad = true
-//                DispatchQueue.main.async {
-//                    self.buildRoadButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-//                }
-//            }
-//        }
-//        if (self.buildShipButton.frame.contains(targetLocationView) && rolled && hasResourcesForNewShip() && !tradeOpen && !buildSettlement && !buildRoad
-//            ) {
-//            if (buildShip) {
-//                buildShip = false
-//                DispatchQueue.main.async {
-//                    self.buildShipButton.backgroundColor = UIColor.gray
-//                }
-//            } else {
-//                buildShip = true
-//                DispatchQueue.main.async {
-//                    self.buildShipButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
-//                }
-//            }
-//        }
-//        if (buildSettlement) {
-//            let settlementBuilt = buildSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
-//            
-//            if (settlementBuilt) {
-//                print ("Settlement Built")
-//                buildSettlement = false
-//                DispatchQueue.main.async {
-//                    self.buildUpgradeButton.backgroundColor = UIColor.gray
-//                }
-//            } else {
-//                let settlementUpgraded = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row:  handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
-//                if (settlementUpgraded) {
-//                    print ("Settlement Upgraded")
-//                    buildSettlement = false
-//                    DispatchQueue.main.async {
-//                        self.buildUpgradeButton.backgroundColor = UIColor.gray
-//                    }
-//                }
-//            }
-//        }
-//        if (buildRoad) {
-//            let roadBuilt = buildRoad(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Road, valid:rolled)
-//            if (roadBuilt) {
-//                print("Road Built")
-//                buildRoad = false
-//                DispatchQueue.main.async {
-//                    self.buildRoadButton.backgroundColor = UIColor.gray
-//                }
-//            }
-//        }
-//        if (buildShip) {
-//            let shipBuilt = buildShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row:  handler.Edges.tileRowIndex(fromPosition: targetLocation), type: edgeType.Boat, valid:rolled)
-//            if (shipBuilt) {
-//                print("Ship Built")
-//                buildShip = false
-//                DispatchQueue.main.async {
-//                    self.buildShipButton.backgroundColor = UIColor.gray
-//                }
-//            }
-//        }
     }
     
-    func checkWinningConditions() {
+    func checkWinningConditions(who: Int) {
         var reqVP = requiredVictoryPoints
-        if (players[myPlayerIndex].hasOldBoot) { reqVP += 1 }
-        if reqVP <= players[myPlayerIndex].victoryPoints {
-            let _ = appDelegate.networkManager.sendData(data: "gameOver")
-            let announcement = "You have conquered Catan...congratulations!"
-            let alert = UIAlertController(title: "Congratulations!", message: announcement, preferredStyle: .actionSheet)
+        if (players[who].hasOldBoot) { reqVP += 1 }
+        if reqVP <= players[who].victoryPoints {
+            let announcement = "\(players[who].name) (\(players[who].color.rawValue)) has conquered Catan!"
+            let alert = UIAlertController(title: "Game Over", message: announcement, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: { (action) in
                 //  END GAME AND RETURN TO MAIN MENU
+
             }))
             self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
-    }   }
+        }
+    }
     
-//
-//
-//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        guard let touch = touches.first else { return }
-//        targetLocation = touch.location(in: self)
-//    }
-//
-//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        guard let touch = touches.first else { return }
-//        targetLocation = touch.location(in: self)
-//    }
-//    
-//    override func update(_ currentTime: TimeInterval) {
-//    }  
-
+    func give(victoryPoints: Int, to: Int) {
+        players[to].victoryPoints += victoryPoints
+        let message = "victoryPoints.\(to).\(players[to].victoryPoints)"
+        let sentVP = appDelegate.networkManager.sendData(data: message)
+        if !sentVP { print("failed to sync victory points") }
+        
+        checkWinningConditions(who: to)
+    }
+    
+    func saveGame(filename: String) {
+        var gameState = "GAMEBOARD|"
+        for hex in handler.landHexArray {
+            var value = 0
+            searching: for j in 2...12 {
+                let positions = handler.landHexDictionary[j]
+                if (positions == nil) { continue }
+                for (col, rw) in positions! {
+                    if (col == hex.column && rw == hex.row) {
+                        value = j
+                        break searching
+                    }
+                }
+            }
+            var type: Int!
+            switch hex.type! {
+            case .wood: type = 0
+            case .wheat: type = 1
+            case .stone: type = 2
+            case .sheep: type = 3
+            case .brick: type = 4
+            case .gold: type = 5
+            case .fish: type = 6
+            default: type = 7
+            }
+            
+            gameState.append("\(hex.column),\(hex.row),\(type!),\(value);")
+        }
+        gameState.append(".")
+        
+        for index in 0..<players.count {
+            let player = players[index]
+            gameState.append("PLAYER|\(player.name)|\(index)|\(player.color.rawValue)|\(player.brick)|\(player.brickTradeRatio)|\(player.wheat)|\(player.wheatTradeRatio)|\(player.wood)|\(player.woodTradeRatio)|\(player.sheep)|\(player.sheepTradeRatio)|\(player.stone)|\(player.stoneTradeRatio)|\(player.gold)|\(player.goldTradeRatio)|\(player.paper)|\(player.paperTradeRatio)|\(player.coin)|\(player.coinTradeRatio)|\(player.cloth)|\(player.clothTradeRatio)|\(player.fish)|\(player.victoryPoints)|\(player.hasOldBoot)|\(player.politicsImprovementLevel)|\(player.tradesImprovementLevel)|\(player.sciencesImprovementLevel)|\(player.holdsTradesMetropolis)|\(player.holdsPoliticsMetropolis)|\(player.holdsSciencesMetropolis)|\(player.nextAction.rawValue)|\(player.longestRoad)|\(player.movingKnightStrength)|\(player.movingKnightFromCol)|\(player.movingKnightFromRow)|\(player.movingKnightUpgraded)|\(player.movedShipThisTurn).")
+            
+            gameState.append("PLAYERCORNERS|\(index)")
+            for corner in player.ownedCorners {
+                gameState.append("|\(corner.row),\(corner.column),\(corner.cornerObject!.type.rawValue),\(corner.cornerObject!.hasCityWall),\(corner.cornerObject!.isMetropolis),\(corner.isHarbour),\(corner.harbourType?.rawValue ?? harbourType.General.rawValue)")
+            }
+            gameState.append(".PLAYEREDGES|\(index)")
+            for edge in player.ownedEdges {
+                gameState.append("|\(edge.row),|\(edge.column),\(edge.edgeObject!.type.rawValue),\(edge.edgeObject!.justBuilt)")
+            }
+            gameState.append(".PLAYERKNIGHTS|\(index)")
+            for knight in player.ownedKnights {
+                gameState.append("|\(knight.row),\(knight.column),\(knight.cornerObject!.strength),\(knight.cornerObject!.isActive),\(knight.cornerObject!.hasBeenUpgradedThisTurn),\(knight.cornerObject!.didActionThisTurn)")
+            }
+            gameState.append(".PLAYERPROGRESSCARDS|\(index)")
+            for card in player.progressCards {
+                gameState.append("|\(card.rawValue)")
+            }
+        }
+        gameState.append(".GAMEPROGRESSCARDS")
+        for card in gameDeck {
+            gameState.append("|\(card!.rawValue)")
+        }
+        gameState.append(".GAMEFISHDECK")
+        for fish in fishDeck {
+            gameState.append("|\(fish.value)")
+        }
+        gameState.append(".GAMEDATA|\(currGamePhase.rawValue)|\(dice.redValue)|\(dice.yellowValue)|\(dice.eventValue)|\(currentPlayer)|\(rolled)|\(politicsMetropolisPlaced)|\(sciencesMetropolisPlaced)|\(tradesMetropolisPlaced)|\(maximaPoliticsImprovementReached)|\(maximaSciencesImprovementReached)|\(maximaTradesImprovementReached)|\(pirateRemoved)|\(robberRemoved)|\(barbariansDistanceFromCatan)")
+        
+        
+        // SAVE gameState to file
+        print ("SAVING FILE - \(filename)")
+        let DocumentDirURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        let fileURL = DocumentDirURL.appendingPathComponent("settlersofswift/\(filename)").appendingPathExtension("txt")
+        do {
+            try gameState.write(to: fileURL, atomically: false, encoding: String.Encoding.utf8)
+        }
+        catch let error as NSError {
+            print("Failed writing to URL: \(fileURL), Error: \(error.localizedDescription)")
+        }
+        
+    }
+    
+    func loadGame() {
+        let gameState = appDelegate.networkManager.loadData
+        appDelegate.networkManager.loadData = "nil"
+        
+        let unitData = gameState.components(separatedBy: ".")
+        for unit in unitData {
+            let data = unit.components(separatedBy: "|")
+            let identifier = data[0]
+            switch identifier {
+                case "GAMEBOARD":
+                    setBoardLayout(encoding: data[1])
+                case "PLAYER":
+                    extractPlayerInfo(data)
+                case "PLAYERCORNERS":
+                    extractCorners(data)
+                case "PLAYEREDGES":
+                    extractEdges(data)
+                case "PLAYERKNIGHTS":
+                    extractKnights(data)
+                case "PLAYERPROGRESSCARDS":
+                    extractPlayerCards(data)
+                case "GAMEPROGRESSCARDS":
+                    extractGameCards(data)
+                case "GAMEFISHDECK":
+                    extractGameFish(data)
+                case "GAMEDATA":
+                    extractGameData(data)
+                default:
+                    print("Unrecognized Data Unit")
+            }
+        }
+    }
+    func extractPlayerInfo(_ data: [String]) {
+        let name = data[1]
+        let index = Int(data[2])!
+        if name == appDelegate.networkManager.getName() {
+            myPlayerIndex = index
+        }
+        if players.count-1 == index {
+            players.append(Player(name: name, playerNumber: index))
+        }
+        else {
+            players[index] = Player(name: name, playerNumber: index)
+        }
+        let p = players[index]
+        p.brick = Int(data[4])!
+        p.brickTradeRatio = Int(data[5])!
+        p.wheat = Int(data[6])!
+        p.wheatTradeRatio = Int(data[7])!
+        p.wood = Int(data[8])!
+        p.woodTradeRatio = Int(data[9])!
+        p.sheep = Int(data[10])!
+        p.sheepTradeRatio = Int(data[11])!
+        p.stone = Int(data[12])!
+        p.stoneTradeRatio = Int(data[13])!
+        p.gold = Int(data[14])!
+        p.goldTradeRatio = Int(data[15])!
+        p.paper = Int(data[16])!
+        p.paperTradeRatio = Int(data[17])!
+        p.coin = Int(data[18])!
+        p.coinTradeRatio = Int(data[19])!
+        p.cloth = Int(data[20])!
+        p.clothTradeRatio = Int(data[21])!
+        p.fish = Int(data[22])!
+        p.victoryPoints = Int(data[23])!
+        p.hasOldBoot = Bool(data[24])!
+        p.politicsImprovementLevel = Int(data[25])!
+        p.tradesImprovementLevel = Int(data[26])!
+        p.sciencesImprovementLevel = Int(data[27])!
+        p.holdsTradesMetropolis = Bool(data[28])!
+        p.holdsPoliticsMetropolis = Bool(data[29])!
+        p.holdsSciencesMetropolis = Bool(data[30])!
+        p.nextAction = PlayerIntentions(rawValue: data[31])!
+        p.longestRoad = Int(data[32])!
+        p.movingKnightStrength = Int(data[33])!
+        p.movingKnightFromCol = Int(data[34])!
+        p.movingKnightFromRow = Int(data[35])!
+        p.movingKnightUpgraded = Bool(data[36])!
+        p.movedShipThisTurn = Bool(data[32])!
+    }
+    func extractCorners(_ data: [String]) {
+        let player = Int(data[1])!
+        for i in 2..<data.count {
+            let specs = data[i].components(separatedBy: ",")
+            let row = Int(specs[0])!
+            let column = Int(specs[1])!
+            let type = cornerType(rawValue: specs[2])!
+            let hasCityWall = Bool(specs[3])!
+            let isMetropolis = Bool(specs[4])!
+            let isHarbor = Bool(specs[5])!
+            let harborType = harbourType(rawValue: specs[6])!
+            
+            let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+            corner?.isHarbour = isHarbor
+            corner?.harbourType = harborType
+            corner!.cornerObject = cornerObject(cornerType : type, owner: player)
+            corner!.cornerObject?.hasCityWall = hasCityWall
+            corner!.cornerObject?.isMetropolis = isMetropolis
+            players[player].ownedCorners.append(corner!)
+            let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        }
+    }
+    func extractEdges(_ data: [String]) {
+        let player = Int(data[1])!
+        for i in 2..<data.count {
+            let specs = data[i].components(separatedBy: ",")
+            let row = Int(specs[0])!
+            let column = Int(specs[1])!
+            let type = edgeType(rawValue: specs[2])!
+            let justBuilt = Bool(specs[3])!
+            
+            let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        
+            edge!.edgeObject = edgeObject(edgeType : type, owner: player)
+            edge!.edgeObject?.justBuilt = justBuilt
+            players[player].ownedEdges.append(edge!)
+            let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[player].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
+            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        }
+    }
+    func extractKnights(_ data: [String]) {
+        let player = Int(data[1])!
+        for i in 2..<data.count {
+            let specs = data[i].components(separatedBy: ",")
+            let row = Int(specs[0])!
+            let column = Int(specs[1])!
+            let strength = Int(specs[2])!
+            let isActive = Bool(specs[3])!
+            let hasBeenUpgradedThisTurn = Bool(specs[4])!
+            let didAction = Bool(specs[5])!
+            
+            let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+            corner!.cornerObject = cornerObject(cornerType : .Knight, owner: player)
+            corner!.cornerObject?.strength = strength
+            corner!.cornerObject?.isActive = isActive
+            corner!.cornerObject?.hasBeenUpgradedThisTurn = hasBeenUpgradedThisTurn
+            corner!.cornerObject?.didActionThisTurn = didAction
+            players[player].ownedKnights.append(corner!)
+            let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        }
+    }
+    func extractPlayerCards(_ data: [String]) {
+        let player = Int(data[1])!
+        for i in 2..<data.count {
+            let card = ProgressCardsType(rawValue: data[i])!
+            players[player].progressCards.append(card)
+        }
+    }
+    func extractGameCards(_ data: [String]) {
+        for i in 1..<data.count {
+            let card = ProgressCardsType(rawValue: data[i])!
+            gameDeck.append(card)
+        }
+    }
+    func extractGameFish(_ data: [String]) {
+        for i in 1..<data.count {
+            let value = Int(data[i])!
+            let card = FishToken(v: value)
+            fishDeck.append(card)
+        }
+    }
+    func extractGameData(_ data: [String]) {
+        currGamePhase = GamePhase(rawValue: data[1])!
+        
+        dice.redValue = Int(data[2])!
+        dice.yellowValue = Int(data[3])!
+        dice.eventValue = Int(data[4])!
+        updateDice(red: dice.redValue, yellow: dice.yellowValue, event: dice.eventValue)
+        
+        currentPlayer = Int(data[5])!
+        rolled = Bool(data[6])!
+        politicsMetropolisPlaced = Bool(data[7])!
+        sciencesMetropolisPlaced = Bool(data[8])!
+        tradesMetropolisPlaced = Bool(data[9])!
+        maximaPoliticsImprovementReached = Bool(data[10])!
+        maximaSciencesImprovementReached = Bool(data[11])!
+        maximaTradesImprovementReached = Bool(data[12])!
+        pirateRemoved = Bool(data[13])!
+        robberRemoved = Bool(data[14])!
+        barbariansDistanceFromCatan = Int(data[15])!
+    }
 }
