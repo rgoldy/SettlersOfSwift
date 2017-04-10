@@ -28,7 +28,7 @@ class LoadGameViewController: UITableViewController {
         let pathURL = DocumentDirURL.appendingPathComponent("settlersofswift")
         let files = FileManager.default.enumerator(at: pathURL, includingPropertiesForKeys: nil)
         for file in files! {
-            if let path = NSURL(fileURLWithPath: file as! String, relativeTo: pathURL).path, path.hasSuffix(".txt") {
+            if let path = NSURL(fileURLWithPath: file as! String, relativeTo: pathURL).path {
                 print (path)
                 allFileNames.append(path)
                 let dirs = path.components(separatedBy: "/")

@@ -875,6 +875,7 @@ class GameScene: SKScene {
         if (corner!.cornerObject == nil) { return false }
         if (corner!.cornerObject!.type != .Knight) { return false }
         if (corner!.cornerObject!.didActionThisTurn) { return false }
+        if (!corner!.cornerObject!.isActive) { return false }
         
         handler.Vertices.setTileGroup(nil, forColumn: column, row: row)
         let index = players[currentPlayer].ownedKnights.index(where: {$0.column == column && $0.row == row})
@@ -898,11 +899,24 @@ class GameScene: SKScene {
         return true
     }
     
-    func placeKnightForFree(column: Int, row: Int, valid:Bool, displacable: Bool) -> Bool {
+    func placeKnightForFree(column: Int, row: Int, valid: Bool, displacable: Bool) -> Bool {
         if (!valid) { return false }
         let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false}
         //if (!canPlaceKnight(corner: corner!)) { return false }
+        
+        var nextToRoad : Bool = false
+        for edge in corner!.neighbourEdges {
+            if (edge?.edgeObject?.owner == myPlayerIndex) {
+                nextToRoad = true
+                break
+            }
+        }
+        if (!nextToRoad) { return false }
+        
+        let start = handler.landHexVertexArray.first(where: {$0.column == players[myPlayerIndex].movingKnightFromCol && $0.row == players[myPlayerIndex].movingKnightFromRow})
+        let connected = pathBetween(a: start, b: corner)
+        if (!connected) { return false }
         
         if (corner?.cornerObject != nil && !displacable) { return false }
         else if (corner?.cornerObject != nil) {
@@ -921,31 +935,19 @@ class GameScene: SKScene {
             if (!sent) {
                 print ("failed to sync cornerObject")
             }
+            
             sendDisplaceRequest(player: displace.owner, column: column, row: row, strength: displace.strength, active: displace.isActive)
         }
-        
-        var nextToRoad : Bool = false
-        for edge in corner!.neighbourEdges {
-            if (edge?.edgeObject?.owner == myPlayerIndex) {
-                nextToRoad = true
-                break
-            }
-        }
-        if (!nextToRoad) { return false }
-        
-        let start = handler.landHexVertexArray.first(where: {$0.column == players[myPlayerIndex].movingKnightFromCol && $0.row == players[myPlayerIndex].movingKnightFromRow})
-        let connected = pathBetween(a: start, b: corner)
-        if (!connected) { return false }
         
         corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
         corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
         corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
-        players[currentPlayer].ownedKnights.append(corner!)
+        players[myPlayerIndex].ownedKnights.append(corner!)
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1263,7 +1265,7 @@ class GameScene: SKScene {
                 players[who].ownedCorners.remove(at: index!)
             }
             
-            handler.Edges.setTileGroup(nil, forColumn: column, row: row)
+            handler.Vertices.setTileGroup(nil, forColumn: column, row: row)
         }
     }
     
@@ -2009,7 +2011,7 @@ class GameScene: SKScene {
                         })
                         if card == .Constitution {
                             players[myPlayerIndex].victoryPoints += 1
-                            checkWinningConditions(who: <#Int#>)
+                            checkWinningConditions(who: myPlayerIndex)
                         } else { players[myPlayerIndex].progressCards.append(card) }
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Politics Deck...hurry up and finish the game!"
@@ -2034,7 +2036,7 @@ class GameScene: SKScene {
                         })
                         if card == .Printer {
                             players[myPlayerIndex].victoryPoints += 1
-                            checkWinningConditions(who: <#Int#>)
+                            checkWinningConditions(who: myPlayerIndex)
                         } else { players[myPlayerIndex].progressCards.append(card) }
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Sciences Deck...hurry up and finish the game!"
@@ -2934,10 +2936,9 @@ class GameScene: SKScene {
             case .sheep: type = 3
             case .brick: type = 4
             case .gold: type = 5
-            case .fish: type = 6
-            default: type = 7
+            case .fish: type = 7
+            default: type = 6
             }
-            
             gameState.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
         gameState.append(".")
@@ -2977,14 +2978,19 @@ class GameScene: SKScene {
         // SAVE gameState to file
         print ("SAVING FILE - \(filename)")
         let DocumentDirURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let fileURL = DocumentDirURL.appendingPathComponent("settlersofswift/\(filename)").appendingPathExtension("txt")
+        let fileURL = DocumentDirURL.appendingPathComponent("settlersofswift/\(filename)")
+        
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            print ("creating file")
+            
+        }
+        
         do {
-            try gameState.write(to: fileURL, atomically: false, encoding: String.Encoding.utf8)
+            try gameState.write(to: fileURL, atomically: true, encoding: String.Encoding.utf8)
         }
         catch let error as NSError {
             print("Failed writing to URL: \(fileURL), Error: \(error.localizedDescription)")
         }
-        
     }
     
     func loadGame() {
