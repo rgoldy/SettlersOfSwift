@@ -436,56 +436,222 @@ class InGameFlipChartsViewController: UIViewController {
             case 0:
                 playerReference.coin -= playerReference.politicsImprovementLevel + 2 - offset
                 playerReference.politicsImprovementLevel += 1
-                //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
+
+                let levelInfo = "levelImprovement.\(gameDataReference.scenePort.myPlayerIndex).\(playerReference.politicsImprovementLevel).Politics"
+                let sentLevel = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: levelInfo)
+                if !sentLevel {print("Unable to sync improvement level")}
+                
                 if playerReference.politicsImprovementLevel == 3 && !gameDataReference.scenePort.politicsMetropolisPlaced {
-                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
-                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
-                    //  SET gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
-                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                    let first = gameDataReference.scenePort.isFirstToReach(level: 3, type: .Politics)
+                    if first {
+                        playerReference.holdsPoliticsMetropolis = true
+                        let sent = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: "metropolis.Politics.\(gameDataReference.scenePort.myPlayerIndex).true")
+                        if !sent { print("unable to update metropolis info") }
+                        
+                        // check to see if player has a city
+                        var hascity = false
+                        for corner in playerReference.ownedCorners {
+                            if corner.cornerObject!.type == .City {
+                                hascity = true
+                                break
+                            }
+                        }
+                        if hascity {
+                            playerReference.nextAction = .WillBuildMetropolis
+                        }
+                        else {
+                            playerReference.canBuildMetropolis += 1
+                            let message = "intentToBuildMetropolis.\(gameDataReference.scenePort.myPlayerIndex).true"
+                            let sentM = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: message)
+                            if !sentM { print("unable to sync message") }
+                        }
+                        self.tabBarController?.navigationController?.popViewController(animated: true)
+                    }
                 }
                 if playerReference.politicsImprovementLevel == 4 && !gameDataReference.scenePort.maximaPoliticsImprovementReached && !playerReference.holdsPoliticsMetropolis {
-                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
-                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
-                    //  SET gameDataReference.scenePort.maximaPoliticsImprovementReached and gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
-                    //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
-                    //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
-                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                    let first = gameDataReference.scenePort.isFirstToReach(level: 4, type: .Politics)
+                    if first {
+                        // Remove metropolis from another player (if they have it)
+                        var alreadyOwns = -1
+                        for index in 0..<gameDataReference.scenePort.players.count {
+                            let player = gameDataReference.scenePort.players[index]
+                            if player.holdsPoliticsMetropolis {alreadyOwns = index}
+                        }
+                        if alreadyOwns >= 0 {
+                            gameDataReference.scenePort.removeMetropolis(from: alreadyOwns, type: .Politics)
+                        }
+                        
+                        playerReference.holdsPoliticsMetropolis = true
+                        let sent = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: "metropolis.Politics.\(gameDataReference.scenePort.myPlayerIndex).true")
+                        if !sent { print("unable to update metropolis info") }
+                        
+                        // check to see if player has a city
+                        var hascity = false
+                        for corner in playerReference.ownedCorners {
+                            if corner.cornerObject!.type == .City {
+                                hascity = true
+                                break
+                            }
+                        }
+                        if hascity {
+                            playerReference.nextAction = .WillBuildMetropolis
+                        }
+                        else {
+                            playerReference.canBuildMetropolis += 1
+                            let message = "intentToBuildMetropolis.\(gameDataReference.scenePort.myPlayerIndex).true"
+                            let sentM = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: message)
+                            if !sentM { print("unable to sync message") }
+                        }
+                        self.tabBarController?.navigationController?.popViewController(animated: true)
+                    }
+
                 }
             case 1:
                 playerReference.paper -= playerReference.sciencesImprovementLevel + 2 - offset
                 playerReference.sciencesImprovementLevel += 1
-                //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
+                
+                let levelInfo = "levelImprovement.\(gameDataReference.scenePort.myPlayerIndex).\(playerReference.sciencesImprovementLevel).Sciences"
+                let sentLevel = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: levelInfo)
+                if !sentLevel {print("Unable to sync improvement level")}
+                
                 if playerReference.sciencesImprovementLevel == 3 && !gameDataReference.scenePort.sciencesMetropolisPlaced {
-                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
-                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
-                    //  SET gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
-                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                    let first = gameDataReference.scenePort.isFirstToReach(level: 3, type: .Sciences)
+                    if first {
+                        playerReference.holdsSciencesMetropolis = true
+                        let sent = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: "metropolis.Sciences.\(gameDataReference.scenePort.myPlayerIndex).true")
+                        if !sent { print("unable to update metropolis info") }
+                        
+                        // check to see if player has a city
+                        var hascity = false
+                        for corner in playerReference.ownedCorners {
+                            if corner.cornerObject!.type == .City {
+                                hascity = true
+                                break
+                            }
+                        }
+                        
+                        if hascity {
+                            playerReference.nextAction = .WillBuildMetropolis
+                        }
+                        else {
+                            playerReference.canBuildMetropolis += 1
+                            let message = "intentToBuildMetropolis.\(gameDataReference.scenePort.myPlayerIndex).true"
+                            let sentM = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: message)
+                            if !sentM { print("unable to sync message") }
+                        }
+                        self.tabBarController?.navigationController?.popViewController(animated: true)
+                    }
                 }
                 if playerReference.sciencesImprovementLevel == 4 && !gameDataReference.scenePort.maximaSciencesImprovementReached && !playerReference.holdsSciencesMetropolis {
-                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
-                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
-                    //  SET gameDataReference.scenePort.maximaPoliticsImprovementReached and gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
-                    //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
-                    //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
-                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                    let first = gameDataReference.scenePort.isFirstToReach(level: 4, type: .Sciences)
+                    if first {
+                        // Remove metropolis from another player (if they have it)
+                        var alreadyOwns = -1
+                        for index in 0..<gameDataReference.scenePort.players.count {
+                            let player = gameDataReference.scenePort.players[index]
+                            if player.holdsSciencesMetropolis {alreadyOwns = index}
+                        }
+                        if alreadyOwns >= 0 {
+                            gameDataReference.scenePort.removeMetropolis(from: alreadyOwns, type: .Sciences)
+                        }
+                        
+                        playerReference.holdsSciencesMetropolis = true
+                        let sent = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: "metropolis.Sciences.\(gameDataReference.scenePort.myPlayerIndex).true")
+                        if !sent { print("unable to update metropolis info") }
+                        
+                        // check to see if player has a city
+                        var hascity = false
+                        for corner in playerReference.ownedCorners {
+                            if corner.cornerObject!.type == .City {
+                                hascity = true
+                                break
+                            }
+                        }
+                        if hascity {
+                            playerReference.nextAction = .WillBuildMetropolis
+                        }
+                        else {
+                            playerReference.canBuildMetropolis += 1
+                            let message = "intentToBuildMetropolis.\(gameDataReference.scenePort.myPlayerIndex).true"
+                            let sentM = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: message)
+                            if !sentM { print("unable to sync message") }
+                        }
+                        self.tabBarController?.navigationController?.popViewController(animated: true)
+                    }
                 }
             case 2:
                 playerReference.cloth -= playerReference.tradesImprovementLevel + 2 - offset
                 playerReference.tradesImprovementLevel += 1
-                //  TO WORK ON: IF PLAYER DOES NOT HAVE CITY TO PLACE METROPOLIS ON OR DOES NOT WANT TO, INSERT A BUTTON THAT ALLOWS PLAYER TO DO SO IN SUBSEQUENT TIME
+
+                let levelInfo = "levelImprovement.\(gameDataReference.scenePort.myPlayerIndex).\(playerReference.tradesImprovementLevel).Trades"
+                let sentLevel = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: levelInfo)
+                if !sentLevel {print("Unable to sync improvement level")}
+                
                 if playerReference.tradesImprovementLevel == 3 && !gameDataReference.scenePort.tradesMetropolisPlaced {
-                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
-                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
-                    //  SET gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
-                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                    let first = gameDataReference.scenePort.isFirstToReach(level: 3, type: .Trades)
+                    if first {
+                        playerReference.holdsTradesMetropolis = true
+                        let sent = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: "metropolis.Trades.\(gameDataReference.scenePort.myPlayerIndex).true")
+                        if !sent { print("unable to update metropolis info") }
+                        
+                        // check to see if player has a city
+                        var hascity = false
+                        for corner in playerReference.ownedCorners {
+                            if corner.cornerObject!.type == .City {
+                                hascity = true
+                                break
+                            }
+                        }
+                        
+                        if hascity {
+                            playerReference.nextAction = .WillBuildMetropolis
+                        }
+                        else {
+                            playerReference.canBuildMetropolis += 1
+                            let message = "intentToBuildMetropolis.\(gameDataReference.scenePort.myPlayerIndex).true"
+                            let sentM = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: message)
+                            if !sentM { print("unable to sync message") }
+                        }
+                        self.tabBarController?.navigationController?.popViewController(animated: true)
+                    }
+
                 }
                 if playerReference.tradesImprovementLevel == 4 && !gameDataReference.scenePort.maximaTradesImprovementReached && !playerReference.holdsTradesMetropolis {
-                    //  CHECK IF PLAYER HAS A CITY WITH NO METROPOLIS FOR WHICH HE OR SHE CAN PLACE A METROPOLIS ON
-                    //  SET .WillBuildMetropolis TO nextAction PROPERTY OF PLAYER AND HANDLE BUILD IN handleButtonTouches(...)
-                    //  SET gameDataReference.scenePort.maximaPoliticsImprovementReached and gameDataReference.scenePort.politicsMetropolisPlaced TO TRUE
-                    //  FOR EACH PLAYER CHECK WHETHER holdsPoliticsMetropolis IS TRUE
-                    //  IF IT IS TRUE THEN CALL willLoseMetropolisFor(.Politics) ON THAT PLAYER (NOT YET IMPLEMENTED) WHICH WILL ALSO SET holdsPoliticsMetropolis TO FALSE
-                    //  SET PLAYER PROPERTY holdsPoliticsMetropolis TO TRUE
+                    let first = gameDataReference.scenePort.isFirstToReach(level: 4, type: .Trades)
+                    if first {
+                        // Remove metropolis from another player (if they have it)
+                        var alreadyOwns = -1
+                        for index in 0..<gameDataReference.scenePort.players.count {
+                            let player = gameDataReference.scenePort.players[index]
+                            if player.holdsTradesMetropolis {alreadyOwns = index}
+                        }
+                        if alreadyOwns >= 0 {
+                            gameDataReference.scenePort.removeMetropolis(from: alreadyOwns, type: .Trades)
+                        }
+                        
+                        playerReference.holdsTradesMetropolis = true
+                        let sent = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: "metropolis.Trades.\(gameDataReference.scenePort.myPlayerIndex).true")
+                        if !sent { print("unable to update metropolis info") }
+                        
+                        // check to see if player has a city
+                        var hascity = false
+                        for corner in playerReference.ownedCorners {
+                            if corner.cornerObject!.type == .City {
+                                hascity = true
+                                break
+                            }
+                        }
+                        if hascity {
+                            playerReference.nextAction = .WillBuildMetropolis
+                        }
+                        else {
+                            playerReference.canBuildMetropolis += 1
+                            let message = "intentToBuildMetropolis.\(gameDataReference.scenePort.myPlayerIndex).true"
+                            let sentM = gameDataReference.scenePort.appDelegate.networkManager.sendData(data: message)
+                            if !sentM { print("unable to sync message") }
+                        }
+                        self.tabBarController?.navigationController?.popViewController(animated: true)
+                    }
                 }
                 if playerReference.tradesImprovementLevel >= 2 {
                     playerReference.coinTradeRatio = 2

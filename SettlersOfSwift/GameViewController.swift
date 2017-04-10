@@ -74,17 +74,70 @@ class GameViewController: UIViewController, NetworkDelegate {
             let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
             let moveKnight = UIAlertAction(title: "Move Knight", style: .default) { action -> Void in
                 self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveKnight
+                DispatchQueue.main.async {
+                    self.scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
             }
-            actionSheet.addAction(moveKnight)
+            
             let moveOutlaw = UIAlertAction(title: "Move Outlaw", style: .default) { action -> Void in
                 self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveOutlaw
+                DispatchQueue.main.async {
+                    self.scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
             }
-            actionSheet.addAction(moveOutlaw)
+            let buildMetropolis = UIAlertAction(title: "Build Metropolis", style:. default) {
+                action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillBuildMetropolis
+                DispatchQueue.main.async {
+                    self.scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+            }
             let moveShip = UIAlertAction(title: "Move Ship", style: .default) { action -> Void in
                 self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveShip
+                DispatchQueue.main.async {
+                    self.scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
             }
-            actionSheet.addAction(moveShip)
+            
             let never_mind_XD = UIAlertAction(title: "Cancel", style: .default) { action -> Void in }
+            
+            var canMoveKnight = false
+            for knight in scenePort.players[scenePort.myPlayerIndex].ownedKnights {
+                if !knight.cornerObject!.isActive || knight.cornerObject!.didActionThisTurn { continue }
+                if !scenePort.replacementExists(row: knight.row, col: knight.column) { continue }
+                canMoveKnight = true
+                break
+            }
+            if (canMoveKnight) {
+                actionSheet.addAction(moveKnight)
+            }
+            
+            var canMoveOutlaw = false
+            // TODO: test if you can move the outlaw
+            // true if active knight is adjacent to outlaw
+            // anything else?
+            if (canMoveOutlaw) {
+                actionSheet.addAction(moveOutlaw)
+            }
+            
+            var canBuildMetropolis = scenePort.players[scenePort.myPlayerIndex].canBuildMetropolis > 0
+            for corner in scenePort.players[scenePort.myPlayerIndex].ownedCorners {
+                if corner.cornerObject!.type == .City {
+                    canBuildMetropolis = true && canBuildMetropolis
+                }
+            }
+            if (canBuildMetropolis) {
+                actionSheet.addAction(buildMetropolis)
+            }
+            
+            var canMoveShip = false
+            for edge in scenePort.players[scenePort.myPlayerIndex].ownedEdges {
+                if edge.edgeObject!.type == .Road { continue }
+                if scenePort.canMoveShip(edge: edge) { canMoveShip = true; break }
+            }
+            if (canMoveShip) {
+                actionSheet.addAction(moveShip)
+            }
             actionSheet.addAction(never_mind_XD)
             self.present(actionSheet, animated: true, completion: nil)
     }   }
@@ -103,6 +156,22 @@ class GameViewController: UIViewController, NetworkDelegate {
         setAppearanceForMenuButton()
         if scenePort.players.count > 1 && scenePort.players[scenePort.myPlayerIndex].nextAction != .WillDoNothing {
             scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+        }
+        if scenePort.players.count > 1 && scenePort.players[scenePort.myPlayerIndex].nextAction == .WillBuildMetropolis {
+            let alert = UIAlertController(title: "Metropolis", message: "You can now upgrade a city into a metropolis!", preferredStyle: UIAlertControllerStyle.alert)
+            let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default)
+            alert.addAction(okay)
+            OperationQueue.main.addOperation { () -> Void in
+                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
+        }
+        if scenePort.players[scenePort.myPlayerIndex].canBuildMetropolis > 0 {
+            let alert = UIAlertController(title: "Metropolis", message: "Once you build a city you will be able to upgrade it!", preferredStyle: UIAlertControllerStyle.alert)
+            let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default)
+            alert.addAction(okay)
+            OperationQueue.main.addOperation { () -> Void in
+                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
         }
     }
 
@@ -324,6 +393,9 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "intentions":
                 let player = Int(message[1])!
                 let intent = PlayerIntentions(rawValue: message[2])
+                if intent == .WillRemoveMetropolis {
+                    scenePort.notifyMetropolisLost()
+                }
                 scenePort.players[player].nextAction = intent!
             case "victoryPoints":
                 let player = Int(message[1])!
@@ -504,6 +576,37 @@ class GameViewController: UIViewController, NetworkDelegate {
                         self.present(alert, animated: true, completion: nil)
                     default: break
                 }
+            case "metropolis":
+                let type = ProgressCardsCategory(rawValue: message[1])!
+                let player = Int(message[2])!
+                let holds = Bool(message[3])!
+                if type == .Politics {
+                   scenePort.players[player].holdsPoliticsMetropolis = holds
+                }
+                else if type == .Sciences {
+                    scenePort.players[player].holdsSciencesMetropolis = holds
+                }
+                else {
+                    scenePort.players[player].holdsTradesMetropolis = holds
+                }
+            case "levelImprovement":
+                let player = Int(message[1])!
+                let level = Int(message[2])!
+                let type = ProgressCardsCategory(rawValue: message[3])
+                if type == .Politics {
+                    scenePort.players[player].politicsImprovementLevel = level
+                }
+                else if type == .Sciences {
+                    scenePort.players[player].sciencesImprovementLevel = level
+                }
+                else {
+                    scenePort.players[player].tradesImprovementLevel = level
+                }
+            case "intentToBuildMetropolis":
+                let player = Int(message[1])!
+                let intends = Bool(message[2])!
+                var change = 1; if !intends {change = -1}
+                scenePort.players[player].canBuildMetropolis += change
             default:
                 print("Unknown message")
         }

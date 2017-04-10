@@ -442,13 +442,18 @@ class GameScene: SKScene {
         
         var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
         
-        if type == .Knight {
+        var cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+        
+        if type == .City {
+            tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.hasCityWall)"})
+            
+                cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue),\(corner!.cornerObject!.hasCityWall)"
+        }
+        else if type == .Knight {
             tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
         }
         
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
-        
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -484,7 +489,11 @@ class GameScene: SKScene {
             give(victoryPoints: 1, to: currentPlayer)
         }
         else if corner!.cornerObject!.type == .City {
-            give(victoryPoints: 2, to: currentPlayer)        }
+            give(victoryPoints: 2, to: currentPlayer)
+        }
+        else if corner!.cornerObject?.type == .Metropolis {
+            give(victoryPoints: 4, to: currentPlayer)
+        }
         
         return true
     }
@@ -717,13 +726,13 @@ class GameScene: SKScene {
         players[myPlayerIndex].stone -= 3
         players[myPlayerIndex].wheat -= 2
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.hasCityWall)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
         // Inform other players of resource change
         sendPlayerData(player: myPlayerIndex)
         
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City.rawValue)"
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City.rawValue),false"
         
         // Send object info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -734,11 +743,7 @@ class GameScene: SKScene {
             print ("successful sync cornerObject")
         }
 
-        players[currentPlayer].victoryPoints += 1
-        let message = "victoryPoints.\(currentPlayer).\(players[currentPlayer].victoryPoints)"
-        let sentVP = appDelegate.networkManager.sendData(data: message)
-        if !sentVP { print("failed to sync victory points") }
-        
+        give(victoryPoints: 1, to: myPlayerIndex)
         return true
     }
     
@@ -870,7 +875,7 @@ class GameScene: SKScene {
     
     func moveKnight(column: Int, row: Int, valid:Bool) -> Bool {
         if (!valid) { return false }
-        let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
+        let corner = players[myPlayerIndex].ownedKnights.first(where: {$0.column == column && $0.row == row})
         if (corner == nil) { return false }
         if (corner!.cornerObject == nil) { return false }
         if (corner!.cornerObject!.type != .Knight) { return false }
@@ -1196,6 +1201,171 @@ class GameScene: SKScene {
         return true
     }
     
+    func buildCityWall(column: Int, row: Int, valid: Bool) -> Bool {
+        if !valid { return false }
+        if !hasResourcesForCityWall() { return false }
+        let corner = players[myPlayerIndex].ownedCorners.first(where: {$0.column == column && $0.row == row})
+        if corner == nil { return false }
+        if corner?.cornerObject == nil { return false }
+        if corner?.cornerObject!.type != .City && corner?.cornerObject!.type != .Metropolis { return false }
+        if (corner?.cornerObject!.hasCityWall)! { return false }
+        if corner!.cornerObject!.owner != myPlayerIndex { return false }
+        
+        corner?.cornerObject!.hasCityWall = true
+        
+        // Pay for wall and update others of payment
+        players[myPlayerIndex].brick -= 2
+        sendPlayerData(player: myPlayerIndex)
+        
+        var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if !sent { print("failed to sync city") }
+        // Update others of wall construction
+        cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City.rawValue),true"
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if !sent { print("failed to sync city") }
+        
+        // Buildwall
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)true"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        return true
+    }
+    
+    func isFirstToReach(level: Int, type: ProgressCardsCategory) -> Bool {
+        var count = 0
+        for player in players {
+            if type == .Politics {
+                if player.politicsImprovementLevel >= level {count += 1}
+            }
+            else if type == .Sciences {
+                if player.sciencesImprovementLevel >= level {count += 1}
+            }
+            else {
+                if player.tradesImprovementLevel >= level {count += 1}
+            }
+        }
+        
+        return (count == 1)
+    }
+    
+    func buildMetropolis(col: Int, row: Int, valid: Bool) -> Bool {
+        let corner = players[myPlayerIndex].ownedCorners.first(where: {$0.column == col && $0.row == row})
+        if corner == nil {return false}
+        if corner?.cornerObject == nil {return false}
+        if corner!.cornerObject!.type != .City {return false}
+        if corner!.cornerObject!.owner != myPlayerIndex {return false}
+        
+        corner!.cornerObject!.type = .Metropolis
+        
+        let cornerObjectInfo = "cornerData.\(currentPlayer),\(col),\(row),\(cornerType.Metropolis),\(corner!.cornerObject!.hasCityWall)"
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if !sent {print("failed to sync metropolis")}
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cornerType.Metropolis)\(corner!.cornerObject!.hasCityWall)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: col, row: row)
+    
+        return true
+    }
+    func removeMetropolis(from :Int, type: ProgressCardsCategory) {
+        let player = players[from]
+        if type == .Politics {
+            player.holdsPoliticsMetropolis = false;
+            let sent = appDelegate.networkManager.sendData(data: "metropolis.Politics.\(from).false")
+            if !sent { print("unable to update metropolis info") }
+        }
+        else if type == .Sciences {
+            player.holdsSciencesMetropolis = false;
+            let sent = appDelegate.networkManager.sendData(data: "metropolis.Sciences.\(from).false")
+            if !sent { print("unable to update metropolis info") }
+        }
+        else {
+            player.holdsTradesMetropolis = false;
+            let sent = appDelegate.networkManager.sendData(data: "Trades.\(from).false")
+            if !sent { print("unable to update metropolis info") }
+        }
+        
+        var num = 0
+        for corner in players[from].ownedCorners {
+            if corner.cornerObject!.type == .Metropolis {
+                num += 1
+            }
+        }
+        if num > 1 {
+            // if player has multiple
+            players[from].nextAction = .WillRemoveMetropolis
+            let sent = appDelegate.networkManager.sendData(data: "intentions.\(from).WillRemoveMetropolis")
+            if !sent {print("unable to sync remove metropolis")}
+            
+            let sent3 = appDelegate.networkManager.sendData(data: "metropolis.\(type.rawValue).\(from).false")
+            if !sent3 { print("unable to update metropolis info") }
+
+        }
+        else if num == 1 {
+            // reduce to city
+            let corner = players[from].ownedCorners.first(where: {$0.cornerObject!.type == .Metropolis})
+            
+            let removeNotification = "cornerObject.\(from),\(corner!.column),\(corner!.row),nil"
+            let sent = appDelegate.networkManager.sendData(data: removeNotification)
+            if !sent {print("failed to sync metropolis")}
+            
+            corner?.cornerObject?.type = .City
+            
+            let cornerObjectInfo = "cornerData.\(from),\(corner!.column),\(corner!.row),\(cornerType.City),\(corner!.cornerObject!.hasCityWall)"
+            let sent2 = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+            if !sent2 {print("failed to sync metropolis")}
+            
+            let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[from].color.rawValue)\(cornerType.City)\(corner!.cornerObject!.hasCityWall)"})
+            handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
+            
+            let sent3 = appDelegate.networkManager.sendData(data: "metropolis.\(type.rawValue).\(from).false")
+            if !sent3 { print("unable to update metropolis info") }
+        }
+        else {
+            // remove right to build when obtain city
+            players[from].canBuildMetropolis -= 1
+            let sent = appDelegate.networkManager.sendData(data: "intentToBuildMetropolis.\(from).false")
+            if !sent { print("unable to update metropolis info") }
+            
+            let sent3 = appDelegate.networkManager.sendData(data: "metropolis.\(type.rawValue).\(from).false")
+            if !sent3 { print("unable to update metropolis info") }
+
+        }
+        
+    }
+    func reduceMetropolis(column: Int, row: Int, valid: Bool) -> Bool {
+        let corner = players[myPlayerIndex].ownedCorners.first(where: {$0.column == column && $0.row == row})
+        if corner == nil {return false}
+        if corner!.cornerObject == nil {return false}
+        if corner!.cornerObject!.owner != myPlayerIndex {return false}
+        if corner!.cornerObject!.type != .Metropolis {return false}
+        
+        let removeNotification = "cornerObject.\(myPlayerIndex),\(column),\(row),nil"
+        let sent = appDelegate.networkManager.sendData(data: removeNotification)
+        if !sent {print("failed to sync metropolis")}
+        
+        corner?.cornerObject?.type = .City
+        
+        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City),\(corner!.cornerObject!.hasCityWall)"
+        let sent2 = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if !sent2 {print("failed to sync metropolis")}
+        
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cornerType.City)\(corner!.cornerObject!.hasCityWall)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        return true
+    }
+    func notifyMetropolisLost() {
+        let alert = UIAlertController(title: "Metropolis Stolen", message: "Another player has stolen a Metropolis from you. Choose which one to give away.", preferredStyle: UIAlertControllerStyle.alert)
+        let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default)
+        alert.addAction(okay)
+        
+        OperationQueue.main.addOperation { () -> Void in
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     //function that will read a recieved message and set the corner object
     func setCornerObjectFromMessage(info:String) {
         let cornerInfo = info.components(separatedBy: ",")
@@ -1225,7 +1395,7 @@ class GameScene: SKScene {
                 else {
                     corner?.cornerObject?.hasBeenUpgradedThisTurn = upgraded!
                 }
-                let used = Bool(cornerInfo[6])
+                let used = Bool(cornerInfo[7])
                 if (used == nil) {
                     corner?.cornerObject?.didActionThisTurn = true
                 }
@@ -1238,12 +1408,31 @@ class GameScene: SKScene {
             else {
                 players[who].ownedCorners.append(corner!)
                 
-                give(victoryPoints: 1, to: who)
+                if type == .Metropolis {
+                    give(victoryPoints: 2, to: who)
+                    let hasCityWall = Bool(cornerInfo[4])!
+                    corner?.cornerObject?.hasCityWall = hasCityWall
+                }
+                else {
+                    give(victoryPoints: 1, to: who)
+                    
+                    if type == .City {
+                        let hasCityWall = Bool(cornerInfo[4])!
+                        corner?.cornerObject?.hasCityWall = hasCityWall
+                    }
+                    else {
+                        corner?.cornerObject?.hasCityWall = false
+                    }
+                }
             }
             
             var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
             
-            if type == .Knight {
+            if type == .City {
+                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.hasCityWall)"})
+
+            }
+            else if type == .Knight {
                 tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
             }
             
@@ -1376,16 +1565,16 @@ class GameScene: SKScene {
                     knightCorner.cornerObject!.isActive = false
                     
                     //Update knight GUI
-//                    let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(knightCorner!.cornerObject!.type.rawValue)\(knightCorner!.cornerObject!.strength)\(knightCorner!.cornerObject!.isActive)"})
-//                    handler.Vertices.setTileGroup(tileGroup, forColumn: knightCorner.column, row: knightCorner.row)
+                    updateKnightGUI(row: knightCorner.row, col: knightCorner.column, player: player, strength: knightCorner.cornerObject!.strength, isActive: false)
                 }
             }
             for cityCorner in players[player].ownedCorners {
                 if (cityCorner.cornerObject!.type == .City) {
                     barbarianStrength += 1
-                    if (!(cityCorner.cornerObject?.isMetropolis)!) {
-                        immune[player] = false
-                    }
+                    immune[player] = false
+                }
+                else if (cityCorner.cornerObject!.type == .Metropolis) {
+                    barbarianStrength += 1
                 }
             }
         }
@@ -1412,7 +1601,7 @@ class GameScene: SKScene {
             if knightStrength[myPlayerIndex] == weakest {
                 var numCities = 0
                 for cityCorner in players[myPlayerIndex].ownedCorners {
-                    if cityCorner.cornerObject?.type == .City && !(cityCorner.cornerObject?.isMetropolis)! {
+                    if cityCorner.cornerObject?.type == .City {
                         numCities += 1
                     }
                 }
@@ -1420,7 +1609,7 @@ class GameScene: SKScene {
                 if (numCities == 1) {
                     let alert = UIAlertController(title: "Barbarians Arrived in Catan", message: "The barbarians are stronger than the knights, and will pillage your city", preferredStyle: UIAlertControllerStyle.alert)
                     let okay: UIAlertAction = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default) { (alertAction) -> Void in
-                        let cityCorner = self.players[self.myPlayerIndex].ownedCorners.first(where: {$0.cornerObject?.type == .City && $0.cornerObject?.isMetropolis == false})
+                        let cityCorner = self.players[self.myPlayerIndex].ownedCorners.first(where: {$0.cornerObject?.type == .City})
                         let _ = self.destroyCity(column: (cityCorner?.column)!, row: (cityCorner?.row)!, who: self.myPlayerIndex)
                     }
                     alert.addAction(okay)
@@ -1526,7 +1715,6 @@ class GameScene: SKScene {
         if cityCorner?.cornerObject == nil {return false}
         if cityCorner?.cornerObject?.owner != who {return false}
         if cityCorner?.cornerObject?.type != .City {return false}
-        if (cityCorner?.cornerObject?.isMetropolis)! { return false }
         
         cityCorner?.cornerObject?.type = .Settlement
         cityCorner?.cornerObject?.hasCityWall = false
@@ -1548,6 +1736,11 @@ class GameScene: SKScene {
         if !sent { print ("Failed to update others on city destruction") }
         
         return true
+    }
+    
+    func updateKnightGUI(row: Int, col: Int, player: Int, strength: Int, isActive: Bool) {
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)Knight\(strength)\(isActive)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: col, row: row)
     }
     
     // function that rolls the dice
@@ -2701,12 +2894,34 @@ class GameScene: SKScene {
                         rolled = true
                     }
                 }
-                if (cancelButton.frame.contains(targetLocationView)) {
+                if (cancelButton.frame.contains(targetLocationView) && players[myPlayerIndex].nextAction != .WillBuildMetropolis) {
                     if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
                     if players[myPlayerIndex].comingFromFishes {
                         players[myPlayerIndex].fish += 5
                         players[myPlayerIndex].comingFromFishes = false
                     }
+                    if players[myPlayerIndex].nextAction == .WillBuildKnightForFree {
+                        let corner = handler.landHexVertexArray.first(where: {$0.row == players[myPlayerIndex].movingKnightFromRow && $0.column == players[myPlayerIndex].movingKnightFromCol})
+                        
+                        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
+                        corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
+                        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
+                        corner!.cornerObject!.isActive = true
+                        corner!.cornerObject!.didActionThisTurn = false
+                        players[myPlayerIndex].ownedKnights.append(corner!)
+                        
+                        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+                        handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
+                        
+                        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(corner!.column),\(corner!.row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+                        
+                        // Send player info to other players
+                        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+                        if (!sent) {
+                            print ("failed to sync cornerObject")
+                        }
+                    }
+
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
@@ -2741,12 +2956,34 @@ class GameScene: SKScene {
                         rolled = true
                     }
                 }
-                if (cancelButton.frame.contains(targetLocationView)) {
+                if (cancelButton.frame.contains(targetLocationView) && players[myPlayerIndex].nextAction != .WillBuildMetropolis) {
                     if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
                     if players[myPlayerIndex].comingFromFishes {
                         players[myPlayerIndex].fish += 5
                         players[myPlayerIndex].comingFromFishes = false
                     }
+                    if players[myPlayerIndex].nextAction == .WillBuildKnightForFree {
+                        let corner = handler.landHexVertexArray.first(where: {$0.row == players[myPlayerIndex].movingKnightFromRow && $0.column == players[myPlayerIndex].movingKnightFromCol})
+                        
+                        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
+                        corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
+                        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
+                        corner!.cornerObject!.isActive = true
+                        corner!.cornerObject!.didActionThisTurn = false
+                        players[myPlayerIndex].ownedKnights.append(corner!)
+                        
+                        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+                        handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
+                        
+                        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(corner!.column),\(corner!.row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+                        
+                        // Send player info to other players
+                        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+                        if (!sent) {
+                            print ("failed to sync cornerObject")
+                        }
+                    }
+
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
@@ -2785,11 +3022,32 @@ class GameScene: SKScene {
                         rolled = true
                     }
                 }
-                if (cancelButton.frame.contains(targetLocationView)) {
+                if (cancelButton.frame.contains(targetLocationView) && players[myPlayerIndex].nextAction != .WillBuildMetropolis) {
                     if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
                     if players[myPlayerIndex].comingFromFishes {
                         players[myPlayerIndex].fish += 5
                         players[myPlayerIndex].comingFromFishes = false
+                    }
+                    if players[myPlayerIndex].nextAction == .WillBuildKnightForFree {
+                        let corner = handler.landHexVertexArray.first(where: {$0.row == players[myPlayerIndex].movingKnightFromRow && $0.column == players[myPlayerIndex].movingKnightFromCol})
+                        
+                        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
+                        corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
+                        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
+                        corner!.cornerObject!.isActive = true
+                        corner!.cornerObject!.didActionThisTurn = false
+                        players[myPlayerIndex].ownedKnights.append(corner!)
+                        
+                        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+                        handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
+                        
+                        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(corner!.column),\(corner!.row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+                        
+                        // Send player info to other players
+                        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+                        if (!sent) {
+                            print ("failed to sync cornerObject")
+                        }
                     }
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
@@ -2852,7 +3110,9 @@ class GameScene: SKScene {
                 case .WillBuildCity:
                     let cityHasBeenBuilt = upgradeSettlement(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
                     if cityHasBeenBuilt { players[myPlayerIndex].nextAction = .WillDoNothing }
-                case .WillBuildWall: return;   //  NOT IMPLEMENTED
+                case .WillBuildWall:
+                    let built = buildCityWall(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if built { players[myPlayerIndex].nextAction = .WillDoNothing }
                 case .WillBuildKnight:
                     let built = buildKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
                     if (built) { players[myPlayerIndex].nextAction = .WillDoNothing }
@@ -2862,7 +3122,18 @@ class GameScene: SKScene {
                 case .WillActivateKnight:
                     let activated = activateKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
                     if (activated) { players[myPlayerIndex].nextAction = .WillDoNothing }
-                case .WillBuildMetropolis: return;   //  NOT IMPLEMENTED
+                case .WillBuildMetropolis:
+                    let built = buildMetropolis(col: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if built {
+                        players[myPlayerIndex].nextAction = .WillDoNothing
+                        let message = "intentToBuildMetropolis.\(myPlayerIndex).false"
+                        let sentM = appDelegate.networkManager.sendData(data: message)
+                        if !sentM { print("unable to sync message") }
+                        players[myPlayerIndex].canBuildMetropolis -= 1
+                    }
+                case .WillRemoveMetropolis:
+                    let removed = reduceMetropolis(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if removed {players[myPlayerIndex].nextAction = .WillDoNothing}
                 case .WillRemoveOutlaw: return;   //  NOT IMPLEMENTED, FISHES ALREADY REMOVED BEFOREHAND
                 case .WillMoveShip: let movedShip = moveShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), valid: rolled)
                 if !movedShip { players[myPlayerIndex].nextAction = .WillDoNothing }
@@ -2901,6 +3172,9 @@ class GameScene: SKScene {
                         let sent = self.appDelegate.networkManager.sendData(data: "intentions.\(myPlayerIndex).WillDoNothing")
                         if !sent {print("failed to send player intentions")}
                     }
+                case .WillRemoveMetropolis:
+                    let removed = reduceMetropolis(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
+                    if removed {players[myPlayerIndex].nextAction = .WillDoNothing}
                 default: break
             }
         }
@@ -2967,7 +3241,7 @@ class GameScene: SKScene {
             
             gameState.append(".PLAYERCORNERS|\(index)")
             for corner in player.ownedCorners {
-                gameState.append("|\(corner.row),\(corner.column),\(corner.cornerObject!.type.rawValue),\(corner.cornerObject!.hasCityWall),\(corner.cornerObject!.isMetropolis),\(corner.isHarbour),\(corner.harbourType?.rawValue ?? harbourType.General.rawValue)")
+                gameState.append("|\(corner.row),\(corner.column),\(corner.cornerObject!.type.rawValue),\(corner.cornerObject!.hasCityWall),\(corner.isHarbour),\(corner.harbourType?.rawValue ?? harbourType.General.rawValue)")
             }
             gameState.append(".PLAYEREDGES|\(index)")
             for edge in player.ownedEdges {
@@ -3087,6 +3361,12 @@ class GameScene: SKScene {
         p.movingKnightFromRow = Int(data[35])!
         p.movingKnightUpgraded = Bool(data[36])!
         p.movedShipThisTurn = Bool(data[37])!
+        
+        if (myPlayerIndex >= 0 && myPlayerIndex < players.count && players[myPlayerIndex].hasOldBoot) {
+            DispatchQueue.main.async {
+                self.view?.addSubview(self.oldBootButton)
+            }
+        }
     }
     func extractCorners(_ data: [String]) {
         let player = Int(data[1])!
@@ -3096,18 +3376,20 @@ class GameScene: SKScene {
             let column = Int(specs[1])!
             let type = cornerType(rawValue: specs[2])!
             let hasCityWall = Bool(specs[3])!
-            let isMetropolis = Bool(specs[4])!
-            let isHarbor = Bool(specs[5])!
-            let harborType = harbourType(rawValue: specs[6])!
+            let isHarbor = Bool(specs[4])!
+            let harborType = harbourType(rawValue: specs[5])!
             
             let corner = handler.landHexVertexArray.first(where: {$0.column == column && $0.row == row})
             corner?.isHarbour = isHarbor
             corner?.harbourType = harborType
             corner!.cornerObject = cornerObject(cornerType : type, owner: player)
             corner!.cornerObject?.hasCityWall = hasCityWall
-            corner!.cornerObject?.isMetropolis = isMetropolis
             players[player].ownedCorners.append(corner!)
-            let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+            
+            var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
+            if type == .City || type == .Metropolis {
+                tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.hasCityWall)"})
+            }
             handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         }
     }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum ProgressCardsCategory {
+enum ProgressCardsCategory : String {
     case Politics
     case Sciences
     case Trades

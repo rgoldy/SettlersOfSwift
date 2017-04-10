@@ -29,6 +29,7 @@ class StartScreenController: UIViewController {
         self.navigationController?.navigationBar.isHidden = false;
         appDelegate.networkManager.disconnect()
         appDelegate.networkManager.delegate = nil
+        appDelegate.networkManager.loadData = "nil"
     }
 
     override func didReceiveMemoryWarning() {

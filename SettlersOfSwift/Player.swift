@@ -39,6 +39,8 @@ class Player {
     var holdsSciencesMetropolis = false
     var holdsTradesMetropolis = false
     
+    var canBuildMetropolis = 0
+    
     var nextAction: PlayerIntentions = .WillDoNothing
     
     var paper = 0

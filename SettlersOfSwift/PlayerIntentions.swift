@@ -26,6 +26,7 @@ enum PlayerIntentions : String {
     case WillPromoteKnight
     case WillActivateKnight
     case WillBuildMetropolis
+    case WillRemoveMetropolis
     case WillRemoveOutlaw
     case WillMoveShip
     case WillMoveKnight
