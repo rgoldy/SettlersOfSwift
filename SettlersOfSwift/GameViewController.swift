@@ -341,6 +341,8 @@ class GameViewController: UIViewController, NetworkDelegate {
                         //  END GAME AND RETURN TO MAIN MENU
                     }))
                 self.present(alert, animated: true, completion: nil)
+            case "removeProgressCardAtIndex":
+                scenePort.gameDeck[Int(message[1])!] = nil
             case "sendCommodityOrResource":
                 if Int(message[2])! == scenePort.myPlayerIndex {
                     let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))

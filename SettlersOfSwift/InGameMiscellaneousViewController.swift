@@ -292,7 +292,7 @@ class InGameMiscellaneousViewController: UIViewController {
         self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func didInteractWithBottomRightButton(_ sender: Any) {    //  NOT IMPLEMENTED _ CHOOSE PROGRESS CARD
+    @IBAction func didInteractWithBottomRightButton(_ sender: Any) {
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 7
         var deckCopy = [ProgressCardsType?]()
         for item in gameDataReference.scenePort.gameDeck { deckCopy.append(item) }
@@ -303,8 +303,20 @@ class InGameMiscellaneousViewController: UIViewController {
             deckCopy[first] = deckCopy[second]
             deckCopy[second] = temporaryCard
         }
-        //
-        wireButtonFunctionalities()
+        let actionSheet = UIAlertController(title: nil, message: "Please select the Progress Card you would like to receive...", preferredStyle: .actionSheet)
+        for item in deckCopy {
+            if item != nil {
+                let itemAction = UIAlertAction(title: item!.rawValue, style: .default, handler: { action -> Void in
+                    for index in 0..<self.gameDataReference.scenePort.gameDeck.count {
+                        if self.gameDataReference.scenePort.gameDeck[index] == item {
+                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "removeProgressCardAtIndex.\(index)")
+                            self.gameDataReference.scenePort.gameDeck[index] = nil
+                    }   }
+                    self.wireButtonFunctionalities()
+                })
+                actionSheet.addAction(itemAction)
+        }   }
+        self.present(actionSheet, animated: true, completion: nil)
     }
 
     /*
