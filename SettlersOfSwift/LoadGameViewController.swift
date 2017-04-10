@@ -25,10 +25,10 @@ class LoadGameViewController: UITableViewController {
         tblView.delegate = self
 
         let DocumentDirURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let pathURL = DocumentDirURL.appendingPathComponent("settlersofswift")
+        let pathURL = DocumentDirURL
         let files = FileManager.default.enumerator(at: pathURL, includingPropertiesForKeys: nil)
         for file in files! {
-            if let path = NSURL(fileURLWithPath: file as! String, relativeTo: pathURL).path {
+            if let path = NSURL(fileURLWithPath: (file as AnyObject).path, relativeTo: pathURL).path {
                 print (path)
                 allFileNames.append(path)
                 let dirs = path.components(separatedBy: "/")
@@ -40,7 +40,6 @@ class LoadGameViewController: UITableViewController {
                 catch {
                     allFileNames.remove(at: allFileNames.count-1)
                     displayName.remove(at: displayName.count-1)
-
                 }
             }
         }
@@ -69,7 +68,7 @@ class LoadGameViewController: UITableViewController {
         return allFileNames.count
     }
     
-    // Adds saved games
+    // Lists saved games
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
         let cell = tableView.dequeueReusableCell(withIdentifier: "idGame")! as UITableViewCell
@@ -78,6 +77,25 @@ class LoadGameViewController: UITableViewController {
         cell.textLabel?.text = displayName[indexPath.row]
         
         return cell
+    }
+    
+    // Functionality to delete saved games
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.delete {
+            // Delete file
+            do {
+                try FileManager.default.removeItem(atPath: allFileNames[indexPath.row])
+                
+                displayName.remove(at: indexPath.row)
+                allFileNames.remove(at: indexPath.row)
+                allFileContents.remove(at: indexPath.row)
+                
+                tableView.deleteRows(at: [indexPath as IndexPath], with: UITableViewRowAnimation.automatic)
+            }
+            catch {
+                print ("Unable to delete file")
+            }
+        }
     }
     
     // Sets row height

@@ -2941,19 +2941,18 @@ class GameScene: SKScene {
             }
             gameState.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
-        gameState.append(".")
         
         for index in 0..<players.count {
             let player = players[index]
-            gameState.append("PLAYER|\(player.name)|\(index)|\(player.color.rawValue)|\(player.brick)|\(player.brickTradeRatio)|\(player.wheat)|\(player.wheatTradeRatio)|\(player.wood)|\(player.woodTradeRatio)|\(player.sheep)|\(player.sheepTradeRatio)|\(player.stone)|\(player.stoneTradeRatio)|\(player.gold)|\(player.goldTradeRatio)|\(player.paper)|\(player.paperTradeRatio)|\(player.coin)|\(player.coinTradeRatio)|\(player.cloth)|\(player.clothTradeRatio)|\(player.fish)|\(player.victoryPoints)|\(player.hasOldBoot)|\(player.politicsImprovementLevel)|\(player.tradesImprovementLevel)|\(player.sciencesImprovementLevel)|\(player.holdsTradesMetropolis)|\(player.holdsPoliticsMetropolis)|\(player.holdsSciencesMetropolis)|\(player.nextAction.rawValue)|\(player.longestRoad)|\(player.movingKnightStrength)|\(player.movingKnightFromCol)|\(player.movingKnightFromRow)|\(player.movingKnightUpgraded)|\(player.movedShipThisTurn).")
+            gameState.append(".PLAYER|\(player.name)|\(index)|\(player.color.rawValue)|\(player.brick)|\(player.brickTradeRatio)|\(player.wheat)|\(player.wheatTradeRatio)|\(player.wood)|\(player.woodTradeRatio)|\(player.sheep)|\(player.sheepTradeRatio)|\(player.stone)|\(player.stoneTradeRatio)|\(player.gold)|\(player.goldTradeRatio)|\(player.paper)|\(player.paperTradeRatio)|\(player.coin)|\(player.coinTradeRatio)|\(player.cloth)|\(player.clothTradeRatio)|\(player.fish)|\(player.victoryPoints)|\(player.hasOldBoot)|\(player.politicsImprovementLevel)|\(player.tradesImprovementLevel)|\(player.sciencesImprovementLevel)|\(player.holdsTradesMetropolis)|\(player.holdsPoliticsMetropolis)|\(player.holdsSciencesMetropolis)|\(player.nextAction.rawValue)|\(player.longestRoad)|\(player.movingKnightStrength)|\(player.movingKnightFromCol)|\(player.movingKnightFromRow)|\(player.movingKnightUpgraded)|\(player.movedShipThisTurn)")
             
-            gameState.append("PLAYERCORNERS|\(index)")
+            gameState.append(".PLAYERCORNERS|\(index)")
             for corner in player.ownedCorners {
                 gameState.append("|\(corner.row),\(corner.column),\(corner.cornerObject!.type.rawValue),\(corner.cornerObject!.hasCityWall),\(corner.cornerObject!.isMetropolis),\(corner.isHarbour),\(corner.harbourType?.rawValue ?? harbourType.General.rawValue)")
             }
             gameState.append(".PLAYEREDGES|\(index)")
             for edge in player.ownedEdges {
-                gameState.append("|\(edge.row),|\(edge.column),\(edge.edgeObject!.type.rawValue),\(edge.edgeObject!.justBuilt)")
+                gameState.append("|\(edge.row),\(edge.column),\(edge.edgeObject!.type.rawValue),\(edge.edgeObject!.justBuilt)")
             }
             gameState.append(".PLAYERKNIGHTS|\(index)")
             for knight in player.ownedKnights {
@@ -2978,12 +2977,8 @@ class GameScene: SKScene {
         // SAVE gameState to file
         print ("SAVING FILE - \(filename)")
         let DocumentDirURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let fileURL = DocumentDirURL.appendingPathComponent("settlersofswift/\(filename)")
-        
-        if !FileManager.default.fileExists(atPath: fileURL.path) {
-            print ("creating file")
-            
-        }
+        //let fileURL = DocumentDirURL.appendingPathComponent("settlersofswift/\(filename)")
+        let fileURL = DocumentDirURL.appendingPathComponent(filename)
         
         do {
             try gameState.write(to: fileURL, atomically: true, encoding: String.Encoding.utf8)
@@ -3004,6 +2999,7 @@ class GameScene: SKScene {
             switch identifier {
                 case "GAMEBOARD":
                     setBoardLayout(encoding: data[1])
+                    handler.updateGUI()
                 case "PLAYER":
                     extractPlayerInfo(data)
                 case "PLAYERCORNERS":
@@ -3031,11 +3027,11 @@ class GameScene: SKScene {
         if name == appDelegate.networkManager.getName() {
             myPlayerIndex = index
         }
-        if players.count-1 == index {
+        while players.count-1 < index {
             players.append(Player(name: name, playerNumber: index))
         }
-        else {
-            players[index] = Player(name: name, playerNumber: index)
+        if players.count-1 >= index {
+            self.players[index] = Player(name: name, playerNumber: index)
         }
         let p = players[index]
         p.brick = Int(data[4])!
@@ -3071,7 +3067,7 @@ class GameScene: SKScene {
         p.movingKnightFromCol = Int(data[34])!
         p.movingKnightFromRow = Int(data[35])!
         p.movingKnightUpgraded = Bool(data[36])!
-        p.movedShipThisTurn = Bool(data[32])!
+        p.movedShipThisTurn = Bool(data[37])!
     }
     func extractCorners(_ data: [String]) {
         let player = Int(data[1])!
@@ -3110,8 +3106,9 @@ class GameScene: SKScene {
             edge!.edgeObject = edgeObject(edgeType : type, owner: player)
             edge!.edgeObject?.justBuilt = justBuilt
             players[player].ownedEdges.append(edge!)
+            
             let tileGroup = handler.edgesTiles.tileGroups.first(where: {$0.name == "\(edge!.direction.rawValue)\(players[player].color.rawValue)\(edge!.edgeObject!.type.rawValue)"})
-            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+            handler.Edges.setTileGroup(tileGroup, forColumn: column, row: row)
         }
     }
     func extractKnights(_ data: [String]) {
@@ -3141,6 +3138,7 @@ class GameScene: SKScene {
         for i in 2..<data.count {
             let card = ProgressCardsType(rawValue: data[i])!
             players[player].progressCards.append(card)
+            print ("Player \(players[player].name) has \(card.rawValue)")
         }
     }
     func extractGameCards(_ data: [String]) {
@@ -3175,6 +3173,18 @@ class GameScene: SKScene {
         pirateRemoved = Bool(data[13])!
         robberRemoved = Bool(data[14])!
         barbariansDistanceFromCatan = Int(data[15])!
+        
+        if (currentPlayer == myPlayerIndex) {
+            DispatchQueue.main.async {
+                self.gameButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+            }
+            if players[myPlayerIndex].nextAction != .WillDoNothing {
+                DispatchQueue.main.async {
+                    self.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
+                }
+
+            }
+        }
     }
 
     func weddingCardDiscard(amount: Int = 2, receiverIndex: Int) {
@@ -3260,7 +3270,8 @@ class GameScene: SKScene {
                 actionSheet.addAction(clothAction)
             } else { invalidCounter += 1 }
             if invalidCounter == 9 { return } else { self.view?.window?.rootViewController?.present(actionSheet, animated: true, completion: nil) }
-    }   }
+        }
+    }
     
 //
 //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
