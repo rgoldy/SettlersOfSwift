@@ -292,6 +292,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                             scenePort.players[scenePort.myPlayerIndex].progressCards.remove(at: index)
                             break
                 }   }   }
+            case "robberDiscardScenario": scenePort.checkIfCardsNeedDiscard()
             case "sendResourcesCount":
                 let player = scenePort.players[Int(message[1])!]
                 player.brick = Int(message[2])!
@@ -340,6 +341,8 @@ class GameViewController: UIViewController, NetworkDelegate {
                         //  END GAME AND RETURN TO MAIN MENU
                     }))
                 self.present(alert, animated: true, completion: nil)
+            case "removeProgressCardAtIndex":
+                scenePort.gameDeck[Int(message[1])!] = nil
             case "sendCommodityOrResource":
                 if Int(message[2])! == scenePort.myPlayerIndex {
                     let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
@@ -437,6 +440,35 @@ class GameViewController: UIViewController, NetworkDelegate {
                 }
             case "weddingCard":
                 if scenePort.players[scenePort.myPlayerIndex].victoryPoints > scenePort.players[Int(message[1])!].victoryPoints { scenePort.weddingCardDiscard(receiverIndex: Int(message[1])!) }
+            case "loseOneOf":
+                if Int(message[2])! == scenePort.myPlayerIndex {
+                    switch message[1] {
+                        case "BRICK": scenePort.players[scenePort.myPlayerIndex].brick -= 1
+                        case "SHEEP": scenePort.players[scenePort.myPlayerIndex].sheep -= 1
+                        case "STONE": scenePort.players[scenePort.myPlayerIndex].stone -= 1
+                        case "WHEAT": scenePort.players[scenePort.myPlayerIndex].wheat -= 1
+                        case "WOOD": scenePort.players[scenePort.myPlayerIndex].wood -= 1
+                        case "COIN": scenePort.players[scenePort.myPlayerIndex].coin -= 1
+                        case "PAPER": scenePort.players[scenePort.myPlayerIndex].paper -= 1
+                        case "CLOTH": scenePort.players[scenePort.myPlayerIndex].cloth -= 1
+                        default: break
+                    }
+                    let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationBanner.isOpaque = false
+                    notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.8)
+                    let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationContent.isOpaque = false
+                    notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                    notificationContent.textColor = UIColor.lightGray
+                    notificationContent.textAlignment = .center
+                    notificationContent.text = "You have just lost a \(message[1])..."
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(notificationContent)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                        notificationContent.removeFromSuperview()
+                        notificationBanner.removeFromSuperview()
+                    })
+                }
             case "resourcesHasBeenStolen":
                 switch message[1] {
                     case "BRICK":
