@@ -68,7 +68,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithMiddleLeftButton(_ sender: Any) {
-        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 2
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 3
         let actionSheet = UIAlertController(title: "Opponent Steal", message: "Who would you like to steal randomly from?", preferredStyle: .alert)
         let previousPlayer = UIAlertAction(title: "Previous Player", style: .default) { action -> Void in
             self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].fetchedTargetData = false
@@ -238,7 +238,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithBottomLeftButton(_ sender: Any) {
-        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 3
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 4
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
             self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick += 1
@@ -278,13 +278,33 @@ class InGameMiscellaneousViewController: UIViewController {
         self.present(actionSheet, animated: true, completion: nil)
     }
     
-    @IBAction func didInteractWithTopRightButton(_ sender: Any) {   //  NOT IMPLEMENTED _ GIVE FREE ROAD
+    @IBAction func didInteractWithTopRightButton(_ sender: Any) {
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 5
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillBuildRoadForFree
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].comingFromFishes = true
+        self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func didInteractWithMiddleRightButton(_ sender: Any) {    //  NOT IMPLEMENTED _ GIVE FREE SHIP
+    @IBAction func didInteractWithMiddleRightButton(_ sender: Any) {
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 5
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillBuildShipForFree
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].comingFromFishes = true
+        self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func didInteractWithBottomRightButton(_ sender: Any) {    //  NOT IMPLEMENTED _ CHOOSE PROGRESS CARD
+        gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 7
+        var deckCopy = [ProgressCardsType?]()
+        for item in gameDataReference.scenePort.gameDeck { deckCopy.append(item) }
+        for _ in 0..<216 {
+            let first = Int(arc4random() % 54)
+            let second = Int(arc4random() % 54)
+            let temporaryCard = deckCopy[first]
+            deckCopy[first] = deckCopy[second]
+            deckCopy[second] = temporaryCard
+        }
+        //
+        wireButtonFunctionalities()
     }
 
     /*

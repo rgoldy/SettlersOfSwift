@@ -70,6 +70,8 @@ class Player {
     
     var movedShipThisTurn : Bool = false
     
+    var comingFromFishes = false
+    
     init(name : String, playerNumber : Int) {
         self.name = name
         switch playerNumber {

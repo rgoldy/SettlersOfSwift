@@ -2703,6 +2703,10 @@ class GameScene: SKScene {
                 }
                 if (cancelButton.frame.contains(targetLocationView)) {
                     if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
+                    if players[myPlayerIndex].comingFromFishes {
+                        players[myPlayerIndex].fish += 5
+                        players[myPlayerIndex].comingFromFishes = false
+                    }
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
@@ -2739,6 +2743,10 @@ class GameScene: SKScene {
                 }
                 if (cancelButton.frame.contains(targetLocationView)) {
                     if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
+                    if players[myPlayerIndex].comingFromFishes {
+                        players[myPlayerIndex].fish += 5
+                        players[myPlayerIndex].comingFromFishes = false
+                    }
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
@@ -2779,6 +2787,10 @@ class GameScene: SKScene {
                 }
                 if (cancelButton.frame.contains(targetLocationView)) {
                     if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
+                    if players[myPlayerIndex].comingFromFishes {
+                        players[myPlayerIndex].fish += 5
+                        players[myPlayerIndex].comingFromFishes = false
+                    }
                     players[myPlayerIndex].nextAction = .WillDoNothing
                     cancelButton.backgroundColor = UIColor.gray
                 }
@@ -3345,19 +3357,9 @@ class GameScene: SKScene {
     }   }
     
     func checkIfCardsNeedDiscard() {
-        var commoditiesAndResourcesCount = 0
-        commoditiesAndResourcesCount += players[myPlayerIndex].brick
-        commoditiesAndResourcesCount += players[myPlayerIndex].gold
-        commoditiesAndResourcesCount += players[myPlayerIndex].sheep
-        commoditiesAndResourcesCount += players[myPlayerIndex].stone
-        commoditiesAndResourcesCount += players[myPlayerIndex].wheat
-        commoditiesAndResourcesCount += players[myPlayerIndex].wood
-        commoditiesAndResourcesCount += players[myPlayerIndex].coin
-        commoditiesAndResourcesCount += players[myPlayerIndex].paper
-        commoditiesAndResourcesCount += players[myPlayerIndex].cloth
-        if commoditiesAndResourcesCount > 7 {
-            robberCardDiscard(originalAmount: commoditiesAndResourcesCount / 2, amount: commoditiesAndResourcesCount / 2)
-    }   }
+        let discardCount = players[myPlayerIndex].mustRemoveHalfOfHand()
+        if discardCount != 0 { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
+    }
     
     
 //

@@ -155,6 +155,11 @@ class InGameFlipChartsViewController: UIViewController {
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillDoNothing
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        //  PUT CODE HERE FOR METROPOLIS RETROACTIVE BUILD
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -419,7 +424,10 @@ class InGameFlipChartsViewController: UIViewController {
     }
     
     func blockImprovement() {
-        
+        let announcement = "Looks like you don't have the necessary commodities to perform this action..."
+        let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "YES", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func continueImprovingCharts(_ index: Int, offset: Int) {
