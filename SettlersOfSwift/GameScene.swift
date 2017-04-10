@@ -946,7 +946,12 @@ class GameScene: SKScene {
         
         corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
         corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
-        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
+        if (displacable) {
+            corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
+        }
+        else {
+            corner!.cornerObject!.isActive = players[myPlayerIndex].movingKnightUpgraded
+        }
         players[myPlayerIndex].ownedKnights.append(corner!)
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
@@ -989,6 +994,16 @@ class GameScene: SKScene {
         players[player].movingKnightStrength = strength
         players[player].movingKnightUpgraded = active
         players[player].nextAction = .WillDisplaceKnight
+        
+        // alert
+        if (player == myPlayerIndex) {
+            let alert = UIAlertController(title: "Knight Displaced", message: "Select a new position for your knight.", preferredStyle: UIAlertControllerStyle.alert)
+            let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default)
+            alert.addAction(okay)
+            OperationQueue.main.addOperation { () -> Void in
+                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     func pathBetween(a: LandHexVertex?, b: LandHexVertex?) -> Bool {
@@ -1017,11 +1032,24 @@ class GameScene: SKScene {
                 let v2 = e1?.neighbourVertex2
                 visited.append(e1!)
                 if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
-                    if (v1?.row == v.row && v1?.column == v.column) {
+                    if (v1?.row != v.row || v1?.column != v.column) {
+                        queue.append(v1!)
+                    }
+                }
+                else if (v1?.cornerObject != nil) {
+                    if v1!.cornerObject?.type == .Knight && v1!.row == b?.row && v1!.column == b?.column && v1?.cornerObject?.owner != myPlayerIndex {
+                        queue.append(v1!)
+                    }
+                }
+                
+                if (v2?.cornerObject == nil || v2?.cornerObject?.owner == myPlayerIndex) {
+                    if (v2?.row != v.row || v2?.column != v.column) {
                         queue.append(v2!)
                     }
-                    else {
-                        queue.append(v1!)
+                }
+                else if (v2?.cornerObject != nil) {
+                    if v2!.cornerObject?.type == .Knight && v2!.row == b?.row && v2!.column == b?.column && v2?.cornerObject?.owner != myPlayerIndex {
+                        queue.append(v2!)
                     }
                 }
             }
@@ -1030,25 +1058,49 @@ class GameScene: SKScene {
                 let v2 = e2?.neighbourVertex2
                 visited.append(e2!)
                 if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
-                    if (v1?.row == v.row && v1?.column == v.column) {
-                        queue.append(v2!)
-                    }
-                    else {
+                    if (v1?.row != v.row || v1?.column != v.column) {
                         queue.append(v1!)
                     }
                 }
-
-            }
+                else if (v1?.cornerObject != nil) {
+                    if v1!.cornerObject?.type == .Knight && v1!.row == b?.row && v1!.column == b?.column && v1?.cornerObject?.owner != myPlayerIndex {
+                        queue.append(v1!)
+                    }
+                }
+                
+                if (v2?.cornerObject == nil || v2?.cornerObject?.owner == myPlayerIndex) {
+                    if (v2?.row != v.row || v2?.column != v.column) {
+                        queue.append(v2!)
+                    }
+                }
+                else if (v2?.cornerObject != nil) {
+                    if v2!.cornerObject?.type == .Knight && v2!.row == b?.row && v2!.column == b?.column && v2?.cornerObject?.owner != myPlayerIndex  {
+                        queue.append(v2!)
+                    }
+                }            }
             if (has3 == nil && e3 != nil && e3?.edgeObject?.owner == myPlayerIndex) {
                 let v1 = e3?.neighbourVertex1
                 let v2 = e3?.neighbourVertex2
                 visited.append(e3!)
                 if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
-                    if (v1?.row == v.row && v1?.column == v.column) {
+                    if (v1?.row != v.row || v1?.column != v.column) {
+                        queue.append(v1!)
+                    }
+                }
+                else if (v1?.cornerObject != nil) {
+                    if v1!.cornerObject?.type == .Knight && v1!.row == b?.row && v1!.column == b?.column && v1?.cornerObject?.owner != myPlayerIndex {
+                        queue.append(v1!)
+                    }
+                }
+                
+                if (v2?.cornerObject == nil || v2?.cornerObject?.owner == myPlayerIndex) {
+                    if (v2?.row != v.row || v2?.column != v.column) {
                         queue.append(v2!)
                     }
-                    else {
-                        queue.append(v1!)
+                }
+                else if (v2?.cornerObject != nil) {
+                    if v2!.cornerObject?.type == .Knight && v2!.row == b?.row && v2!.column == b?.column && v2?.cornerObject?.owner != myPlayerIndex {
+                        queue.append(v2!)
                     }
                 }
             }
@@ -1058,7 +1110,7 @@ class GameScene: SKScene {
     }
     
     func replacementExists(row: Int, col: Int) -> Bool {
-        let start = players[myPlayerIndex].ownedKnights.first(where:{$0.row == row && $0.column == col})
+        let start = handler.landHexVertexArray.first(where:{$0.row == row && $0.column == col})
         var queue : [LandHexVertex] = []
         var visited : [LandHexEdge] = []
         queue.append(start!)
@@ -1095,10 +1147,12 @@ class GameScene: SKScene {
                 let v2 = e2?.neighbourVertex2
                 visited.append(e2!)
                 if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
-                    if (v1?.row == v.row && v1?.column == v.column) {
-                        queue.append(v2!)
+                    if (v1?.row != v.row || v1?.column != v.column) {
+                        queue.append(v1!)
                     }
-                    else {
+                }
+                if (v2?.cornerObject == nil || v2?.cornerObject?.owner == myPlayerIndex) {
+                    if (v2?.row != v.row || v2?.column != v.column) {
                         queue.append(v1!)
                     }
                 }
@@ -1109,10 +1163,12 @@ class GameScene: SKScene {
                 let v2 = e3?.neighbourVertex2
                 visited.append(e3!)
                 if (v1?.cornerObject == nil || v1?.cornerObject?.owner == myPlayerIndex) {
-                    if (v1?.row == v.row && v1?.column == v.column) {
-                        queue.append(v2!)
+                    if (v1?.row != v.row || v1?.column != v.column) {
+                        queue.append(v1!)
                     }
-                    else {
+                }
+                if (v2?.cornerObject == nil || v2?.cornerObject?.owner == myPlayerIndex) {
+                    if (v2?.row != v.row || v2?.column != v.column) {
                         queue.append(v1!)
                     }
                 }
@@ -3174,7 +3230,12 @@ class GameScene: SKScene {
                     }
                 case .WillRemoveMetropolis:
                     let removed = reduceMetropolis(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
-                    if removed {players[myPlayerIndex].nextAction = .WillDoNothing}
+                    if removed {
+                        players[myPlayerIndex].nextAction = .WillDoNothing
+                        players[myPlayerIndex].nextAction = .WillDoNothing
+                        let sent = self.appDelegate.networkManager.sendData(data: "intentions.\(myPlayerIndex).WillDoNothing")
+                        if !sent {print("failed to send player intentions")}
+                }
                 default: break
             }
         }

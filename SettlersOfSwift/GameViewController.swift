@@ -104,7 +104,6 @@ class GameViewController: UIViewController, NetworkDelegate {
             var canMoveKnight = false
             for knight in scenePort.players[scenePort.myPlayerIndex].ownedKnights {
                 if !knight.cornerObject!.isActive || knight.cornerObject!.didActionThisTurn { continue }
-                if !scenePort.replacementExists(row: knight.row, col: knight.column) { continue }
                 canMoveKnight = true
                 break
             }
