@@ -25,7 +25,7 @@ class Player {
     var sheepTradeRatio = 4
     var brick = 0
     var brickTradeRatio = 4
-    var gold = 0
+    var gold = 2
     var goldTradeRatio = 2
     
     var progressCards = [ProgressCardsType]()
