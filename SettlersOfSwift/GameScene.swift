@@ -632,6 +632,9 @@ class GameScene: SKScene {
             sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
             if (!sent) { print ("failed to sync cornerObject") }
             
+            let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+            
             return true
         }
         
@@ -686,7 +689,7 @@ class GameScene: SKScene {
         handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "robber"}), forColumn: hex!.center!.column, row: hex!.center!.row)
         hex?.center?.hasRobber = true
         
-        let cornerObjectInfo = "moveRobber.\(oldHex!.column),\(oldHex!.row),\(column),\(row)"
+        let cornerObjectInfo = "moveRobber.\(oldHex!.column).\(oldHex!.row).\(column).\(row)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -701,7 +704,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
         if(hex == nil) { return false }
-        if(hex?.type != .water || hex?.type != .fish) { return false }
+        if(hex?.type != .water && hex?.type != .fish) { return false }
         
         let oldHex = handler.landHexArray.first(where: {$0.center?.hasPirate == true})
         oldHex?.center?.hasPirate = false
@@ -710,7 +713,7 @@ class GameScene: SKScene {
         handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "pirate"}), forColumn: hex!.center!.column, row: hex!.center!.row)
         hex?.center?.hasPirate = true
         
-        let cornerObjectInfo = "movePirate.\(oldHex!.column),\(oldHex!.row),\(column),\(row)"
+        let cornerObjectInfo = "movePirate.\(oldHex!.column).\(oldHex!.row).\(column).\(row)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1982,6 +1985,7 @@ class GameScene: SKScene {
         
         cityCorner?.cornerObject?.type = .Settlement
         cityCorner?.cornerObject?.hasCityWall = false
+        players[myPlayerIndex].victoryPoints += 1
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(cityCorner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -2561,7 +2565,7 @@ class GameScene: SKScene {
                     } else {
                         numberResources = 1
                     }
-                    if (vertex.tile1.column == col && vertex.tile1.row == row) {
+                    if (vertex.tile1.column == col && vertex.tile1.row == row && (!(vertex.tile1.center?.hasRobber)! || !(vertex.tile1.center?.hasPirate)!) ) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
                             case .wood:
@@ -2615,7 +2619,7 @@ class GameScene: SKScene {
                             default: break
                         }
                     }
-                    if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
+                    if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row && (!(vertex.tile2?.center?.hasRobber)! || !(vertex.tile2?.center?.hasPirate)!) ) {
                         // Distribute resources of type tile2.type
                         switch vertex.tile2!.type! {
                             case .wood:
@@ -2669,7 +2673,7 @@ class GameScene: SKScene {
                             default: break
                         }
                     }
-                    if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
+                    if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row && (!(vertex.tile3!.center?.hasRobber)! || !(vertex.tile3!.center?.hasPirate)!) ) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
                             case .wood:
