@@ -2856,6 +2856,7 @@ class GameScene: SKScene {
     }
     
     func endTurn(player: Int) {
+        players[player].merchantFleetSelect = nil
         players[player].nextAction = .WillDoNothing
         for knightCorner in players[player].ownedKnights {
             let knight = knightCorner.cornerObject
@@ -3394,6 +3395,20 @@ class GameScene: SKScene {
             }
             gameState.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
+        
+        //  updates other player's progress cards data
+        players[myPlayerIndex].receivedPeersCards = false
+        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 1) % 3)")
+        while !players[myPlayerIndex].receivedPeersCards { }
+        players[myPlayerIndex].receivedPeersCards = false
+        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 2) % 3)")
+        while !players[myPlayerIndex].receivedPeersCards { }
+        players[myPlayerIndex].dataReceived = false
+        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 1) % 3)")
+        while !players[myPlayerIndex].dataReceived { }
+        players[myPlayerIndex].dataReceived = false
+        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 2) % 3)")
+        while !players[myPlayerIndex].dataReceived { }
         
         for index in 0..<players.count {
             let player = players[index]
