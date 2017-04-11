@@ -575,6 +575,25 @@ class GameViewController: UIViewController, NetworkDelegate {
                         self.present(alert, animated: true, completion: nil)
                     default: break
                 }
+        case "stealPlayerResourceOrCommodity":
+            if Int(message[1])! == scenePort.myPlayerIndex {
+                switch message[2] {
+                case "BRICK": scenePort.players[scenePort.myPlayerIndex].brick -= 1
+                case "GOLD": scenePort.players[scenePort.myPlayerIndex].gold -= 1
+                case "SHEEP": scenePort.players[scenePort.myPlayerIndex].sheep -= 1
+                case "STONE": scenePort.players[scenePort.myPlayerIndex].stone -= 1
+                case "WHEAT": scenePort.players[scenePort.myPlayerIndex].wheat -= 1
+                case "WOOD": scenePort.players[scenePort.myPlayerIndex].wood -= 1
+                case "COIN": scenePort.players[scenePort.myPlayerIndex].coin -= 1
+                case "PAPER": scenePort.players[scenePort.myPlayerIndex].paper -= 1
+                case "CLOTH": scenePort.players[scenePort.myPlayerIndex].cloth -= 1
+                default: break
+                }
+                let announcement = "Someone has stolen one of your " + message[1] + "..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
             case "metropolis":
                 let type = ProgressCardsCategory(rawValue: message[1])!
                 let player = Int(message[2])!
@@ -691,6 +710,13 @@ class GameViewController: UIViewController, NetworkDelegate {
                 reference.movedShipThisTurn = message[38] == "1" ? true : false
                 reference.merchantFleetSelect = message[39] == "2" ? nil : SelectedItem(rawValue: message[39])!
                 scenePort.players[scenePort.myPlayerIndex].dataReceived = true
+            case "refreshVictoryPoints":
+                if Int(message[1])! == scenePort.myPlayerIndex {
+                    let _ = appDelegate.networkManager.sendData(data: "myVictoryPointsUpdate.\(scenePort.myPlayerIndex).\(scenePort.players[scenePort.myPlayerIndex].victoryPoints)")
+                }
+            case "myVictoryPointsUpdate":
+                scenePort.players[Int(message[1])!].victoryPoints = Int(message[2])!
+                scenePort.players[scenePort.myPlayerIndex].victoryPointsRefreshed = true
             default:
                 print("Unknown message")
         }

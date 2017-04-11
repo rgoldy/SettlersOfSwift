@@ -78,6 +78,8 @@ class Player {
     
     var merchantFleetSelect: SelectedItem? = nil
     
+    var victoryPointsRefreshed = false
+    
     init(name : String, playerNumber : Int) {
         self.name = name
         switch playerNumber {
