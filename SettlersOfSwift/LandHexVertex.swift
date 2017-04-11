@@ -23,6 +23,7 @@ class LandHexVertex {
     var isCenter: Bool = false
     var hasRobber: Bool = false
     var hasPirate: Bool = false
+    var isValidFish: Bool = false
     
     init(tile1: LandHex, column : Int, row : Int) {
         self.tile1 = tile1

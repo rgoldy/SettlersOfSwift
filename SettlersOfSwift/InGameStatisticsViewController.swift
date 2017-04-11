@@ -51,10 +51,44 @@ class InGameStatisticsViewController: UIViewController {
     
     func getPlayerDescription(playerIndex: Int, isPlayer: Bool) -> String {
         let somePlayer = gameDataReference.scenePort.players[playerIndex]
-        var description = ""
-        description += somePlayer.name + "(" + somePlayer.color.rawValue + ")\n\n"
-        description += "{ . . . }"
+        
         //  COMPOSE STRING TO RETURN WITH DETAILED PLAYER DESCRIPTION
+        var description = ""
+        description += somePlayer.name + "\n(" + somePlayer.color.rawValue + " Player)\n\n"
+        description += "Victory Points: \(somePlayer.victoryPoints)\n\n"
+        
+        var numSet = 0
+        var numCit = 0
+        var numMet = 0
+        for corner in gameDataReference.scenePort.players[playerIndex].ownedCorners {
+            if corner.cornerObject?.type == .Settlement {
+                numSet += 1
+            }
+            else if corner.cornerObject?.type == .City {
+                numCit += 1
+            }
+            else {
+                numMet += 1
+            }
+        }
+        description += "Number of Settlements: \(numSet)\n"
+        description += "Number of Cities: \(numCit)\n"
+        description += "Number of Metropolis: \(numMet)\n\n"
+        
+        var numKnight = 0
+        var totalStrength = 0
+        var activeStrength = 0
+        for knight in gameDataReference.scenePort.players[playerIndex].ownedKnights {
+            numKnight += 1
+            if (knight.cornerObject?.isActive == true) {
+                activeStrength += (knight.cornerObject?.strength)!
+            }
+            totalStrength += (knight.cornerObject?.strength)!
+        }
+        description += "Number of Knights: \(numKnight)\n"
+        description += "Active Knight Strength: \(activeStrength)\n"
+        description += "Total Knight Strength: \(totalStrength)\n"
+        
         return description
     }
     

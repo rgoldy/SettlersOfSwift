@@ -42,6 +42,7 @@ class Player {
     var canBuildMetropolis = 0
     
     var nextAction: PlayerIntentions = .WillDoNothing
+    var canMoveOutlaw = false
     
     var paper = 0
     var paperTradeRatio = 4

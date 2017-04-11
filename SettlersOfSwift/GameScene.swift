@@ -2424,7 +2424,15 @@ class GameScene: SKScene {
             if !robberRemoved {
                 let _ = appDelegate.networkManager.sendData(data: "robberDiscardScenario")
                 checkIfCardsNeedDiscard()
-        }   }
+            }
+            if (!robberRemoved || !pirateRemoved) && currentPlayer == myPlayerIndex {
+                players[myPlayerIndex].canMoveOutlaw = true
+                let alert = UIAlertController(title: "Move Robber or Pirate", message: "Move either the robber, pirate, or choose to do nothing.", preferredStyle: .alert)
+                let alertAction = UIAlertAction(title: "Robber", style: .default, handler: nil)
+                alert.addAction(alertAction)
+                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
+        }
         
         // distribute resources on other players' devices
         let sent = appDelegate.networkManager.sendData(data: diceData)
@@ -2578,6 +2586,7 @@ class GameScene: SKScene {
                             case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
                             case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
+                                if !vertex.isValidFish {break}
                                 var newFish = drawFishCard()
                         
                                 if (newFish == -1) { /* Deck is empty */ }
@@ -2631,6 +2640,7 @@ class GameScene: SKScene {
                             case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
                             case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
+                             if !vertex.isValidFish {break}
                              var newFish = drawFishCard()
                              
                              if (newFish == -1) { /* Deck is empty */ }
@@ -2684,6 +2694,7 @@ class GameScene: SKScene {
                             case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
                             case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
+                             if !vertex.isValidFish {break}
                              var newFish = drawFishCard()
                              
                              if (newFish == -1) { /* Deck is empty */ }
@@ -2989,6 +3000,7 @@ class GameScene: SKScene {
             edge.edgeObject?.justBuilt = false
         }
         
+        players[player].canMoveOutlaw = false
         players[player].movedShipThisTurn = false
     }
     
@@ -3874,6 +3886,29 @@ class GameScene: SKScene {
         }
     }
     
+    func moveRobberOrPirate() {
+        if currentPlayer != myPlayerIndex { return }
+        let alert = UIAlertController(title: "Move Robber or Pirate", message: "change later", preferredStyle: .actionSheet)
+        let robber = UIAlertAction(title: "Robber", style: .default, handler: { action -> Void in
+            self.players[self.myPlayerIndex].nextAction = .WillMoveRobber
+        })
+        let pirate = UIAlertAction(title: "Priate", style: .default, handler: { action -> Void in
+            self.players[self.myPlayerIndex].nextAction = .WillMovePirate
+        })
+        let nothing = UIAlertAction(title: "Nothing", style: .default, handler: { action -> Void in
+            self.players[self.myPlayerIndex].nextAction = .WillMoveRobber
+        })
+        
+        if !robberRemoved {
+            alert.addAction(robber)
+        }
+        if !pirateRemoved {
+            alert.addAction(pirate)
+        }
+        alert.addAction(nothing)
+        self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+    }
+    
     func robberCardDiscard(originalAmount: Int, amount: Int) {
         if originalAmount == amount {
             let alert = UIAlertController(title: "Robber Roll", message: "You have more than 7 resources or commodities cards on you! Let's discard half of them!", preferredStyle: .alert)
@@ -3887,63 +3922,63 @@ class GameScene: SKScene {
             if players[myPlayerIndex].brick > 0 {
                 let brickAction = UIAlertAction(title: "BRICK(\(players[myPlayerIndex].brick))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].brick -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate(); return }
                 })
                 actionSheet.addAction(brickAction)
             }
             if players[myPlayerIndex].gold > 0 {
                 let goldAction = UIAlertAction(title: "GOLD(\(players[myPlayerIndex].gold))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].gold -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate(); return }
                 })
                 actionSheet.addAction(goldAction)
             }
             if players[myPlayerIndex].sheep > 0 {
                 let sheepAction = UIAlertAction(title: "SHEEP(\(players[myPlayerIndex].sheep))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].sheep -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(sheepAction)
             }
             if players[myPlayerIndex].stone > 0 {
                 let stoneAction = UIAlertAction(title: "STONE(\(players[myPlayerIndex].stone))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].stone -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(stoneAction)
             }
             if players[myPlayerIndex].wheat > 0 {
                 let wheatAction = UIAlertAction(title: "WHEAT(\(players[myPlayerIndex].wheat))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].wheat -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(wheatAction)
             }
             if players[myPlayerIndex].wood > 0 {
                 let woodAction = UIAlertAction(title: "WOOD(\(players[myPlayerIndex].wood))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].wood -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(woodAction)
             }
             if players[myPlayerIndex].coin > 0 {
                 let coinAction = UIAlertAction(title: "COIN(\(players[myPlayerIndex].coin))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].coin -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(coinAction)
             }
             if players[myPlayerIndex].paper > 0 {
                 let paperAction = UIAlertAction(title: "PAPER(\(players[myPlayerIndex].paper))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].paper -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(paperAction)
             }
             if players[myPlayerIndex].cloth > 0 {
                 let clothAction = UIAlertAction(title: "CLOTH(\(players[myPlayerIndex].cloth))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].cloth -= 1
-                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
+                    if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { self.moveRobberOrPirate();return }
                 })
                 actionSheet.addAction(clothAction)
             }
@@ -3953,6 +3988,8 @@ class GameScene: SKScene {
     func checkIfCardsNeedDiscard() {
         let discardCount = players[myPlayerIndex].mustRemoveHalfOfHand()
         if discardCount != 0 { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
+        else { moveRobberOrPirate() }
+        
     }
     
     func stealFromPlayer(_ index: Int) {

@@ -38,6 +38,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     func wireButtonFunctionalities() {
+        gameDataReference.scenePort.sendPlayerData(player: gameDataReference.scenePort.myPlayerIndex)
         if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish > 1 { topLeftButton.isEnabled = true } else { topLeftButton.isEnabled = false }
         if gameDataReference.scenePort.pirateRemoved && gameDataReference.scenePort.robberRemoved { topLeftButton.isEnabled = false }
         if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish > 2 { middleLeftButton.isEnabled = true } else { middleLeftButton.isEnabled = false }
@@ -63,6 +64,7 @@ class InGameMiscellaneousViewController: UIViewController {
         if !gameDataReference.scenePort.pirateRemoved || !gameDataReference.scenePort.robberRemoved {
             gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillRemoveOutlaw
             gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 2
+            
         }
         self.tabBarController?.navigationController?.popViewController(animated: true)
     }
