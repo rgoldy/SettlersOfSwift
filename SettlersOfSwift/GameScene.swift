@@ -2770,6 +2770,7 @@ class GameScene: SKScene {
     }
     
     func endTurn(player: Int) {
+        players[player].merchantFleetSelect = nil
         players[player].nextAction = .WillDoNothing
         for knightCorner in players[player].ownedKnights {
             let knight = knightCorner.cornerObject

@@ -76,6 +76,8 @@ class Player {
     
     var dataReceived = false
     
+    var merchantFleetSelect: SelectedItem? = nil
+    
     init(name : String, playerNumber : Int) {
         self.name = name
         switch playerNumber {

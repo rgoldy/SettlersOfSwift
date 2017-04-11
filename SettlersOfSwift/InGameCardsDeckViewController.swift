@@ -108,8 +108,11 @@ class InGameCardsDeckViewController: UIViewController {
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
             case .Engineer: //  NOT IMPLEMENTED
-                break
-                //
+                let announcement = "This card may only be used from the flip charts screen when purchasing a city wall..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                //  ONE CITY WALL FOR FREE
             case .Inventor: //  NOT IMPLEMENTED
                 break
                 //
@@ -117,18 +120,27 @@ class InGameCardsDeckViewController: UIViewController {
                 break
                 //
             case .Medicine: //  NOT IMPLEMENTED
-                break
-                //
+                let announcement = "This card may only be used from the flip charts screen when upgrading a settlement..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                //  SETTLEMENT UPGRADES NOW COST TWO ORE AND ONE GRAIN FOR ONE
             case .Mining:   //  NOT IMPLEMENTED
                 break
                 //
             case .Printer: break
             case .RoadBuilding: //  NOT IMPLEMENTED
-                break
-                //
+                let announcement = "This card may only be used from the flip charts screen when purchasing a road..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                //  BUILD TWO ROADS FOR FREE
             case .Smith:    //  NOT IMPLEMENTED
-                break
-                //
+                let announcement = "This card may only be used from the flip charts screen when promoting a knight..."
+                let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                //  PROMOTE TWO KNIGHTS FOR FREE
             case .Bishop:   //  NOT IMPLEMENTED
                 break
                 //
@@ -144,7 +156,7 @@ class InGameCardsDeckViewController: UIViewController {
                 //
             case .Saboteur: //  NOT IMPLEMENTED
                 break
-                //
+                //  PLAYERS WITH EQUALLY MANY OR MORE VICTORY POINTS DISCARD HALF OF THEIR CARDS
             case .Spy:
                 let announcement = "Would you like to use The Spy Progress Card...?"
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
@@ -214,6 +226,7 @@ class InGameCardsDeckViewController: UIViewController {
                 self.present(alert, animated: true, completion: nil)
             case .Warlord:  //  NOT IMPLEMENTED
                 break
+                //  ALL KNIGHTS ACTIVATION ARE FREE
             case .Wedding:
                 let announcement = "Would you like to use The Wedding Progress Card...?"
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
@@ -231,16 +244,115 @@ class InGameCardsDeckViewController: UIViewController {
                 self.present(alert, animated: true, completion: nil)
             case .CommercialHarbor: //  NOT IMPLEMENTED
                 break
-                //
+                //  FOR EACH PLAYER GIVE ONE RESOURCE AND RECEIVE ONE COMMODITY, INVALIDATED IF NOT ENOUGH RESOURCE / COMMIDITY
             case .MasterMerchant:   //  NOT IMPLEMENTED
                 break
-                //
+                //  CHOOSE TWO RESOURCES AND / OR COMMODITIES CARDS FROM A PLAYER WITH MORE VICTORY POINTS TO ADD TO OWN HANDS
             case .Merchant: //  NOT IMPLEMENTED
                 break
                 //
-            case .MerchantFleet:    //  NOT IMPLEMENTED
-                break
-                //
+            case .MerchantFleet:
+                let actionSheet = UIAlertController(title: nil, message: "Select an item to trade at 2 : 1 ratio for current turn...", preferredStyle: .alert)
+                let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Brick
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(brickResource)
+                let goldResource = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Gold
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(goldResource)
+                let sheepResource = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Sheep
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(sheepResource)
+                let stoneResource = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Stone
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(stoneResource)
+                let wheatResource = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Wheat
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(wheatResource)
+                let woodResource = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Wood
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(woodResource)
+                let coinResource = UIAlertAction(title: "Coin", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Coin
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(coinResource)
+                let paperResource = UIAlertAction(title: "Paper", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Paper
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(paperResource)
+                let clothResource = UIAlertAction(title: "Cloth", style: .default) { action -> Void in
+                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect = .Cloth
+                    for index in 0..<self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.count {
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards[index] == card {
+                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.remove(at: index)
+                            break
+                    }   }
+                    self.currentDisplayIndex = 0
+                    self.updateCardsDisplayWithStartingIndex(self.currentDisplayIndex)
+                }
+                actionSheet.addAction(clothResource)
+                self.present(actionSheet, animated: true, completion: nil)
             case .ResourceMonopoly:
                 sceneReference.players[sceneReference.myPlayerIndex].fetchedTargetData = false
                 var message = "getTradeResources.\((sceneReference.myPlayerIndex + 1) % 3)"

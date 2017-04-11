@@ -87,15 +87,15 @@ class InGameTradeViewController: UIViewController {
         if segmentSelector.selectedSegmentIndex == 0 {
             if selectedSource != .None, selectedTarget != .None {
                 switch selectedSource {
-                    case .Brick: myPlayerIndex.brick -= myPlayerIndex.brickTradeRatio
-                    case .Gold: myPlayerIndex.gold -= myPlayerIndex.goldTradeRatio
-                    case .Sheep: myPlayerIndex.sheep -= myPlayerIndex.sheepTradeRatio
-                    case.Stone: myPlayerIndex.stone -= myPlayerIndex.stoneTradeRatio
-                    case .Wheat: myPlayerIndex.wheat -= myPlayerIndex.wheatTradeRatio
-                    case .Wood: myPlayerIndex.wood -= myPlayerIndex.woodTradeRatio
-                    case .Coin: myPlayerIndex.coin -= myPlayerIndex.coinTradeRatio
-                    case .Paper: myPlayerIndex.paper -= myPlayerIndex.paperTradeRatio
-                    case .Cloth: myPlayerIndex.cloth -= myPlayerIndex.clothTradeRatio
+                    case .Brick: myPlayerIndex.brick -= myPlayerIndex.merchantFleetSelect == .Brick ? 2 : myPlayerIndex.brickTradeRatio
+                    case .Gold: myPlayerIndex.gold -= myPlayerIndex.merchantFleetSelect == .Gold ? 2 : myPlayerIndex.goldTradeRatio
+                    case .Sheep: myPlayerIndex.sheep -= myPlayerIndex.merchantFleetSelect == .Sheep ? 2 : myPlayerIndex.sheepTradeRatio
+                    case.Stone: myPlayerIndex.stone -= myPlayerIndex.merchantFleetSelect == .Stone ? 2 : myPlayerIndex.stoneTradeRatio
+                    case .Wheat: myPlayerIndex.wheat -= myPlayerIndex.merchantFleetSelect == .Wheat ? 2 : myPlayerIndex.wheatTradeRatio
+                    case .Wood: myPlayerIndex.wood -= myPlayerIndex.merchantFleetSelect == .Wood ? 2 : myPlayerIndex.woodTradeRatio
+                    case .Coin: myPlayerIndex.coin -= myPlayerIndex.merchantFleetSelect == .Coin ? 2 : myPlayerIndex.coinTradeRatio
+                    case .Paper: myPlayerIndex.paper -= myPlayerIndex.merchantFleetSelect == .Paper ? 2 : myPlayerIndex.paperTradeRatio
+                    case .Cloth: myPlayerIndex.cloth -= myPlayerIndex.merchantFleetSelect == .Cloth ? 2 : myPlayerIndex.clothTradeRatio
                     case .None: break;
                 }
                 switch selectedTarget {
@@ -194,7 +194,7 @@ class InGameTradeViewController: UIViewController {
         sourceBrick.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Brick
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].brickTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Brick ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].brickTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsGold(_ sender: Any) {
@@ -203,7 +203,7 @@ class InGameTradeViewController: UIViewController {
         sourceGold.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Gold
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].goldTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Gold ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].goldTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsSheep(_ sender: Any) {
@@ -212,7 +212,7 @@ class InGameTradeViewController: UIViewController {
         sourceSheep.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Sheep
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].sheepTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Sheep ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].sheepTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsStone(_ sender: Any) {
@@ -221,7 +221,7 @@ class InGameTradeViewController: UIViewController {
         sourceStone.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Stone
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].stoneTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Stone ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].stoneTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsWheat(_ sender: Any) {
@@ -230,7 +230,7 @@ class InGameTradeViewController: UIViewController {
         sourceWheat.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Wheat
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].wheatTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Wheat ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].wheatTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsWood(_ sender: Any) {
@@ -239,7 +239,7 @@ class InGameTradeViewController: UIViewController {
         sourceWood.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Wood
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].woodTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Wood ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].woodTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsCoin(_ sender: Any) {
@@ -248,7 +248,7 @@ class InGameTradeViewController: UIViewController {
         sourceCoin.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Coin
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].coinTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Coin ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].coinTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsPaper(_ sender: Any) {
@@ -257,7 +257,7 @@ class InGameTradeViewController: UIViewController {
         sourcePaper.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Paper
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].paperTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Paper ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].paperTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedSourceAsCloth(_ sender: Any) {
@@ -266,7 +266,7 @@ class InGameTradeViewController: UIViewController {
         sourceCloth.setTitleColor(UIColor.orange, for: UIControlState.normal)
         selectedSource = .Cloth
         performTrade.isEnabled = selectedSource != .None && selectedTarget != .None
-        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].clothTradeRatio) : 1", for: UIControlState.disabled) }
+        if segmentSelector.selectedSegmentIndex == 0 { ratioSelector.setTitle("\(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].merchantFleetSelect == .Cloth ? 2 : gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].clothTradeRatio) : 1", for: UIControlState.disabled) }
     }
     
     @IBAction func selectedTargetAsBrick(_ sender: Any) {
@@ -358,15 +358,15 @@ class InGameTradeViewController: UIViewController {
         for item in buttonsCollection { item.setTitleColor(UIColor.blue, for: UIControlState.normal) }
         let myPlayerIndex = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         if segmentSelector.selectedSegmentIndex == 0 {
-            if myPlayerIndex.brick < myPlayerIndex.brickTradeRatio { sourceBrick.isEnabled = false } else { sourceBrick.isEnabled = true }
-            if myPlayerIndex.gold < myPlayerIndex.goldTradeRatio { sourceGold.isEnabled = false } else { sourceGold.isEnabled = true }
-            if myPlayerIndex.sheep < myPlayerIndex.sheepTradeRatio { sourceSheep.isEnabled = false } else { sourceSheep.isEnabled = true }
-            if myPlayerIndex.stone < myPlayerIndex.stoneTradeRatio { sourceStone.isEnabled = false } else { sourceStone.isEnabled = true }
-            if myPlayerIndex.wheat < myPlayerIndex.wheatTradeRatio { sourceWheat.isEnabled = false } else { sourceWheat.isEnabled = true }
-            if myPlayerIndex.wood < myPlayerIndex.woodTradeRatio { sourceWood.isEnabled = false } else { sourceWood.isEnabled = true }
-            if myPlayerIndex.coin < myPlayerIndex.coinTradeRatio { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
-            if myPlayerIndex.paper < myPlayerIndex.paperTradeRatio { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
-            if myPlayerIndex.cloth < myPlayerIndex.clothTradeRatio { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
+            if myPlayerIndex.brick < (myPlayerIndex.merchantFleetSelect == .Brick ? 2 : myPlayerIndex.brickTradeRatio) { sourceBrick.isEnabled = false } else { sourceBrick.isEnabled = true }
+            if myPlayerIndex.gold < (myPlayerIndex.merchantFleetSelect == .Gold ? 2 : myPlayerIndex.goldTradeRatio) { sourceGold.isEnabled = false } else { sourceGold.isEnabled = true }
+            if myPlayerIndex.sheep < (myPlayerIndex.merchantFleetSelect == .Sheep ? 2 : myPlayerIndex.sheepTradeRatio) { sourceSheep.isEnabled = false } else { sourceSheep.isEnabled = true }
+            if myPlayerIndex.stone < (myPlayerIndex.merchantFleetSelect == .Stone ? 2 : myPlayerIndex.stoneTradeRatio) { sourceStone.isEnabled = false } else { sourceStone.isEnabled = true }
+            if myPlayerIndex.wheat < (myPlayerIndex.merchantFleetSelect == .Wheat ? 2 : myPlayerIndex.wheatTradeRatio) { sourceWheat.isEnabled = false } else { sourceWheat.isEnabled = true }
+            if myPlayerIndex.wood < (myPlayerIndex.merchantFleetSelect == .Wood ? 2 : myPlayerIndex.woodTradeRatio) { sourceWood.isEnabled = false } else { sourceWood.isEnabled = true }
+            if myPlayerIndex.coin < (myPlayerIndex.merchantFleetSelect == .Coin ? 2 : myPlayerIndex.coinTradeRatio) { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
+            if myPlayerIndex.paper < (myPlayerIndex.merchantFleetSelect == .Paper ? 2 : myPlayerIndex.paperTradeRatio) { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
+            if myPlayerIndex.cloth < (myPlayerIndex.merchantFleetSelect == .Cloth ? 2 : myPlayerIndex.clothTradeRatio) { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
             ratioSelector.setTitle("* : 1", for: UIControlState.disabled)
             ratioSelector.isEnabled = false
         } else {

@@ -647,6 +647,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                     returnMessage += ".\(reference.movingKnightFromRow)"
                     returnMessage += ".\(reference.movingKnightFromCol)"
                     returnMessage += ".\(reference.movedShipThisTurn ? 1 : 0)"
+                    returnMessage += reference.merchantFleetSelect == nil ? "2" : reference.merchantFleetSelect!.rawValue
                     let _ = appDelegate.networkManager.sendData(data: returnMessage)
                 }
             case "returnedMiscellaneousData":
@@ -688,6 +689,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 reference.movingKnightFromRow = Int(message[36])!
                 reference.movingKnightFromCol = Int(message[37])!
                 reference.movedShipThisTurn = message[38] == "1" ? true : false
+                reference.merchantFleetSelect = message[39] == "2" ? nil : SelectedItem(rawValue: message[39])!
                 scenePort.players[scenePort.myPlayerIndex].dataReceived = true
             default:
                 print("Unknown message")
