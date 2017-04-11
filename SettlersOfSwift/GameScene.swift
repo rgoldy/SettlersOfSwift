@@ -295,6 +295,12 @@ class GameScene: SKScene {
             if(handler.landHexDictionary[value] == nil) { handler.landHexDictionary[value] = [] }
             handler.landHexDictionary[value]!.append((column!, row!))
         }
+
+        for hex in handler.landHexArray {
+            if hex.fishNumber != nil {
+                handler.landHexDictionary[hex.fishNumber!]?.append((hex.column, hex.row))
+            }
+        }
     }
     
     func initPlayers() {
@@ -632,6 +638,9 @@ class GameScene: SKScene {
             sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
             if (!sent) { print ("failed to sync cornerObject") }
             
+            let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+            handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+            
             return true
         }
         
@@ -800,7 +809,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
         if (edge == nil) { return false }
-        if (edge?.tile2?.type != hexType.water) { return false }
+        if (edge?.tile2?.type != hexType.water && edge?.tile2?.type != .fish) { return false }
         if (edge?.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
         if (!hasResourcesForNewShip() && players[currentPlayer].nextAction != .WillBuildShipForFree) { return false }
@@ -1982,6 +1991,7 @@ class GameScene: SKScene {
         
         cityCorner?.cornerObject?.type = .Settlement
         cityCorner?.cornerObject?.hasCityWall = false
+        players[myPlayerIndex].victoryPoints += 1
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(cityCorner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -2569,7 +2579,7 @@ class GameScene: SKScene {
                     } else {
                         numberResources = 1
                     }
-                    if (vertex.tile1.column == col && vertex.tile1.row == row) {
+                    if (vertex.tile1.column == col && vertex.tile1.row == row && (!(vertex.tile1.center?.hasRobber)! || !(vertex.tile1.center?.hasPirate)!) ) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
                             case .wood:
@@ -2623,7 +2633,7 @@ class GameScene: SKScene {
                             default: break
                         }
                     }
-                    if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row) {
+                    if (vertex.tile2 != nil && vertex.tile2!.column == col && vertex.tile2!.row == row && (!(vertex.tile2?.center?.hasRobber)! || !(vertex.tile2?.center?.hasPirate)!) ) {
                         // Distribute resources of type tile2.type
                         switch vertex.tile2!.type! {
                             case .wood:
@@ -2677,7 +2687,7 @@ class GameScene: SKScene {
                             default: break
                         }
                     }
-                    if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row) {
+                    if (vertex.tile3 != nil && vertex.tile3!.column == col && vertex.tile3!.row == row && (!(vertex.tile3!.center?.hasRobber)! || !(vertex.tile3!.center?.hasPirate)!) ) {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
                             case .wood:

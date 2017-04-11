@@ -31,6 +31,7 @@ class LandHex {
     var onMainIsland: Bool //bool to determine if a landhex is on the main island or not
     var water: Bool //bool to indicate if this tile is a water tile or not
     var harbourType : harbourType?
+    var fishNumber : Int?
     
     init(column:Int, row: Int, type : String, onMainIsland: Bool, water: Bool) {
         self.column = column
