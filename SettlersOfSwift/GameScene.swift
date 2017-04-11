@@ -1846,15 +1846,21 @@ class GameScene: SKScene {
                     }
                     
                     let politics = UIAlertAction(title: "Politics", style: UIAlertActionStyle.default) { (alertAction) -> Void in
-                        self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &self.gameDeck)!)
-                        
+                        let newCard = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &self.gameDeck)
+                        if newCard == .Constitution {
+                            self.players[self.myPlayerIndex].victoryPoints += 1
+                            self.checkWinningConditions(who: self.myPlayerIndex)
+                        } else if newCard != nil { self.players[self.myPlayerIndex].progressCards.append(newCard!) }
                         let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.POLITICS")
                         if !sent { print("failed to send draw progress card") }
                     }
                     
                     let science = UIAlertAction(title: "Science", style: UIAlertActionStyle.default) { (alertAction) -> Void in
-                        self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &self.gameDeck)!)
-                        
+                        let newCard = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &self.gameDeck)
+                        if newCard == .Printer {
+                            self.players[self.myPlayerIndex].victoryPoints += 1
+                            self.checkWinningConditions(who: self.myPlayerIndex)
+                        } else if newCard != nil { self.players[self.myPlayerIndex].progressCards.append(newCard!) }
                         let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.SCIENCES")
                         if !sent { print("failed to send draw progress card") }
                     }

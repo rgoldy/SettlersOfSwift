@@ -411,6 +411,7 @@ class InGameFlipChartsViewController: UIViewController {
                         playerReference.progressCards.remove(at: index)
                         break
                 }   }
+                self.drawCurrentChartScene()
             }))
             alert.addAction(UIAlertAction(title: "NO", style: .default, handler: { (action) in
                 switch self.chartsSceneIndex {

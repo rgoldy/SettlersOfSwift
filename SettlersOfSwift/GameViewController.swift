@@ -187,14 +187,14 @@ class GameViewController: UIViewController, NetworkDelegate {
     }
     
     func setAppearanceForMenuButton() {
-        if scenePort.myPlayerIndex != -1 {
-            let playerColor = scenePort.players[scenePort.myPlayerIndex].color
-            switch playerColor {
-                case .Blue: menuButton.backgroundColor = UIColor.blue
-                case .Orange: menuButton.backgroundColor = UIColor.orange
-                case .Red: menuButton.backgroundColor = UIColor.red
-            }
-        } else { menuButton.backgroundColor = UIColor.black }
+//        if scenePort.myPlayerIndex != -1 {
+//            let playerColor = scenePort.players[scenePort.myPlayerIndex].color
+//            switch playerColor {
+//                case .Blue: menuButton.backgroundColor = UIColor.blue
+//                case .Orange: menuButton.backgroundColor = UIColor.orange
+//                case .Red: menuButton.backgroundColor = UIColor.red
+//            }
+//        } else { menuButton.backgroundColor = UIColor.black }
         //  CUSTOMIZES MENU BUTTON APPEARANCE
     }
     
@@ -819,8 +819,54 @@ class GameViewController: UIViewController, NetworkDelegate {
     }   }
     
     @IBAction func endCurrentPlayerTurn(_ sender: Any) {
-        //  REPLACES END TURN FOR CURRENT PLAYER FROM SCENE FILE
-        //  CURRENTLY DOES NOTHING AT ALL
+        if(scenePort.currentPlayer == scenePort.myPlayerIndex) { //only accept taps if it's your turn
+            switch scenePort.currGamePhase {
+            case .p1Turn :
+                var ready = true
+                for p in scenePort.players {
+                    if p.nextAction != .WillDoNothing {ready = false; break}
+                }
+                if (scenePort.rolled && ready && !scenePort.showingBootMenu) {
+                    scenePort.endTurn(player: scenePort.currentPlayer)
+                    scenePort.currentPlayer = scenePort.currentPlayer + 1
+                    scenePort.currGamePhase = GamePhase.p2Turn
+                    scenePort.sendNewCurrPlayer()
+                    scenePort.sendNewGamePhase(gamePhase: scenePort.currGamePhase)
+                    scenePort.rolled = false
+                }
+            case .p2Turn :
+                var ready = true
+                for p in scenePort.players {
+                    if p.nextAction != .WillDoNothing {ready = false; break}
+                }
+                if (scenePort.rolled && ready && !scenePort.showingBootMenu) {
+                    scenePort.endTurn(player: scenePort.currentPlayer)
+                    scenePort.currentPlayer = (scenePort.currentPlayer + 1) % scenePort.players.count
+                    if (scenePort.currentPlayer == 2) {
+                        scenePort.currGamePhase = GamePhase.p3Turn
+                    } else {
+                        scenePort.currGamePhase = GamePhase.p1Turn
+                    }
+                    scenePort.sendNewCurrPlayer()
+                    scenePort.sendNewGamePhase(gamePhase: scenePort.currGamePhase)
+                    scenePort.rolled = false
+                }
+            case .p3Turn :
+                var ready = true
+                for p in scenePort.players {
+                    if p.nextAction != .WillDoNothing {ready = false; break}
+                }
+                if (scenePort.rolled && ready && !scenePort.showingBootMenu) {
+                    scenePort.endTurn(player: scenePort.currentPlayer)
+                    scenePort.currentPlayer = 0
+                    scenePort.currGamePhase = GamePhase.p1Turn
+                    scenePort.sendNewCurrPlayer()
+                    scenePort.sendNewGamePhase(gamePhase: scenePort.currGamePhase)
+                    scenePort.rolled = false
+                }
+            default : break
+            }
+        }
     }
     
     

@@ -115,41 +115,34 @@ class InGameCardsDeckViewController: UIViewController {
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
-            case .Inventor: //  NOT IMPLEMENTED
-                break
-            case .Irrigation:   //  NOT IMPLEMENTED
-                break
-            case .Medicine: //  NOT IMPLEMENTED
+            case .Inventor: break           //  NOT IMPLEMENTED
+            case .Irrigation: break           //  NOT IMPLEMENTED
+            case .Medicine: break           //  NOT IMPLEMENTED
                 let announcement = "This card may only be used from the flip charts screen when upgrading a settlement..."
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
                 //  SETTLEMENT UPGRADES NOW COST TWO ORE AND ONE GRAIN FOR ONE
-            case .Mining:   //  NOT IMPLEMENTED
-                break
+            case .Mining: break           //  NOT IMPLEMENTED
             case .Printer: break
-            case .RoadBuilding: //  NOT IMPLEMENTED
+            case .RoadBuilding: break           //  NOT IMPLEMENTED
                 let announcement = "This card may only be used from the flip charts screen when purchasing a road..."
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
                 //  BUILD TWO ROADS FOR FREE
-            case .Smith:    //  NOT IMPLEMENTED
+            case .Smith: break           //  NOT IMPLEMENTED
                 let announcement = "This card may only be used from the flip charts screen when promoting a knight..."
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
                 //  PROMOTE TWO KNIGHTS FOR FREE
-            case .Bishop:   //  NOT IMPLEMENTED
-                break
+            case .Bishop: break           //  NOT IMPLEMENTED
             case .Constitution: break
-            case .Deserter: //  NOT IMPLEMENTED
-                break
-            case .Diplomat: //  NOT IMPLEMENTED
-                break
-            case .Intrigue: //  NOT IMPLEMENTED
-                break
-            case .Saboteur: //  NOT IMPLEMENTED
+            case .Deserter: break           //  NOT IMPLEMENTED
+            case .Diplomat: break           //  NOT IMPLEMENTED
+            case .Intrigue: break           //  NOT IMPLEMENTED
+            case .Saboteur: break           //  NOT IMPLEMENTED
                 gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].victoryPointsRefreshed = false
                 let _ = gameDataReference.appDelegate.networkManager.sendData(data: "refreshVictoryPoints.\((gameDataReference.scenePort.myPlayerIndex + 1) % 3)")
                 while !gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].victoryPointsRefreshed { }
@@ -213,9 +206,7 @@ class InGameCardsDeckViewController: UIViewController {
                 }))
                 alert.addAction(UIAlertAction(title: "NO", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
-            case .Warlord:  //  NOT IMPLEMENTED
-                break
-            
+            case .Warlord: break           //  NOT IMPLEMENTED
                 //  ALL KNIGHTS ACTIVATION ARE FREE
             case .Wedding:
                 let announcement = "Would you like to use The Wedding Progress Card...?"
@@ -887,8 +878,7 @@ class InGameCardsDeckViewController: UIViewController {
                     }
                     self.present(newAlert, animated: true, completion: nil)
             }
-            case .Merchant: //  NOT IMPLEMENTED
-                break
+            case .Merchant: break           //  NOT IMPLEMENTED
             case .MerchantFleet:
                 let actionSheet = UIAlertController(title: nil, message: "Select an item to trade at 2 : 1 ratio for current turn...", preferredStyle: .alert)
                 let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in

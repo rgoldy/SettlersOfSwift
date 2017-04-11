@@ -199,11 +199,10 @@
                                     <action selector="toggleMusicPlayback:" destination="nnZ-Iz-im3" eventType="touchUpInside" id="rth-j1-UWS"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="AHV-5z-3ea">
-                                <rect key="frame" x="680" y="358" width="35.5" height="35.5"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="AHV-5z-3ea">
+                                <rect key="frame" x="680" y="358" width="36" height="36"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" heightSizable="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <state key="normal">
+                                <state key="normal" image="END_GAME_BUTTON">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="titleShadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -1103,6 +1102,7 @@
     <resources>
         <image name="CARDS" width="30" height="30"/>
         <image name="CHARTS" width="30" height="30"/>
+        <image name="END_GAME_BUTTON" width="36" height="36"/>
         <image name="MENU_VIEW" width="36" height="36"/>
         <image name="MISCELLANEOUS" width="30" height="30"/>
         <image name="SOUND_BUTTON" width="36" height="36"/>
