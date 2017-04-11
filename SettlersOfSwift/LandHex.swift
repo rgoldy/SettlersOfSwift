@@ -27,6 +27,7 @@ class LandHex {
     var neighbouringTiles = [LandHex?]() //0 is top, 1 is top right, 2 is bot right... nil indicates water tile
     var corners = [LandHexVertex]() //object on corner of hex i.e. port, city, settlement etc..., 0 is top left, 1 is top right...
     var edges = [LandHexEdge]() //object on edge of hex i.e. boat or road, 0 is top, 1 is top right, 2 is bot right..
+    var center : LandHexVertex?
     var onMainIsland: Bool //bool to determine if a landhex is on the main island or not
     var water: Bool //bool to indicate if this tile is a water tile or not
     var harbourType : harbourType?

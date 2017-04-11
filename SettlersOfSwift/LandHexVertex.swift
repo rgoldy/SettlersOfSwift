@@ -20,7 +20,9 @@ class LandHexVertex {
     var neighbourEdges: [LandHexEdge?] = [] //array of 3 neighbouring vertices
     var isHarbour : Bool = false
     var harbourType : harbourType?
-
+    var isCenter: Bool = false
+    var hasRobber: Bool = false
+    var hasPirate: Bool = false
     
     init(tile1: LandHex, column : Int, row : Int) {
         self.tile1 = tile1

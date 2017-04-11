@@ -330,8 +330,21 @@ class tileHandler {
             let currPosition = landBackground.centerOfTile(atColumn: hex.column, row: hex.row)
             let centerVertexCol = Vertices.tileColumnIndex(fromPosition: currPosition) - 2 //need to subtract 2 from col for some reason. NOTED
             let centerVertexRow = Vertices.tileRowIndex(fromPosition: currPosition)
+            hex.center = LandHexVertex(tile1: hex, column: centerVertexCol, row: centerVertexRow)
+            hex.center?.isCenter = true
             
-            var vertex : LandHexVertex
+            //init robber
+            if(hex.column == 7 && hex.row == (NumRows - 4)) {
+                Vertices.setTileGroup(verticesTiles.tileGroups.first(where: {$0.name == "robber"}), forColumn: centerVertexCol, row: centerVertexRow)
+                hex.center?.hasRobber = true
+            }
+            //init pirate
+            if(hex.column == 4 && hex.row == (NumRows - 8)) {
+                Vertices.setTileGroup(verticesTiles.tileGroups.first(where: {$0.name == "pirate"}), forColumn: centerVertexCol, row: centerVertexRow)
+                hex.center?.hasPirate = true
+            }
+            
+                var vertex : LandHexVertex
             for i in 0...5 {
                 if (centerVertexRow % 2 == 0) {
                     if let neighbour = landHexVertexArray.first(where: {$0.column == centerVertexCol + xEvenOffsetV[i] && $0.row == centerVertexRow + yOffsetV[i]}) {
