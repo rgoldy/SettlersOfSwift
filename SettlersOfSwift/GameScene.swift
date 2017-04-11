@@ -3295,7 +3295,7 @@ class GameScene: SKScene {
                     if(pirateMoved) {
                         let playersToStealFrom = getPlayersToStealFrom(column: handler.landBackground.tileColumnIndex(fromPosition: targetLocation), row: handler.landBackground.tileRowIndex(fromPosition: targetLocation))
                         
-                        //ADD STEAL FROM PLAYER HERE
+                        for targetIndex in playersToStealFrom { stealFromPlayer(targetIndex) }
                         
                         players[currentPlayer].nextAction = .WillDoNothing
                     }
@@ -3304,7 +3304,7 @@ class GameScene: SKScene {
                     if(robberMoved) {
                         let playersToStealFrom = getPlayersToStealFrom(column: handler.landBackground.tileColumnIndex(fromPosition: targetLocation), row: handler.landBackground.tileRowIndex(fromPosition: targetLocation))
                         
-                        //ADD STEAL FROM PLAYER HERE
+                        for targetIndex in playersToStealFrom { stealFromPlayer(targetIndex) }
                         
                         players[currentPlayer].nextAction = .WillDoNothing
                     }
@@ -3827,6 +3827,92 @@ class GameScene: SKScene {
     func checkIfCardsNeedDiscard() {
         let discardCount = players[myPlayerIndex].mustRemoveHalfOfHand()
         if discardCount != 0 { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
+    }
+    
+    func stealFromPlayer(_ index: Int) {
+        players[myPlayerIndex].fetchedTargetData = false
+        let message = "getTradeResources.\(index)"
+        let _ = appDelegate.networkManager.sendData(data: message)
+        while players[myPlayerIndex].fetchedTargetData == false { }
+        var invalidCounter = 0
+        let newSheet = UIAlertController(title: "", message: "Select a resource or a commodity to steal...", preferredStyle: .actionSheet)
+        if players[index].brick > 0 {
+            let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).BRICK")
+                self.players[index].brick -= 1
+                self.players[self.myPlayerIndex].brick += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if self.players[index].gold > 0 {
+            let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).GOLD")
+                self.players[index].gold -= 1
+                self.players[self.myPlayerIndex].gold += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if players[index].sheep > 0 {
+            let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).SHEEP")
+                self.players[index].sheep -= 1
+                self.players[self.myPlayerIndex].sheep += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if self.players[index].stone > 0 {
+            let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).STONE")
+                self.players[index].stone -= 1
+                self.players[self.myPlayerIndex].stone += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if players[index].wheat > 0 {
+            let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).WHEAT")
+                self.players[index].wheat -= 1
+                self.players[self.myPlayerIndex].wheat += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if players[index].wood > 0 {
+            let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).WOOD")
+                self.players[index].wood -= 1
+                self.players[self.myPlayerIndex].wood += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if players[index].coin > 0 {
+            let commodity = UIAlertAction(title: "Coin", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).COIN")
+                self.players[index].coin -= 1
+                self.players[self.myPlayerIndex].coin += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if players[index].paper > 0 {
+            let commodity = UIAlertAction(title: "Paper", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).PAPER")
+                self.players[index].paper -= 1
+                self.players[self.myPlayerIndex].paper += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if players[index].cloth > 0 {
+            let commodity = UIAlertAction(title: "Cloth", style: .default) { action -> Void in
+                let _ = self.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\(index).CLOTH")
+                self.players[index].cloth -= 1
+                self.players[self.myPlayerIndex].cloth += 1
+            }
+            newSheet.addAction(commodity)
+        } else { invalidCounter += 1 }
+        if invalidCounter == 9 {
+            let newAlert = UIAlertController(title: nil, message: "Sorry, but looks like the player you chose is broke!", preferredStyle: .alert)
+            newAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.view?.window?.rootViewController?.present(newAlert, animated: true, completion: nil)
+        } else { self.view?.window?.rootViewController?.present(newSheet, animated: true, completion: nil) }
     }
     
     

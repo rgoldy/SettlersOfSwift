@@ -242,18 +242,18 @@ class InGameCardsDeckViewController: UIViewController {
                 self.view.addSubview(loadingView)
                 while sceneReference.players[sceneReference.myPlayerIndex].fetchedTargetData == false { }
                 loadingView.removeFromSuperview()
-                let myResourcesCount = sceneReference.players[sceneReference.myPlayerIndex].brick +
-                                       sceneReference.players[sceneReference.myPlayerIndex].gold +
-                                       sceneReference.players[sceneReference.myPlayerIndex].sheep +
-                                       sceneReference.players[sceneReference.myPlayerIndex].stone +
-                                       sceneReference.players[sceneReference.myPlayerIndex].wheat +
-                                       sceneReference.players[sceneReference.myPlayerIndex].wood
-                let previousPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].coin +
-                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].paper +
-                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].cloth
-                let nextPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].coin +
-                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].paper +
-                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].cloth
+//                let myResourcesCount = sceneReference.players[sceneReference.myPlayerIndex].brick +
+//                                       sceneReference.players[sceneReference.myPlayerIndex].gold +
+//                                       sceneReference.players[sceneReference.myPlayerIndex].sheep +
+//                                       sceneReference.players[sceneReference.myPlayerIndex].stone +
+//                                       sceneReference.players[sceneReference.myPlayerIndex].wheat +
+//                                       sceneReference.players[sceneReference.myPlayerIndex].wood
+//                let previousPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].coin +
+//                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].paper +
+//                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].cloth
+//                let nextPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].coin +
+//                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].paper +
+//                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].cloth
             
             
                 //  TO BE CONTINUED
@@ -290,6 +290,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).BRICK")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].brick -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -298,6 +299,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).GOLD")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].gold -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -306,6 +308,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).SHEEP")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].sheep -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -314,6 +317,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).STONE")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].stone -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -322,6 +326,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).WHEAT")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].wheat -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -330,6 +335,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).WOOD")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].wood -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -338,6 +344,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Coin", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).COIN")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].coin -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].coin += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -346,6 +353,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Paper", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).PAPER")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].paper -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].paper += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -354,6 +362,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Cloth", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).CLOTH")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 2) % 3].cloth -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].cloth += 1
                                     self.masterMerchantHelper(offset: 2, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -363,7 +372,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 newAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                                 self.present(newAlert, animated: true, completion: nil)
                                 self.removeAndRefresh(card)
-                            }
+                            } else { self.present(newSheet, animated: true, completion: nil) }
                         }))
                     }
                     if self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].victoryPoints > self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].victoryPoints {
@@ -383,6 +392,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].brick -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -391,6 +401,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].gold -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -399,6 +410,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].sheep -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -407,6 +419,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].stone -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -415,6 +428,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].wheat -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -423,6 +437,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].wood -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -431,6 +446,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Coin", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).COIN")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].coin -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].coin += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -439,6 +455,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Paper", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).PAPER")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].paper -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].paper += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -447,6 +464,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 let commodity = UIAlertAction(title: "Cloth", style: .default) { action -> Void in
                                     let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).CLOTH")
                                     self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + 1) % 3].cloth -= 1
+                                    self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].cloth += 1
                                     self.masterMerchantHelper(offset: 1, card: card)
                                 }
                                 newSheet.addAction(commodity)
@@ -456,7 +474,7 @@ class InGameCardsDeckViewController: UIViewController {
                                 newAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                                 self.present(newAlert, animated: true, completion: nil)
                                 self.removeAndRefresh(card)
-                            }
+                            } else { self.present(newSheet, animated: true, completion: nil) }
                         }))
                     }
                     self.present(newAlert, animated: true, completion: nil)
@@ -638,6 +656,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).BRICK")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].brick -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -646,6 +665,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).GOLD")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].gold -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -654,6 +674,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).SHEEP")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].sheep -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -662,6 +683,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).STONE")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].stone -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -670,6 +692,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).WHEAT")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].wheat -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -678,6 +701,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).WOOD")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].wood -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -686,6 +710,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Coin", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).COIN")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].coin -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].coin += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -694,6 +719,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Paper", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).PAPER")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].paper -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].paper += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -702,6 +728,7 @@ class InGameCardsDeckViewController: UIViewController {
             let commodity = UIAlertAction(title: "Cloth", style: .default) { action -> Void in
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "stealPlayerResourceOrCommodity.\((self.gameDataReference.scenePort.myPlayerIndex + offset) % 3).CLOTH")
                 self.gameDataReference.scenePort.players[(self.gameDataReference.scenePort.myPlayerIndex + offset) % 3].cloth -= 1
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].cloth += 1
                 self.removeAndRefresh(card)
             }
             newSheet.addAction(commodity)
@@ -711,7 +738,8 @@ class InGameCardsDeckViewController: UIViewController {
             newAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(newAlert, animated: true, completion: nil)
             self.removeAndRefresh(card)
-    }   }
+        } else { self.present(newSheet, animated: true, completion: nil) }
+    }
     
     /*
     // MARK: - Navigation
