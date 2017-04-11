@@ -87,7 +87,7 @@ class tileHandler {
         guard let tilesArray = dictionary["mainTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray, onMainIsland: true, water: false, harbour: false)
+        placeTiles(tilesArray: tilesArray, onMainIsland: true, water: false, harbour: false, fish: false)
         _ = placeNumberTiles(tilesArray: tilesArray)
         
         //init smallIslands
@@ -118,7 +118,7 @@ class tileHandler {
         guard let tilesArray2 = dictionary["islandTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray2, onMainIsland: false, water: false, harbour: false)
+        placeTiles(tilesArray: tilesArray2, onMainIsland: false, water: false, harbour: false, fish: false)
         _ = placeNumberTiles(tilesArray: tilesArray2)
         
         //init landHexDictionary
@@ -139,7 +139,7 @@ class tileHandler {
         guard let tilesArray3 = dictionary["waterTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray3, onMainIsland: false, water: true, harbour: false)
+        placeTiles(tilesArray: tilesArray3, onMainIsland: false, water: true, harbour: false, fish: false)
         
         //init harbourTiles
         
@@ -147,15 +147,24 @@ class tileHandler {
         guard let tilesArray4 = dictionary["harbourTiles"] as? [[Int]] else { return }
         
         //place tiles
-        placeTiles(tilesArray: tilesArray4, onMainIsland: false, water: false, harbour: true)
+        placeTiles(tilesArray: tilesArray4, onMainIsland: false, water: false, harbour: true, fish: false)
+        
+        //init fishTiles
+        
+        //get tile layout
+        guard let tilesArray5 = dictionary["fishTiles"] as? [[Int]] else { return }
+        
+        //place tiles
+        placeTiles(tilesArray: tilesArray5, onMainIsland: false, water: false, harbour: false, fish: true)
         
         //init all hex attributes
         initHexAttributes()
     }
     
     //takes in a 2d int tile array and initialises and places the tile in landBackground with a valid tile type
-    func placeTiles(tilesArray : [[Int]], onMainIsland: Bool, water: Bool, harbour: Bool) {
+    func placeTiles(tilesArray : [[Int]], onMainIsland: Bool, water: Bool, harbour: Bool, fish: Bool) {
         var harbourCounter = 0
+        var fishCounter = 0
         
         for (row, rowArray) in tilesArray.enumerated() {
             let tileRow = NumRows - row - 1
@@ -188,6 +197,33 @@ class tileHandler {
                         default: break
                         }
                         harbourCounter+=1
+                    }
+                } else if (fish) {
+                    if value == 1 {
+                        let hex = landHexArray.first(where: {$0.column == column && $0.row == tileRow})
+                        hex?.type = .fish
+                        switch fishCounter {
+                            case 0: landBackground.setTileGroup(terrainTiles.tileGroups[14], forColumn: column, row: tileRow)
+                                hex?.fishNumber = 4
+                                landHexDictionary[hex!.fishNumber!]?.append((column, tileRow))
+                            case 1: landBackground.setTileGroup(terrainTiles.tileGroups[15], forColumn: column, row: tileRow)
+                                hex?.fishNumber = 5
+                                landHexDictionary[hex!.fishNumber!]?.append((column, tileRow))
+                            case 2: landBackground.setTileGroup(terrainTiles.tileGroups[17], forColumn: column, row: tileRow)
+                                hex?.fishNumber = 8
+                                landHexDictionary[hex!.fishNumber!]?.append((column, tileRow))
+                            case 3: landBackground.setTileGroup(terrainTiles.tileGroups[16], forColumn: column, row: tileRow)
+                                hex?.fishNumber = 6
+                                landHexDictionary[hex!.fishNumber!]?.append((column, tileRow))
+                            case 4: landBackground.setTileGroup(terrainTiles.tileGroups[18], forColumn: column, row: tileRow)
+                                hex?.fishNumber = 9
+                                landHexDictionary[hex!.fishNumber!]?.append((column, tileRow))
+                            case 5: landBackground.setTileGroup(terrainTiles.tileGroups[19], forColumn: column, row: tileRow)
+                                hex?.fishNumber = 10
+                                landHexDictionary[hex!.fishNumber!]?.append((column, tileRow))
+                            default: break
+                        }
+                        fishCounter+=1
                     }
                 } else {
                     if value == 1 {
@@ -326,6 +362,9 @@ class tileHandler {
         }
         
         //init hex vertices
+        var harbourCounter = 0
+        var fishCounter = 0
+
         for hex in landHexArray {
             let currPosition = landBackground.centerOfTile(atColumn: hex.column, row: hex.row)
             let centerVertexCol = Vertices.tileColumnIndex(fromPosition: currPosition) - 2 //need to subtract 2 from col for some reason. NOTED
@@ -368,46 +407,74 @@ class tileHandler {
             }
             
             //init harbour
-            var harbourCounter = 0
-            for _ in 0...5 {
-                if(hex.harbourType != nil) {
-                    switch harbourCounter {
-                    case 0: hex.corners[2].isHarbour = true
-                            hex.corners[2].harbourType = hex.harbourType
-                            hex.corners[3].isHarbour = true
-                            hex.corners[3].harbourType = hex.harbourType
-                    case 1: hex.corners[4].isHarbour = true
-                            hex.corners[4].harbourType = hex.harbourType
-                            hex.corners[5].isHarbour = true
-                            hex.corners[5].harbourType = hex.harbourType
-                    case 2: hex.corners[3].isHarbour = true
-                            hex.corners[3].harbourType = hex.harbourType
-                            hex.corners[4].isHarbour = true
-                            hex.corners[4].harbourType = hex.harbourType
-                    case 3: hex.corners[3].isHarbour = true
-                            hex.corners[3].harbourType = hex.harbourType
-                            hex.corners[4].isHarbour = true
-                            hex.corners[4].harbourType = hex.harbourType
-                    case 4: hex.corners[2].isHarbour = true
-                            hex.corners[2].harbourType = hex.harbourType
-                            hex.corners[3].isHarbour = true
-                            hex.corners[3].harbourType = hex.harbourType
-                    case 5: hex.corners[0].isHarbour = true
-                            hex.corners[0].harbourType = hex.harbourType
-                            hex.corners[1].isHarbour = true
-                            hex.corners[1].harbourType = hex.harbourType
-                    case 6: hex.corners[5].isHarbour = true
-                            hex.corners[5].harbourType = hex.harbourType
-                            hex.corners[0].isHarbour = true
-                            hex.corners[0].harbourType = hex.harbourType
-                    case 7: hex.corners[0].isHarbour = true
-                            hex.corners[0].harbourType = hex.harbourType
-                            hex.corners[1].isHarbour = true
-                            hex.corners[1].harbourType = hex.harbourType
-                    default: break
-                    }
-                    harbourCounter+=1
+            if(hex.harbourType != nil) {
+                switch harbourCounter {
+                case 0: hex.corners[2].isHarbour = true
+                        hex.corners[2].harbourType = hex.harbourType
+                        hex.corners[3].isHarbour = true
+                        hex.corners[3].harbourType = hex.harbourType
+                case 1: hex.corners[4].isHarbour = true
+                        hex.corners[4].harbourType = hex.harbourType
+                        hex.corners[5].isHarbour = true
+                        hex.corners[5].harbourType = hex.harbourType
+                case 2: hex.corners[3].isHarbour = true
+                        hex.corners[3].harbourType = hex.harbourType
+                        hex.corners[4].isHarbour = true
+                        hex.corners[4].harbourType = hex.harbourType
+                case 3: hex.corners[3].isHarbour = true
+                        hex.corners[3].harbourType = hex.harbourType
+                        hex.corners[4].isHarbour = true
+                        hex.corners[4].harbourType = hex.harbourType
+                case 4: hex.corners[2].isHarbour = true
+                        hex.corners[2].harbourType = hex.harbourType
+                        hex.corners[3].isHarbour = true
+                        hex.corners[3].harbourType = hex.harbourType
+                case 5: hex.corners[0].isHarbour = true
+                        hex.corners[0].harbourType = hex.harbourType
+                        hex.corners[1].isHarbour = true
+                        hex.corners[1].harbourType = hex.harbourType
+                case 6: hex.corners[5].isHarbour = true
+                        hex.corners[5].harbourType = hex.harbourType
+                        hex.corners[0].isHarbour = true
+                        hex.corners[0].harbourType = hex.harbourType
+                case 7: hex.corners[0].isHarbour = true
+                        hex.corners[0].harbourType = hex.harbourType
+                        hex.corners[1].isHarbour = true
+                        hex.corners[1].harbourType = hex.harbourType
+                default: break
                 }
+                harbourCounter+=1
+            }
+        
+            if(hex.fishNumber != nil) {
+                switch fishCounter {
+                case 0:
+                    hex.corners[4].isValidFish = true
+                    hex.corners[5].isValidFish = true
+                    hex.corners[0].isValidFish = true
+                case 1:
+                    hex.corners[4].isValidFish = true
+                    hex.corners[5].isValidFish = true
+                    hex.corners[0].isValidFish = true
+                case 2:
+                    hex.corners[0].isValidFish = true
+                    hex.corners[1].isValidFish = true
+                    hex.corners[2].isValidFish = true
+                case 3:
+                    hex.corners[4].isValidFish = true
+                    hex.corners[5].isValidFish = true
+                    hex.corners[0].isValidFish = true
+                case 4:
+                    hex.corners[0].isValidFish = true
+                    hex.corners[1].isValidFish = true
+                    hex.corners[2].isValidFish = true
+                case 5:
+                    hex.corners[0].isValidFish = true
+                    hex.corners[1].isValidFish = true
+                    hex.corners[2].isValidFish = true
+                default: break
+                }
+                fishCounter+=1
             }
         }
         
@@ -516,11 +583,13 @@ class tileHandler {
         for entry in landHexDictionary {
             for (column, tileRow) in entry.value {
                 let numberTile = numberTiles.tileGroups.first(where: {$0.name == "\(entry.key)"})
-                Numbers.setTileGroup(numberTile, forColumn: column, row: tileRow)
                 let hex = landHexArray.first(where: {$0.column == column && $0.row == tileRow})
+                if(hex?.fishNumber == nil) {
+                    Numbers.setTileGroup(numberTile, forColumn: column, row: tileRow)
+                }
                 let terrainType = hex?.type?.rawValue
                 let terrainTile = terrainTiles.tileGroups.first(where: {$0.name == terrainType!})
-                if(hex?.harbourType == nil) { landBackground.setTileGroup(terrainTile, forColumn: column, row: tileRow) }
+                if(hex?.harbourType == nil && hex?.fishNumber == nil) { landBackground.setTileGroup(terrainTile, forColumn: column, row: tileRow) }
             }
         }
     }

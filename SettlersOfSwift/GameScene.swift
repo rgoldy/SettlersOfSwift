@@ -295,6 +295,12 @@ class GameScene: SKScene {
             if(handler.landHexDictionary[value] == nil) { handler.landHexDictionary[value] = [] }
             handler.landHexDictionary[value]!.append((column!, row!))
         }
+
+        for hex in handler.landHexArray {
+            if hex.fishNumber != nil {
+                handler.landHexDictionary[hex.fishNumber!]?.append((hex.column, hex.row))
+            }
+        }
     }
     
     func initPlayers() {
@@ -803,7 +809,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
         if (edge == nil) { return false }
-        if (edge?.tile2?.type != hexType.water) { return false }
+        if (edge?.tile2?.type != hexType.water && edge?.tile2?.type != .fish) { return false }
         if (edge?.edgeObject != nil) { return false }
         if (!canPlaceEdge(edge: edge!)) { return false }
         if (!hasResourcesForNewShip() && players[currentPlayer].nextAction != .WillBuildShipForFree) { return false }
