@@ -30,6 +30,7 @@ enum PlayerIntentions : String {
     case WillRemoveOutlaw
     case WillMoveShip
     case WillMoveKnight
+    case WillSelectKnightToChaseOutlaw
     case WillMoveOutlaw
     case WillDestroyCity
     case WillMovePirate

@@ -574,6 +574,105 @@ class GameScene: SKScene {
         return true
     }
     
+    func hasKnightAdjacentToOutlaw() -> Bool {
+        let robberHex = handler.landHexArray.first(where: {$0.center?.hasRobber == true})
+        let pirateHex = handler.landHexArray.first(where: {$0.center?.hasPirate == true})
+        var isAdjacent = false
+        
+        if robberHex != nil {
+            let vertices = robberHex?.corners
+            for vertex in vertices! {
+                if vertex.cornerObject != nil && vertex.cornerObject?.type == .Knight && vertex.cornerObject?.owner == myPlayerIndex && vertex.cornerObject?.isActive == true {
+                    isAdjacent = true
+                    break;
+                }
+            }
+        }
+        if pirateHex != nil && !isAdjacent {
+            let vertices = pirateHex?.corners
+            for vertex in vertices! {
+                if vertex.cornerObject != nil && vertex.cornerObject?.type == .Knight && vertex.cornerObject?.owner == myPlayerIndex && vertex.cornerObject?.isActive == true {
+                    isAdjacent = true
+                    break;
+                }
+            }
+        }
+        
+        return isAdjacent
+    }
+    
+    func selectKnightToChaseOutlaw(column: Int, row: Int, valid: Bool) -> Bool {
+        let corner = players[myPlayerIndex].ownedKnights.first(where: {$0.column == column && $0.row == row})
+        if corner == nil { return false }
+        if corner?.cornerObject == nil { return false }
+        if corner?.cornerObject?.type != .Knight { return false }
+        
+        var nextToR = false
+        if (corner?.tile1.center?.hasRobber)! { nextToR  = true }
+        if (corner?.tile2?.center?.hasRobber)! { nextToR  = true }
+        if (corner?.tile3?.center?.hasRobber)! { nextToR  = true }
+        
+        var nextToP = false
+        if (corner?.tile1.center?.hasPirate)! { nextToP = true }
+        if (corner?.tile2?.center?.hasPirate)! { nextToP = true }
+        if (corner?.tile3?.center?.hasPirate)! { nextToP = true }
+        if (!nextToP && !nextToR) { return false }
+        
+        if (nextToR || nextToP) && !(nextToP && nextToR) {
+            if (nextToR) {players[myPlayerIndex].nextAction = .WillMoveRobber}
+            else {players[myPlayerIndex].nextAction = .WillMovePirate}
+            
+            corner?.cornerObject?.isActive = false
+            
+            var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
+            var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+            if (!sent) { print ("failed to sync cornerObject") }
+            
+            cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+            sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+            if (!sent) { print ("failed to sync cornerObject") }
+            
+            return true
+        }
+        
+        players[myPlayerIndex].movingKnightFromCol = column
+        players[myPlayerIndex].movingKnightFromRow = row
+        players[myPlayerIndex].movingKnightStrength = (corner?.cornerObject?.strength)!
+        players[myPlayerIndex].nextAction = .WillMoveOutlaw
+        return true
+    }
+    
+    func chaseOutlaw(column: Int, row: Int, valid: Bool) -> Bool {
+        let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+        if hex == nil { return false }
+        if hex?.center?.hasPirate == false && hex?.center?.hasRobber == false { return false }
+        
+        let corner = players[myPlayerIndex].ownedKnights.first(where: {$0.column == players[myPlayerIndex].movingKnightFromCol && $0.row == players[myPlayerIndex].movingKnightFromRow})
+        
+        corner?.cornerObject?.isActive = false
+        
+        var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) { print ("failed to sync cornerObject") }
+        
+        cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) { print ("failed to sync cornerObject") }
+        
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
+        handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
+        
+        // If moving pirate
+        if hex?.center?.hasPirate == true {
+            players[myPlayerIndex].nextAction = .WillMovePirate
+        }
+        else { // if moving robber
+            players[myPlayerIndex].nextAction = .WillMoveRobber
+        }
+        
+        return true
+    }
+    
     func moveRobber(column: Int, row: Int, valid: Bool) -> Bool {
         if (!valid) { return false }
         let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
@@ -854,9 +953,6 @@ class GameScene: SKScene {
         players[currentPlayer].ownedKnights.append(corner!)
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
-        
-        if tileGroup == nil {print("Unable to find knight asset - \(players[currentPlayer].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(String(describing: corner!.cornerObject!.isActive))")}
-        
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
         
         let cornerObjectInfo = "cornerData.\(currentPlayer),\(column),\(row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
@@ -3303,7 +3399,10 @@ class GameScene: SKScene {
                 case .WillMoveKnight:
                     let movedKnight = moveKnight(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled)
                     if (movedKnight) { players[currentPlayer].nextAction = .WillBuildKnightForFree }
-                case .WillMoveOutlaw: return;   //  NOT IMPLEMENTED
+                case .WillSelectKnightToChaseOutlaw:
+                    let _ = selectKnightToChaseOutlaw(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled)
+                case .WillMoveOutlaw:
+                    let _ = chaseOutlaw(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled)
                 case .WillBuildKnightForFree:
                     let movedKnight = placeKnightForFree(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid: rolled, displacable: true)
                     if movedKnight { players[currentPlayer].nextAction = .WillDoNothing }
