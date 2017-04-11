@@ -686,7 +686,7 @@ class GameScene: SKScene {
         handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "robber"}), forColumn: hex!.center!.column, row: hex!.center!.row)
         hex?.center?.hasRobber = true
         
-        let cornerObjectInfo = "moveRobber.\(oldHex!.column),\(oldHex!.row),\(column),\(row)"
+        let cornerObjectInfo = "moveRobber.\(oldHex!.column).\(oldHex!.row).\(column).\(row)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -701,7 +701,7 @@ class GameScene: SKScene {
         if (!valid) { return false }
         let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
         if(hex == nil) { return false }
-        if(hex?.type != .water || hex?.type != .fish) { return false }
+        if(hex?.type != .water && hex?.type != .fish) { return false }
         
         let oldHex = handler.landHexArray.first(where: {$0.center?.hasPirate == true})
         oldHex?.center?.hasPirate = false
@@ -710,7 +710,7 @@ class GameScene: SKScene {
         handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "pirate"}), forColumn: hex!.center!.column, row: hex!.center!.row)
         hex?.center?.hasPirate = true
         
-        let cornerObjectInfo = "movePirate.\(oldHex!.column),\(oldHex!.row),\(column),\(row)"
+        let cornerObjectInfo = "movePirate.\(oldHex!.column).\(oldHex!.row).\(column).\(row)"
         
         // Send player info to other players
         let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -2419,6 +2419,14 @@ class GameScene: SKScene {
     }
     
     func continueDiceRoll(_ values: [Int]) {
+        
+        //  MIGHT NOT WORK, FIX LATER
+        
+        let previousView = self.view?.window?.rootViewController as? GameViewController
+        previousView?.menuButton.isEnabled = true
+        
+        //  MIGHT NOT WORK, FIX LATER
+        
         updateDice(red: values[0], yellow: values[1], event: values[2])
         let diceData = "diceRoll.\(values[0]),\(values[1]),\(values[2])"
         
@@ -3008,6 +3016,13 @@ class GameScene: SKScene {
         
         players[player].canMoveOutlaw = false
         players[player].movedShipThisTurn = false
+        
+        //  MIGHT NOT WORK, FIX LATER
+        
+        let previousView = self.view?.window?.rootViewController as? GameViewController
+        previousView?.menuButton.isEnabled = false
+        
+        //  MIGHT NOT WORK, FIX LATER
     }
     
     
@@ -3993,7 +4008,7 @@ class GameScene: SKScene {
     
     func checkIfCardsNeedDiscard() {
         let discardCount = players[myPlayerIndex].mustRemoveHalfOfHand()
-        if discardCount != 0 { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
+        if discardCount != 0 && false { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
         else { moveRobberOrPirate() }
         
     }

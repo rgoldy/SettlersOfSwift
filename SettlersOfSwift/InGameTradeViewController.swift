@@ -195,7 +195,7 @@ class InGameTradeViewController: UIViewController {
                         notificationBanner.removeFromSuperview()
                     })
         }   }   }
-        updateOptions()
+        didChangeRatio(self)
     }
     
     @IBAction func selectedSourceAsBrick(_ sender: Any) {
@@ -377,6 +377,15 @@ class InGameTradeViewController: UIViewController {
             if myPlayerIndex.coin < (myPlayerIndex.merchantFleetSelect == .Coin ? 2 : myPlayerIndex.coinTradeRatio) { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
             if myPlayerIndex.paper < (myPlayerIndex.merchantFleetSelect == .Paper ? 2 : myPlayerIndex.paperTradeRatio) { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
             if myPlayerIndex.cloth < (myPlayerIndex.merchantFleetSelect == .Cloth ? 2 : myPlayerIndex.clothTradeRatio) { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
+            targetBrick.isEnabled = true
+            targetGold.isEnabled = true
+            targetSheep.isEnabled = true
+            targetStone.isEnabled = true
+            targetWheat.isEnabled = true
+            targetWood.isEnabled = true
+            targetCoin.isEnabled = true
+            targetPaper.isEnabled = true
+            targetCloth.isEnabled = true
             ratioSelector.setTitle("* : 1", for: UIControlState.disabled)
             ratioSelector.isEnabled = false
         } else {
