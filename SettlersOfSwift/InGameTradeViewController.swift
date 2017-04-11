@@ -60,6 +60,16 @@ class InGameTradeViewController: UIViewController {
         //  MIGHT HAVE TO MODIFY BELOW CODE TO viewWillAppear(Bool) METHOD TO BE COMPATIBLE WITH SAVE LOADING
         gameDataReference = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as! GameViewController
         // Do any additional setup after loading the view.
+        
+        var previousPlayer = gameDataReference.scenePort.myPlayerIndex - 1
+        if previousPlayer < 0 {previousPlayer = gameDataReference.scenePort.players.count - 1}
+        let nextPlayer = (gameDataReference.scenePort.myPlayerIndex + 1) % gameDataReference.scenePort.players.count
+        
+        let previousColor = gameDataReference.scenePort.players[previousPlayer].color.rawValue
+        let nextColor = gameDataReference.scenePort.players[nextPlayer].color.rawValue
+
+        segmentSelector.setTitle("\(previousColor) Player", forSegmentAt: 1)
+        segmentSelector.setTitle("\(nextColor) Player", forSegmentAt: 2)
     }
 
     override func didReceiveMemoryWarning() {
