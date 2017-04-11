@@ -373,13 +373,17 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "displace":
                 scenePort.displaceKnight(data: message[1])
             case "drewProgressCard":
-                switch message[1] {
+                let player = Int(message[1])!
+                switch message[2] {
                     case "POLITICS":
-                        let _ = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &scenePort.gameDeck)
+                        let card = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &scenePort.gameDeck)
+                        if card != nil {scenePort.players[player].progressCards.append(card!)}
                     case "SCIENCES":
-                        let _ = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &scenePort.gameDeck)
+                        let card = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &scenePort.gameDeck)
+                        if card != nil {scenePort.players[player].progressCards.append(card!)}
                     case "TRADES":
-                        let _ = ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &scenePort.gameDeck)
+                        let card = ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &scenePort.gameDeck)
+                        if card != nil {scenePort.players[player].progressCards.append(card!)}
                     default: break
                 }
             case "barbariansDistanceUpdate":

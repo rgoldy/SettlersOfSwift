@@ -1937,21 +1937,21 @@ class GameScene: SKScene {
                     let trade: UIAlertAction = UIAlertAction(title: "Trade", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &self.gameDeck)!)
                         
-                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.TRADES")
+                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.\(self.myPlayerIndex).TRADES")
                         if !sent { print("failed to send draw progress card") }
                     }
                     
                     let politics = UIAlertAction(title: "Politics", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &self.gameDeck)!)
                         
-                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.POLITICS")
+                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.\(self.myPlayerIndex).POLITICS")
                         if !sent { print("failed to send draw progress card") }
                     }
                     
                     let science = UIAlertAction(title: "Science", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         self.players[self.myPlayerIndex].progressCards.append(ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &self.gameDeck)!)
                         
-                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.SCIENCES")
+                        let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.\(self.myPlayerIndex).SCIENCES")
                         if !sent { print("failed to send draw progress card") }
                     }
                     
@@ -2455,7 +2455,7 @@ class GameScene: SKScene {
             case .PoliticsSide:
                 if players[myPlayerIndex].politicsImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Politics, fromDeck: &gameDeck)
-                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.POLITICS")
+                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.\(myPlayerIndex).POLITICS")
                     if let card = newCard {
                         notificationContent.text = "You have just received The \(card) Progress Card from the Politics Deck...congratulations!"
                         self.view?.addSubview(notificationBanner)
@@ -2479,7 +2479,7 @@ class GameScene: SKScene {
                 }   }
             case .SciencesSide:
                 if players[myPlayerIndex].sciencesImprovementLevel + 3 > values[0] {
-                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.SCIENCES")
+                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.\(myPlayerIndex).SCIENCES")
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Sciences, fromDeck: &gameDeck)
                     if let card = newCard {
                         notificationContent.text = "You have just received The \(card) Progress Card from the Sciences Deck...congratulations!"
@@ -2505,7 +2505,7 @@ class GameScene: SKScene {
             case .TradesSide:
                 if players[myPlayerIndex].tradesImprovementLevel + 3 > values[0] {
                     let newCard = ProgressCardsType.getNextCardOfCategory(ProgressCardsCategory.Trades, fromDeck: &gameDeck)
-                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.TRADES")
+                    let _ = appDelegate.networkManager.sendData(data: "drewProgressCard.\(myPlayerIndex).TRADES")
                     if let card = newCard {
                         notificationContent.text = "You have just received The \(card) Progress Card from the Trades Deck...congratulations!"
                         self.view?.addSubview(notificationBanner)
@@ -3521,18 +3521,18 @@ class GameScene: SKScene {
         }
         
         //  updates other player's progress cards data
-        players[myPlayerIndex].receivedPeersCards = false
-        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 1) % 3)")
-        while !players[myPlayerIndex].receivedPeersCards { }
-        players[myPlayerIndex].receivedPeersCards = false
-        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 2) % 3)")
-        while !players[myPlayerIndex].receivedPeersCards { }
-        players[myPlayerIndex].dataReceived = false
-        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 1) % 3)")
-        while !players[myPlayerIndex].dataReceived { }
-        players[myPlayerIndex].dataReceived = false
-        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 2) % 3)")
-        while !players[myPlayerIndex].dataReceived { }
+//        players[myPlayerIndex].receivedPeersCards = false
+//        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 1) % 3)")
+//        while !players[myPlayerIndex].receivedPeersCards { }
+//        players[myPlayerIndex].receivedPeersCards = false
+//        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 2) % 3)")
+//        while !players[myPlayerIndex].receivedPeersCards { }
+//        players[myPlayerIndex].dataReceived = false
+//        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 1) % 3)")
+//        while !players[myPlayerIndex].dataReceived { }
+//        players[myPlayerIndex].dataReceived = false
+//        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 2) % 3)")
+//        while !players[myPlayerIndex].dataReceived { }
         
         for index in 0..<players.count {
             let player = players[index]
