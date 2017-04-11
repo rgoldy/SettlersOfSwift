@@ -1345,7 +1345,25 @@ class GameScene: SKScene {
     
     func buildCityWall(column: Int, row: Int, valid: Bool) -> Bool {
         if !valid { return false }
-        if !hasResourcesForCityWall() { return false }
+        var hasEngineerCard = false
+        var usingEngineerCard = false
+        for item in players[myPlayerIndex].progressCards { if item == .Engineer { hasEngineerCard = true } }
+        if hasEngineerCard {
+            var decisionMade = false
+            let alert = UIAlertController(title: "Progress Card", message: "Would you like to use the Engineer card instead to build this wall?", preferredStyle: .alert)
+            let alertActionA = UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
+                usingEngineerCard = true
+                decisionMade = true
+            })
+            alert.addAction(alertActionA)
+            let alertActionB = UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
+                decisionMade = true
+            })
+            alert.addAction(alertActionB)
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            while !decisionMade { }
+        }
+        if !hasResourcesForCityWall() && !usingEngineerCard { return false }
         let corner = players[myPlayerIndex].ownedCorners.first(where: {$0.column == column && $0.row == row})
         if corner == nil { return false }
         if corner?.cornerObject == nil { return false }
@@ -1356,7 +1374,14 @@ class GameScene: SKScene {
         corner?.cornerObject!.hasCityWall = true
         
         // Pay for wall and update others of payment
-        players[myPlayerIndex].brick -= 2
+        if !usingEngineerCard {
+            players[myPlayerIndex].brick -= 2
+        } else {
+            for index in 0..<players[myPlayerIndex].progressCards.count {
+                if players[myPlayerIndex].progressCards[index] == .Engineer {
+                    players[myPlayerIndex].progressCards.remove(at: index)
+                    break
+        }   }   }
         sendPlayerData(player: myPlayerIndex)
         
         var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
@@ -3670,6 +3695,7 @@ class GameScene: SKScene {
                 self.weddingCardDiscard(amount: 1, receiverIndex: receiverIndex)
             })
             alert.addAction(alertAction)
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
         } else {
             var invalidCounter = 0
             let actionSheet = UIAlertController(title: nil, message: "Please select " + (amount == 0 ? "another " : "a ") + "resource or " + (amount == 0 ? "another " : "a ") + "commodity to discard...", preferredStyle: .actionSheet)
@@ -3756,6 +3782,7 @@ class GameScene: SKScene {
                 self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1)
             })
             alert.addAction(alertAction)
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
         } else {
             let actionSheet = UIAlertController(title: nil, message: "Please select " + (amount == (originalAmount - 1) ? "a " : "another ") + "resource or " + (amount == (originalAmount - 1) ? "a " : "another ") + "commodity to discard...", preferredStyle: .actionSheet)
             if players[myPlayerIndex].brick > 0 {

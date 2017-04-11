@@ -107,12 +107,11 @@ class InGameCardsDeckViewController: UIViewController {
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
-            case .Engineer: //  NOT IMPLEMENTED
+            case .Engineer:
                 let announcement = "This card may only be used from the flip charts screen when purchasing a city wall..."
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
-                //  ONE CITY WALL FOR FREE
             case .Inventor: //  NOT IMPLEMENTED
                 break
             case .Irrigation:   //  NOT IMPLEMENTED

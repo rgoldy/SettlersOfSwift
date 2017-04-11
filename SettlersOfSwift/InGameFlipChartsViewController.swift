@@ -212,7 +212,9 @@ class InGameFlipChartsViewController: UIViewController {
                 secondItemRequirementC.image = nil
                 secondItemRequirementD.image = nil
                 secondItemRequirementE.image = nil
-                if playerReference.brick < 2 { secondItemButton.isEnabled = false } else { secondItemButton.isEnabled = true }
+                var hasEngineerCard = false
+                for item in gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards { if item == .Engineer { hasEngineerCard = true } }
+                if playerReference.brick < 2 && !hasEngineerCard { secondItemButton.isEnabled = false } else { secondItemButton.isEnabled = true }
                 thirdItemButton.setTitle("", for: UIControlState.normal)
                 thirdItemButton.setTitle("", for: UIControlState.disabled)
                 thirdItemRequirementA.image = nil
