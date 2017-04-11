@@ -606,6 +606,89 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let intends = Bool(message[2])!
                 var change = 1; if !intends {change = -1}
                 scenePort.players[player].canBuildMetropolis += change
+            case "getMiscellaneousData":
+                if Int(message[1])! == scenePort.myPlayerIndex {
+                    let reference = scenePort.players[scenePort.myPlayerIndex]
+                    var returnMessage = "returnedMiscellaneousData.\(scenePort.myPlayerIndex)"
+                    returnMessage += ".\(reference.wood)"
+                    returnMessage += ".\(reference.woodTradeRatio)"
+                    returnMessage += ".\(reference.wheat)"
+                    returnMessage += ".\(reference.wheatTradeRatio)"
+                    returnMessage += ".\(reference.stone)"
+                    returnMessage += ".\(reference.stoneTradeRatio)"
+                    returnMessage += ".\(reference.sheep)"
+                    returnMessage += ".\(reference.sheepTradeRatio)"
+                    returnMessage += ".\(reference.brick)"
+                    returnMessage += ".\(reference.brickTradeRatio)"
+                    returnMessage += ".\(reference.gold)"
+                    returnMessage += ".\(reference.goldTradeRatio)"
+                    returnMessage += ".\(reference.politicsImprovementLevel)"
+                    returnMessage += ".\(reference.sciencesImprovementLevel)"
+                    returnMessage += ".\(reference.tradesImprovementLevel)"
+                    returnMessage += ".\(reference.holdsPoliticsMetropolis ?  1 : 0)"
+                    returnMessage += ".\(reference.holdsSciencesMetropolis ? 1 : 0)"
+                    returnMessage += ".\(reference.holdsTradesMetropolis ? 1 : 0)"
+                    returnMessage += ".\(reference.canBuildMetropolis)"
+                    returnMessage += ".\(reference.nextAction.rawValue)"
+                    returnMessage += ".\(reference.paper)"
+                    returnMessage += ".\(reference.paperTradeRatio)"
+                    returnMessage += ".\(reference.cloth)"
+                    returnMessage += ".\(reference.clothTradeRatio)"
+                    returnMessage += ".\(reference.coin)"
+                    returnMessage += ".\(reference.coinTradeRatio)"
+                    returnMessage += ".\(reference.fish)"
+                    returnMessage += ".\(reference.hasOldBoot ? 1 : 0)"
+                    returnMessage += ".\(reference.victoryPoints)"
+                    returnMessage += ".\(reference.comingFromFishes ? 1 : 0)"
+                    returnMessage += ".\(reference.tradeAccepted == nil ? 2 : reference.tradeAccepted! ? 1 : 0)"
+                    returnMessage += ".\(reference.longestRoad)"
+                    returnMessage += ".\(reference.movingKnightStrength)"
+                    returnMessage += ".\(reference.movingKnightUpgraded ? 1 : 0)"
+                    returnMessage += ".\(reference.movingKnightFromRow)"
+                    returnMessage += ".\(reference.movingKnightFromCol)"
+                    returnMessage += ".\(reference.movedShipThisTurn ? 1 : 0)"
+                    let _ = appDelegate.networkManager.sendData(data: returnMessage)
+                }
+            case "returnedMiscellaneousData":
+                let reference = scenePort.players[Int(message[1])!]
+                reference.wood = Int(message[2])!
+                reference.woodTradeRatio = Int(message[3])!
+                reference.wheat = Int(message[4])!
+                reference.wheatTradeRatio = Int(message[5])!
+                reference.stone = Int(message[6])!
+                reference.stoneTradeRatio = Int(message[7])!
+                reference.sheep = Int(message[8])!
+                reference.sheepTradeRatio = Int(message[9])!
+                reference.brick = Int(message[10])!
+                reference.brickTradeRatio = Int(message[11])!
+                reference.gold = Int(message[12])!
+                reference.goldTradeRatio = Int(message[13])!
+                reference.politicsImprovementLevel = Int(message[14])!
+                reference.sciencesImprovementLevel = Int(message[15])!
+                reference.tradesImprovementLevel = Int(message[16])!
+                reference.holdsPoliticsMetropolis = message[17] == "1" ? true : false
+                reference.holdsSciencesMetropolis = message[18] == "1" ? true : false
+                reference.holdsTradesMetropolis = message[19] == "1" ? true : false
+                reference.canBuildMetropolis = Int(message[20])!
+                reference.nextAction = PlayerIntentions.init(rawValue: message[21])!
+                reference.paper = Int(message[22])!
+                reference.paperTradeRatio = Int(message[23])!
+                reference.cloth = Int(message[24])!
+                reference.clothTradeRatio = Int(message[25])!
+                reference.coin = Int(message[26])!
+                reference.coinTradeRatio = Int(message[27])!
+                reference.fish = Int(message[28])!
+                reference.hasOldBoot = message[29] == "1" ? true : false
+                reference.victoryPoints = Int(message[30])!
+                reference.comingFromFishes = message[31] == "1" ? true : false
+                reference.tradeAccepted = message[32] == "2" ? nil : (message[32] == "1" ? true : false)
+                reference.longestRoad = Int(message[33])!
+                reference.movingKnightStrength = Int(message[34])!
+                reference.movingKnightUpgraded = message[35] == "1" ? true : false
+                reference.movingKnightFromRow = Int(message[36])!
+                reference.movingKnightFromCol = Int(message[37])!
+                reference.movedShipThisTurn = message[38] == "1" ? true : false
+                scenePort.players[scenePort.myPlayerIndex].dataReceived = true
             default:
                 print("Unknown message")
         }

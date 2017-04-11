@@ -3291,6 +3291,20 @@ class GameScene: SKScene {
             gameState.append("\(hex.column),\(hex.row),\(type!),\(value);")
         }
         
+        //  updates other player's progress cards data
+        players[myPlayerIndex].receivedPeersCards = false
+        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 1) % 3)")
+        while !players[myPlayerIndex].receivedPeersCards { }
+        players[myPlayerIndex].receivedPeersCards = false
+        let _ = appDelegate.networkManager.sendData(data: "broadcastProgressCards.\((myPlayerIndex + 2) % 3)")
+        while !players[myPlayerIndex].receivedPeersCards { }
+        players[myPlayerIndex].dataReceived = false
+        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 1) % 3)")
+        while !players[myPlayerIndex].dataReceived { }
+        players[myPlayerIndex].dataReceived = false
+        let _ = appDelegate.networkManager.sendData(data: "getMiscellaneousData.\((myPlayerIndex + 2) % 3)")
+        while !players[myPlayerIndex].dataReceived { }
+        
         for index in 0..<players.count {
             let player = players[index]
             gameState.append(".PLAYER|\(player.name)|\(index)|\(player.color.rawValue)|\(player.brick)|\(player.brickTradeRatio)|\(player.wheat)|\(player.wheatTradeRatio)|\(player.wood)|\(player.woodTradeRatio)|\(player.sheep)|\(player.sheepTradeRatio)|\(player.stone)|\(player.stoneTradeRatio)|\(player.gold)|\(player.goldTradeRatio)|\(player.paper)|\(player.paperTradeRatio)|\(player.coin)|\(player.coinTradeRatio)|\(player.cloth)|\(player.clothTradeRatio)|\(player.fish)|\(player.victoryPoints)|\(player.hasOldBoot)|\(player.politicsImprovementLevel)|\(player.tradesImprovementLevel)|\(player.sciencesImprovementLevel)|\(player.holdsTradesMetropolis)|\(player.holdsPoliticsMetropolis)|\(player.holdsSciencesMetropolis)|\(player.nextAction.rawValue)|\(player.longestRoad)|\(player.movingKnightStrength)|\(player.movingKnightFromCol)|\(player.movingKnightFromRow)|\(player.movingKnightUpgraded)|\(player.movedShipThisTurn)")

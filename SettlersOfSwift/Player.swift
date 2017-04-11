@@ -74,6 +74,8 @@ class Player {
     
     var comingFromFishes = false
     
+    var dataReceived = false
+    
     init(name : String, playerNumber : Int) {
         self.name = name
         switch playerNumber {
