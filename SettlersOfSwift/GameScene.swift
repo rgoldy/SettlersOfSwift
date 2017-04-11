@@ -1314,8 +1314,12 @@ class GameScene: SKScene {
         
         corner!.cornerObject!.type = .Metropolis
         
-        let cornerObjectInfo = "cornerData.\(currentPlayer),\(col),\(row),\(cornerType.Metropolis),\(corner!.cornerObject!.hasCityWall)"
-        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        var cornerObjectInfo = "cornerData.\(currentPlayer),\(col),\(row),nil"
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if !sent {print("failed to sync metropolis")}
+        
+        cornerObjectInfo = "cornerData.\(currentPlayer),\(col),\(row),\(cornerType.Metropolis),\(corner!.cornerObject!.hasCityWall)"
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         if !sent {print("failed to sync metropolis")}
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cornerType.Metropolis)\(corner!.cornerObject!.hasCityWall)"})
@@ -1461,30 +1465,21 @@ class GameScene: SKScene {
                 
                 players[who].ownedKnights.append(corner!)
             }
-            else {
+            else { // either Settlement, City, or Metropolis
                 players[who].ownedCorners.append(corner!)
                 
-                if type == .Metropolis {
-                    give(victoryPoints: 2, to: who)
+                if type == .Metropolis || type == .City {
                     let hasCityWall = Bool(cornerInfo[4])!
                     corner?.cornerObject?.hasCityWall = hasCityWall
                 }
                 else {
-                    give(victoryPoints: 1, to: who)
-                    
-                    if type == .City {
-                        let hasCityWall = Bool(cornerInfo[4])!
-                        corner?.cornerObject?.hasCityWall = hasCityWall
-                    }
-                    else {
-                        corner?.cornerObject?.hasCityWall = false
-                    }
+                    corner?.cornerObject?.hasCityWall = false
                 }
             }
             
             var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})
             
-            if type == .City {
+            if type == .City || type == .Metropolis {
                 tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.hasCityWall)"})
 
             }
