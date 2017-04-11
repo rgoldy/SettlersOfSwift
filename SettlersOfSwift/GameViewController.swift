@@ -79,8 +79,8 @@ class GameViewController: UIViewController, NetworkDelegate {
                 }
             }
             
-            let moveOutlaw = UIAlertAction(title: "Move Outlaw", style: .default) { action -> Void in
-                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillMoveOutlaw
+            let moveOutlaw = UIAlertAction(title: "Chase Outlaw", style: .default) { action -> Void in
+                self.scenePort.players[self.scenePort.myPlayerIndex].nextAction = .WillSelectKnightToChaseOutlaw
                 DispatchQueue.main.async {
                     self.scenePort.cancelButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.04, alpha: 1.0)
                 }
@@ -111,10 +111,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 actionSheet.addAction(moveKnight)
             }
             
-            var canMoveOutlaw = false
-            // TODO: test if you can move the outlaw
-            // true if active knight is adjacent to outlaw
-            // anything else?
+            let canMoveOutlaw = scenePort.hasKnightAdjacentToOutlaw()
             if (canMoveOutlaw) {
                 actionSheet.addAction(moveOutlaw)
             }
@@ -376,13 +373,17 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "displace":
                 scenePort.displaceKnight(data: message[1])
             case "drewProgressCard":
-                switch message[1] {
+                let player = Int(message[1])!
+                switch message[2] {
                     case "POLITICS":
-                        let _ = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &scenePort.gameDeck)
+                        let card = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &scenePort.gameDeck)
+                        if card != nil && card != .Constitution {scenePort.players[player].progressCards.append(card!)}
                     case "SCIENCES":
-                        let _ = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &scenePort.gameDeck)
+                        let card = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &scenePort.gameDeck)
+                        if card != nil && card != .Printer {scenePort.players[player].progressCards.append(card!)}
                     case "TRADES":
-                        let _ = ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &scenePort.gameDeck)
+                        let card = ProgressCardsType.getNextCardOfCategory(.Trades, fromDeck: &scenePort.gameDeck)
+                        if card != nil {scenePort.players[player].progressCards.append(card!)}
                     default: break
                 }
             case "barbariansDistanceUpdate":
@@ -887,5 +888,6 @@ class GameViewController: UIViewController, NetworkDelegate {
         
         print ("LOST PEER: autosaving")
         scenePort.saveGame(filename: file)
+        print ("SAVED") 
     }
 }

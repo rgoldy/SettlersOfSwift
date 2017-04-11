@@ -235,6 +235,7 @@
 				TargetAttributes = {
 					6CCF9F601E395DF900AAEB79 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = NAU684T824;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -427,11 +428,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = NAU684T824;
 				INFOPLIST_FILE = SettlersOfSwift/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.comp361.SettlersOfSwift;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yifengyan2.SettlersOfSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -442,11 +443,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = NAU684T824;
 				INFOPLIST_FILE = SettlersOfSwift/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.comp361.SettlersOfSwift;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yifengyan2.SettlersOfSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
