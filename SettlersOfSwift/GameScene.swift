@@ -574,6 +574,91 @@ class GameScene: SKScene {
         return true
     }
     
+    func moveRobber(column: Int, row: Int, valid: Bool) -> Bool {
+        if (!valid) { return false }
+        let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+        if(hex == nil) { return false }
+        if(hex?.type == .water || hex?.type == .fish) { return false }
+        
+        let oldHex = handler.landHexArray.first(where: {$0.center?.hasRobber == true})
+        oldHex?.center?.hasRobber = false
+        handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+        
+        handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "robber"}), forColumn: hex!.center!.column, row: hex!.center!.row)
+        hex?.center?.hasRobber = true
+        
+        let cornerObjectInfo = "moveRobber.\(oldHex!.column),\(oldHex!.row),\(column),\(row)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync moveRobber")
+        }
+
+        return true
+    }
+    
+    func movePirate(column: Int, row: Int, valid: Bool) -> Bool {
+        if (!valid) { return false }
+        let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+        if(hex == nil) { return false }
+        if(hex?.type != .water || hex?.type != .fish) { return false }
+        
+        let oldHex = handler.landHexArray.first(where: {$0.center?.hasPirate == true})
+        oldHex?.center?.hasPirate = false
+        handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+        
+        handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "pirate"}), forColumn: hex!.center!.column, row: hex!.center!.row)
+        hex?.center?.hasPirate = true
+        
+        let cornerObjectInfo = "movePirate.\(oldHex!.column),\(oldHex!.row),\(column),\(row)"
+        
+        // Send player info to other players
+        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync movePirate")
+        }
+        
+        return true
+    }
+    
+    func moveRobberFromMessage(oldColumn: Int, oldRow: Int, column: Int, row: Int) {
+        let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+        
+        let oldHex = handler.landHexArray.first(where: {$0.column == oldColumn && $0.row == oldRow})
+        oldHex?.center?.hasRobber = false
+        handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+        
+        handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "robber"}), forColumn: hex!.center!.column, row: hex!.center!.row)
+        hex?.center?.hasRobber = true
+    }
+    
+    func movePirateFromMessage(oldColumn: Int, oldRow: Int, column: Int, row: Int) {
+        let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+
+        let oldHex = handler.landHexArray.first(where: {$0.column == oldColumn && $0.row == oldRow})
+        oldHex?.center?.hasPirate = false
+        handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+        
+        handler.Vertices.setTileGroup(handler.verticesTiles.tileGroups.first(where: {$0.name == "pirate"}), forColumn: hex!.center!.column, row: hex!.center!.row)
+        hex?.center?.hasPirate = true
+    }
+    
+    func getPlayersToStealFrom(column: Int, row: Int) -> [Int] {
+        let hex = handler.landHexArray.first(where: {$0.column == column && $0.row == row})
+        var playerIndices = [Int]()
+        
+        for i in 0...5 {
+            if(hex!.corners[i].cornerObject != nil && hex!.corners[i].cornerObject?.type != .Knight) {
+                if(hex!.corners[i].cornerObject?.owner != myPlayerIndex && playerIndices.contains((hex!.corners[i].cornerObject?.owner)!) == false) {
+                    playerIndices.append((hex!.corners[i].cornerObject?.owner)!);
+                }
+            }
+        }
+        
+        return playerIndices
+    }
+    
     func buildRoad(column: Int, row: Int, type: edgeType, valid:Bool) -> Bool {
         if (!valid) { return false }
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
@@ -648,6 +733,7 @@ class GameScene: SKScene {
         
         return true
     }
+
     
     func moveShip(column: Int, row: Int, valid:Bool) -> Bool {
         if (!valid) { return false }
@@ -3203,7 +3289,25 @@ class GameScene: SKScene {
                 case .WillDestroyCity:
                     let destroyedCity = destroyCity(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), who: currentPlayer)
                     if destroyedCity {players[currentPlayer].nextAction = .WillDoNothing }
-            }
+                case .WillMovePirate:
+                    let pirateMoved = movePirate(column: handler.landBackground.tileColumnIndex(fromPosition: targetLocation), row: handler.landBackground.tileRowIndex(fromPosition: targetLocation), valid: rolled)
+                    if(pirateMoved) {
+                        let playersToStealFrom = getPlayersToStealFrom(column: handler.landBackground.tileColumnIndex(fromPosition: targetLocation), row: handler.landBackground.tileRowIndex(fromPosition: targetLocation))
+                        
+                        //ADD STEAL FROM PLAYER HERE
+                        
+                        players[currentPlayer].nextAction = .WillDoNothing
+                    }
+                case .WillMoveRobber:
+                    let robberMoved = moveRobber(column: handler.landBackground.tileColumnIndex(fromPosition: targetLocation), row: handler.landBackground.tileRowIndex(fromPosition: targetLocation), valid: rolled)
+                    if(robberMoved) {
+                        let playersToStealFrom = getPlayersToStealFrom(column: handler.landBackground.tileColumnIndex(fromPosition: targetLocation), row: handler.landBackground.tileRowIndex(fromPosition: targetLocation))
+                        
+                        //ADD STEAL FROM PLAYER HERE
+                        
+                        players[currentPlayer].nextAction = .WillDoNothing
+                    }
+           }
             
         }
         else if (currGamePhase == .p1Turn || currGamePhase == .p2Turn || currGamePhase == .p3Turn) {

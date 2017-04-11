@@ -606,6 +606,18 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let intends = Bool(message[2])!
                 var change = 1; if !intends {change = -1}
                 scenePort.players[player].canBuildMetropolis += change
+            case "moveRobber":
+                let oldColumn = Int(message[1])!
+                let oldRow = Int(message[2])!
+                let column = Int(message[3])!
+                let row = Int(message[4])!
+                scenePort.moveRobberFromMessage(oldColumn: oldColumn, oldRow: oldRow, column: column, row: row)
+            case "movePirate":
+                let oldColumn = Int(message[1])!
+                let oldRow = Int(message[2])!
+                let column = Int(message[3])!
+                let row = Int(message[4])!
+                scenePort.movePirateFromMessage(oldColumn: oldColumn, oldRow: oldRow, column: column, row: row)
             default:
                 print("Unknown message")
         }
