@@ -63,36 +63,39 @@ class InGameCardsDeckViewController: UIViewController {
     }
     
     @IBAction func showPreviousCards(_ sender: Any) {
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count <= 3 { updateCardsDisplayWithStartingIndex(0) }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count < 3 { updateCardsDisplayWithStartingIndex(0) }
         else {
             currentDisplayIndex += gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count - 1
             updateCardsDisplayWithStartingIndex(currentDisplayIndex)
     }   }
     
     @IBAction func showFollowingCards(_ sender: Any) {
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count <= 3 { updateCardsDisplayWithStartingIndex(0) }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count < 3 { updateCardsDisplayWithStartingIndex(0) }
         else {
             currentDisplayIndex += 1
             updateCardsDisplayWithStartingIndex(currentDisplayIndex)
     }   }
     
     @IBAction func didInteractWithLeftCard(_ sender: Any) {
-        let cardIndex = currentDisplayIndex % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
-            tryUsingCard(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards[cardIndex])
-    }   }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > 0 {
+            let cardIndex = currentDisplayIndex % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
+            if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
+                tryUsingCard(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards[cardIndex])
+    }   }   }
     
     @IBAction func didInteractWithMiddleCard(_ sender: Any) {
-        let cardIndex = currentDisplayIndex % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
-            tryUsingCard(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards[cardIndex])
-    }   }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > 0 {
+            let cardIndex = (currentDisplayIndex + 1) % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
+            if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
+                tryUsingCard(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards[cardIndex])
+    }   }   }
     
     @IBAction func didInteractWithRightCard(_ sender: Any) {
-        let cardIndex = currentDisplayIndex % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
-        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
-            tryUsingCard(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards[cardIndex])
-    }   }
+        if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > 0 {
+            let cardIndex = (currentDisplayIndex + 2) % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
+            if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
+                tryUsingCard(gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards[cardIndex])
+    }   }   }
     
     func tryUsingCard(_ card: ProgressCardsType) {
         let sceneReference = gameDataReference.scenePort!
@@ -212,6 +215,7 @@ class InGameCardsDeckViewController: UIViewController {
                 self.present(alert, animated: true, completion: nil)
             case .Warlord:  //  NOT IMPLEMENTED
                 break
+            
                 //  ALL KNIGHTS ACTIVATION ARE FREE
             case .Wedding:
                 let announcement = "Would you like to use The Wedding Progress Card...?"
@@ -222,7 +226,7 @@ class InGameCardsDeckViewController: UIViewController {
                 }))
                 alert.addAction(UIAlertAction(title: "NO", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
-            case .CommercialHarbor: //  NOT IMPLEMENTED
+            case .CommercialHarbor:
                 sceneReference.players[sceneReference.myPlayerIndex].fetchedTargetData = false
                 var message = "getTradeResources.\((sceneReference.myPlayerIndex + 2) % 3)"
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
@@ -241,24 +245,429 @@ class InGameCardsDeckViewController: UIViewController {
                 self.view.addSubview(loadingView)
                 while sceneReference.players[sceneReference.myPlayerIndex].fetchedTargetData == false { }
                 loadingView.removeFromSuperview()
-//                let myResourcesCount = sceneReference.players[sceneReference.myPlayerIndex].brick +
-//                                       sceneReference.players[sceneReference.myPlayerIndex].gold +
-//                                       sceneReference.players[sceneReference.myPlayerIndex].sheep +
-//                                       sceneReference.players[sceneReference.myPlayerIndex].stone +
-//                                       sceneReference.players[sceneReference.myPlayerIndex].wheat +
-//                                       sceneReference.players[sceneReference.myPlayerIndex].wood
-//                let previousPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].coin +
-//                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].paper +
-//                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].cloth
-//                let nextPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].coin +
-//                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].paper +
-//                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].cloth
-            
-            
-                //  TO BE CONTINUED
-            
-            
-                //  FOR EACH PLAYER GIVE ONE RESOURCE AND RECEIVE ONE COMMODITY, INVALIDATED IF NOT ENOUGH RESOURCE / COMMIDITY
+                let myResourcesCount = sceneReference.players[sceneReference.myPlayerIndex].brick +
+                                       sceneReference.players[sceneReference.myPlayerIndex].gold +
+                                       sceneReference.players[sceneReference.myPlayerIndex].sheep +
+                                       sceneReference.players[sceneReference.myPlayerIndex].stone +
+                                       sceneReference.players[sceneReference.myPlayerIndex].wheat +
+                                       sceneReference.players[sceneReference.myPlayerIndex].wood
+                let previousPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].coin +
+                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].paper +
+                                                     sceneReference.players[(sceneReference.myPlayerIndex + 2) % 3].cloth
+                let nextPlayerCommoditiesCount = sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].coin +
+                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].paper +
+                                                 sceneReference.players[(sceneReference.myPlayerIndex + 1) % 3].cloth
+                if myResourcesCount == 0 {
+                    let alert = UIAlertController(title: "Alert", message: "You may not play this card since you do not have any resource at hand...", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "YES", style: .default, handler: nil))
+                } else if previousPlayerCommoditiesCount == 0 && nextPlayerCommoditiesCount == 0 {
+                    let alert = UIAlertController(title: "Alert", message: "You may not play this card since no one has any commodity at hand...", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "YES", style: .default, handler: nil))
+                } else {
+                    if previousPlayerCommoditiesCount != 0 {
+                        let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the previous player...", preferredStyle: .actionSheet)
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                            let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).BRICK")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                if nextPlayerCommoditiesCount != 0 && myResourcesCount > 1 {
+                                    let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                                        let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                                        let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                                        let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                                        let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                                        let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                                        let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    self.present(newSheet, animated: true, completion: nil)
+                            }   }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                            let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).GOLD")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                if nextPlayerCommoditiesCount != 0 && myResourcesCount > 1 {
+                                    let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                                        let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                                        let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                                        let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                                        let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                                        let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                                        let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    self.present(newSheet, animated: true, completion: nil)
+                            }   }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                            let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).SHEEP")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                if nextPlayerCommoditiesCount != 0 && myResourcesCount > 1 {
+                                    let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                                        let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                                        let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                                        let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                                        let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                                        let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                                        let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    self.present(newSheet, animated: true, completion: nil)
+                            }   }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                            let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).STONE")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                if nextPlayerCommoditiesCount != 0 && myResourcesCount > 1 {
+                                    let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                                        let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                                        let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                                        let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                                        let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                                        let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                                        let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    self.present(newSheet, animated: true, completion: nil)
+                            }   }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                            let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).WHEAT")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                if nextPlayerCommoditiesCount != 0 && myResourcesCount > 1 {
+                                    let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                                        let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                                        let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                                        let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                                        let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                                        let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                                        let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    self.present(newSheet, animated: true, completion: nil)
+                            }   }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                            let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 2) % 3).WOOD")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                if nextPlayerCommoditiesCount != 0 && myResourcesCount > 1 {
+                                    let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                                        let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                                        let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                                        let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                                        let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                                        let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                                        let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                            let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                            self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                            self.removeAndRefresh(card)
+                                        }
+                                        newSheet.addAction(commodity)
+                                    }
+                                    self.present(newSheet, animated: true, completion: nil)
+                            }   }
+                            newSheet.addAction(commodity)
+                        }
+                        self.present(newSheet, animated: true, completion: nil)
+                    }
+                    if nextPlayerCommoditiesCount != 0 {
+                        let newSheet = UIAlertController(title: nil, message: "Select a resource to give to the next player...", preferredStyle: .actionSheet)
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick > 0 {
+                            let commodity = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).BRICK")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].brick -= 1
+                                self.removeAndRefresh(card)
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold > 0 {
+                            let commodity = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).GOLD")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].gold -= 1
+                                self.removeAndRefresh(card)
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep > 0 {
+                            let commodity = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).SHEEP")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].sheep -= 1
+                                self.removeAndRefresh(card)
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone > 0 {
+                            let commodity = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).STONE")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].stone -= 1
+                                self.removeAndRefresh(card)
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat > 0 {
+                            let commodity = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WHEAT")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wheat -= 1
+                                self.removeAndRefresh(card)
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood > 0 {
+                            let commodity = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                                let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "resourceForCommodity.\(self.gameDataReference.scenePort.myPlayerIndex).\((self.gameDataReference.scenePort.myPlayerIndex + 1) % 3).WOOD")
+                                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].wood -= 1
+                                self.removeAndRefresh(card)
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        self.present(newSheet, animated: true, completion: nil)
+                }   }
             case .MasterMerchant:
                 gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].victoryPointsRefreshed = false
                 let _ = gameDataReference.appDelegate.networkManager.sendData(data: "refreshVictoryPoints.\((gameDataReference.scenePort.myPlayerIndex + 1) % 3)")

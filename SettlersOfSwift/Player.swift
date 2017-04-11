@@ -111,7 +111,7 @@ class Player {
             if city.hasCityWall { numWalls += 1 }
         }
         
-        let numCards = wood + wheat + stone + sheep + brick + paper + coin + cloth
+        let numCards = wood + wheat + stone + sheep + brick + paper + coin + cloth + gold
         let boundary = 7 + 2*numWalls
         if (numCards > boundary) {
             return Int(numCards / 2)

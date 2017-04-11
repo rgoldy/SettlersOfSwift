@@ -164,7 +164,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
             }
         }
-        if scenePort.players[scenePort.myPlayerIndex].canBuildMetropolis > 0 {
+        if scenePort.myPlayerIndex != -1 && scenePort.players[scenePort.myPlayerIndex].canBuildMetropolis > 0 {
             let alert = UIAlertController(title: "Metropolis", message: "Once you build a city you will be able to upgrade it!", preferredStyle: UIAlertControllerStyle.alert)
             let okay = UIAlertAction(title: "Okay", style: UIAlertActionStyle.default)
             alert.addAction(okay)
@@ -637,6 +637,69 @@ class GameViewController: UIViewController, NetworkDelegate {
                 let column = Int(message[3])!
                 let row = Int(message[4])!
                 scenePort.movePirateFromMessage(oldColumn: oldColumn, oldRow: oldRow, column: column, row: row)
+            case "resourceForCommodity":
+                if Int(message[2])! == scenePort.myPlayerIndex {
+                    switch message[3] {
+                        case "BRICK": self.scenePort.players[self.scenePort.myPlayerIndex].brick += 1
+                        case "GOLD": self.scenePort.players[self.scenePort.myPlayerIndex].gold += 1
+                        case "SHEEP": self.scenePort.players[self.scenePort.myPlayerIndex].sheep += 1
+                        case "STONE": self.scenePort.players[self.scenePort.myPlayerIndex].stone += 1
+                        case "WHEAT": self.scenePort.players[self.scenePort.myPlayerIndex].wheat += 1
+                        case "WOOD": self.scenePort.players[self.scenePort.myPlayerIndex].wood += 1
+                        default: break
+                    }
+                    let alert = UIAlertController(title: nil, message: "Someone has used the Commercial Harbor Progress Card on you...", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: { action -> Void in
+                        let newSheet = UIAlertController(title: nil, message: "Select a commodity to give to the player...in return, you will receive a \(message[3])", preferredStyle: .actionSheet)
+                        if self.scenePort.players[self.scenePort.myPlayerIndex].coin > 0 {
+                            let commodity = UIAlertAction(title: "COIN(\(self.scenePort.players[self.scenePort.myPlayerIndex].coin))", style: .default) { action -> Void in
+                                let _ = self.appDelegate.networkManager.sendData(data: "commodityForResource.\(message[1]).COIN")
+                                self.scenePort.players[self.scenePort.myPlayerIndex].coin -= 1
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.scenePort.players[self.scenePort.myPlayerIndex].paper > 0 {
+                            let commodity = UIAlertAction(title: "PAPER(\(self.scenePort.players[self.scenePort.myPlayerIndex].paper))", style: .default) { action -> Void in
+                                let _ = self.appDelegate.networkManager.sendData(data: "commodityForResource.\(message[1]).PAPER")
+                                self.scenePort.players[self.scenePort.myPlayerIndex].paper -= 1
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        if self.scenePort.players[self.scenePort.myPlayerIndex].cloth > 0 {
+                            let commodity = UIAlertAction(title: "CLOTH(\(self.scenePort.players[self.scenePort.myPlayerIndex].cloth))", style: .default) { action -> Void in
+                                let _ = self.appDelegate.networkManager.sendData(data: "commodityForResource.\(message[1]).CLOTH")
+                                self.scenePort.players[self.scenePort.myPlayerIndex].cloth -= 1
+                            }
+                            newSheet.addAction(commodity)
+                        }
+                        self.present(newSheet, animated: true, completion: nil)
+                    }))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            case "commodityForResource":
+                if Int(message[1])! == scenePort.myPlayerIndex {
+                    switch message[2] {
+                        case "COIN": self.scenePort.players[self.scenePort.myPlayerIndex].coin += 1
+                        case "PAPER": self.scenePort.players[self.scenePort.myPlayerIndex].paper += 1
+                        case "CLOTH": self.scenePort.players[self.scenePort.myPlayerIndex].cloth += 1
+                        default: break
+                    }
+                    let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationBanner.isOpaque = false
+                    notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.8)
+                    let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                    notificationContent.isOpaque = false
+                    notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                    notificationContent.textColor = UIColor.lightGray
+                    notificationContent.textAlignment = .center
+                    notificationContent.text = "You have just received some \(message[2])..."
+                    self.view?.addSubview(notificationBanner)
+                    self.view?.addSubview(notificationContent)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                        notificationContent.removeFromSuperview()
+                        notificationBanner.removeFromSuperview()
+                    })
+                }
             case "getMiscellaneousData":
                 if Int(message[1])! == scenePort.myPlayerIndex {
                     let reference = scenePort.players[scenePort.myPlayerIndex]

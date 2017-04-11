@@ -3700,7 +3700,7 @@ class GameScene: SKScene {
             var invalidCounter = 0
             let actionSheet = UIAlertController(title: nil, message: "Please select " + (amount == 0 ? "another " : "a ") + "resource or " + (amount == 0 ? "another " : "a ") + "commodity to discard...", preferredStyle: .actionSheet)
             if players[myPlayerIndex].brick > 0 {
-                let brickAction = UIAlertAction(title: "BRICK", style: .default, handler: { action -> Void in
+                let brickAction = UIAlertAction(title: "BRICK(\(players[myPlayerIndex].brick))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].brick -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.BRICK.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3708,7 +3708,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(brickAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].gold > 0 {
-                let goldAction = UIAlertAction(title: "GOLD", style: .default, handler: { action -> Void in
+                let goldAction = UIAlertAction(title: "GOLD(\(players[myPlayerIndex].gold))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].gold -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.GOLD.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3716,7 +3716,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(goldAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].sheep > 0 {
-                let sheepAction = UIAlertAction(title: "SHEEP", style: .default, handler: { action -> Void in
+                let sheepAction = UIAlertAction(title: "SHEEP(\(players[myPlayerIndex].sheep))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].sheep -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.SHEEP.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3724,7 +3724,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(sheepAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].stone > 0 {
-                let stoneAction = UIAlertAction(title: "STONE", style: .default, handler: { action -> Void in
+                let stoneAction = UIAlertAction(title: "STONE(\(players[myPlayerIndex].stone))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].stone -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.STONE.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3732,7 +3732,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(stoneAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].wheat > 0 {
-                let wheatAction = UIAlertAction(title: "WHEAT", style: .default, handler: { action -> Void in
+                let wheatAction = UIAlertAction(title: "WHEAT(\(players[myPlayerIndex].wheat))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].wheat -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.WHEAT.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3740,7 +3740,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(wheatAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].wood > 0 {
-                let woodAction = UIAlertAction(title: "WOOD", style: .default, handler: { action -> Void in
+                let woodAction = UIAlertAction(title: "WOOD(\(players[myPlayerIndex].wood))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].wood -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.WOOD.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3748,7 +3748,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(woodAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].coin > 0 {
-                let coinAction = UIAlertAction(title: "COIN", style: .default, handler: { action -> Void in
+                let coinAction = UIAlertAction(title: "COIN(\(players[myPlayerIndex].coin))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].coin -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.COIN.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3756,7 +3756,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(coinAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].paper > 0 {
-                let paperAction = UIAlertAction(title: "PAPER", style: .default, handler: { action -> Void in
+                let paperAction = UIAlertAction(title: "PAPER(\(players[myPlayerIndex].paper))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].paper -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.PAPER.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3764,7 +3764,7 @@ class GameScene: SKScene {
                 actionSheet.addAction(paperAction)
             } else { invalidCounter += 1 }
             if players[myPlayerIndex].cloth > 0 {
-                let clothAction = UIAlertAction(title: "CLOTH", style: .default, handler: { action -> Void in
+                let clothAction = UIAlertAction(title: "CLOTH(\(players[myPlayerIndex].cloth))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].cloth -= 1
                     let _ = self.appDelegate.networkManager.sendData(data: "sendCommodityOrResource.CLOTH.\(receiverIndex)")
                     if amount == 1 { self.weddingCardDiscard(amount: 0, receiverIndex: receiverIndex) } else { return }
@@ -3786,63 +3786,63 @@ class GameScene: SKScene {
         } else {
             let actionSheet = UIAlertController(title: nil, message: "Please select " + (amount == (originalAmount - 1) ? "a " : "another ") + "resource or " + (amount == (originalAmount - 1) ? "a " : "another ") + "commodity to discard...", preferredStyle: .actionSheet)
             if players[myPlayerIndex].brick > 0 {
-                let brickAction = UIAlertAction(title: "BRICK", style: .default, handler: { action -> Void in
+                let brickAction = UIAlertAction(title: "BRICK(\(players[myPlayerIndex].brick))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].brick -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(brickAction)
             }
             if players[myPlayerIndex].gold > 0 {
-                let goldAction = UIAlertAction(title: "GOLD", style: .default, handler: { action -> Void in
+                let goldAction = UIAlertAction(title: "GOLD(\(players[myPlayerIndex].gold))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].gold -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(goldAction)
             }
             if players[myPlayerIndex].sheep > 0 {
-                let sheepAction = UIAlertAction(title: "SHEEP", style: .default, handler: { action -> Void in
+                let sheepAction = UIAlertAction(title: "SHEEP(\(players[myPlayerIndex].sheep))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].sheep -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(sheepAction)
             }
             if players[myPlayerIndex].stone > 0 {
-                let stoneAction = UIAlertAction(title: "STONE", style: .default, handler: { action -> Void in
+                let stoneAction = UIAlertAction(title: "STONE(\(players[myPlayerIndex].stone))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].stone -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(stoneAction)
             }
             if players[myPlayerIndex].wheat > 0 {
-                let wheatAction = UIAlertAction(title: "WHEAT", style: .default, handler: { action -> Void in
+                let wheatAction = UIAlertAction(title: "WHEAT(\(players[myPlayerIndex].wheat))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].wheat -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(wheatAction)
             }
             if players[myPlayerIndex].wood > 0 {
-                let woodAction = UIAlertAction(title: "WOOD", style: .default, handler: { action -> Void in
+                let woodAction = UIAlertAction(title: "WOOD(\(players[myPlayerIndex].wood))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].wood -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(woodAction)
             }
             if players[myPlayerIndex].coin > 0 {
-                let coinAction = UIAlertAction(title: "COIN", style: .default, handler: { action -> Void in
+                let coinAction = UIAlertAction(title: "COIN(\(players[myPlayerIndex].coin))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].coin -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(coinAction)
             }
             if players[myPlayerIndex].paper > 0 {
-                let paperAction = UIAlertAction(title: "PAPER", style: .default, handler: { action -> Void in
+                let paperAction = UIAlertAction(title: "PAPER(\(players[myPlayerIndex].paper))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].paper -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
                 actionSheet.addAction(paperAction)
             }
             if players[myPlayerIndex].cloth > 0 {
-                let clothAction = UIAlertAction(title: "CLOTH", style: .default, handler: { action -> Void in
+                let clothAction = UIAlertAction(title: "CLOTH(\(players[myPlayerIndex].cloth))", style: .default, handler: { action -> Void in
                     self.players[self.myPlayerIndex].cloth -= 1
                     if amount != 0 { self.robberCardDiscard(originalAmount: originalAmount, amount: amount - 1) } else { return }
                 })
