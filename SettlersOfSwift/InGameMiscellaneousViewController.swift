@@ -360,6 +360,7 @@ class InGameMiscellaneousViewController: UIViewController {
                             if item == .Constitution || item == .Printer {
                                 self.gameDataReference.scenePort.give(victoryPoints: 1, to: self.gameDataReference.scenePort.myPlayerIndex)
                             } else { self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.append(item!) }
+                            break
                     }   }
                     self.wireButtonFunctionalities()
                 })
