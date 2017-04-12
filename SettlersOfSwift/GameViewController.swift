@@ -211,6 +211,11 @@ class GameViewController: UIViewController, NetworkDelegate {
                     print("Board Sync Data Sent")
                 }
                 
+                scenePort.gameDeck = ProgressCardsType.generateNewGameDeck()
+                var deckUpdateMessage = "originalDeckUpdate"
+                for item in scenePort.gameDeck { deckUpdateMessage += "." + item!.rawValue }
+                let _ = appDelegate.networkManager.sendData(data: deckUpdateMessage)
+                
                 // Create player objects and send to non-hosts
                 scenePort.initPlayers()
                 // Create and shuffle fish deck then send to non-hosts
@@ -264,6 +269,8 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "gamePhaseData":
                 scenePort.setNewGamePhase(info: message[1])
                 print("Updated currGamePhase")
+            case "originalDeckUpdate":
+                for index in 1...54 { scenePort.gameDeck[index - 1] = ProgressCardsType(rawValue: message[index])! }
             case "diceRoll":
                 let diceData = message[1].components(separatedBy: ",")
                 let redDie = Int(diceData[0])!
@@ -516,6 +523,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 if Int(message[2])! == scenePort.myPlayerIndex {
                     switch message[1] {
                         case "BRICK": scenePort.players[scenePort.myPlayerIndex].brick -= 1
+                        case "GOLD": scenePort.players[scenePort.myPlayerIndex].gold -= 1
                         case "SHEEP": scenePort.players[scenePort.myPlayerIndex].sheep -= 1
                         case "STONE": scenePort.players[scenePort.myPlayerIndex].stone -= 1
                         case "WHEAT": scenePort.players[scenePort.myPlayerIndex].wheat -= 1
@@ -590,7 +598,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 case "CLOTH": scenePort.players[scenePort.myPlayerIndex].cloth -= 1
                 default: break
                 }
-                let announcement = "Someone has stolen one of your " + message[1] + "..."
+                let announcement = "Someone has stolen one of your " + message[2] + "..."
                 let alert = UIAlertController(title: "Alert", message: announcement, preferredStyle: .actionSheet)
                 alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
@@ -797,15 +805,56 @@ class GameViewController: UIViewController, NetworkDelegate {
                 scenePort.players[Int(message[1])!].longestRoad = Int(message[2])!
                 scenePort.longestRoad = Int(message[2])!
                 scenePort.holdsLongestRoad = Int(message[1])!
+            case "removeOutlaw":
+                if message[1] == "Pirate" {
+                    let oldHex = scenePort.handler.landHexArray.first(where: {$0.center?.hasPirate == true})
+                    oldHex?.center?.hasPirate = false
+                    scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+                    scenePort.pirateRemoved = true
+                } else if message[1] == "Robber" {
+                    let oldHex = scenePort.handler.landHexArray.first(where: {$0.center?.hasRobber == true})
+                    oldHex?.center?.hasRobber = false
+                    scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+                    scenePort.robberRemoved = true
+                }
+            case "benefitsOfNoResourceDrawn":
+                if scenePort.myPlayerIndex == Int(message[1])! && scenePort.players[scenePort.myPlayerIndex].sciencesImprovementLevel >= 2 {
+                    let actionSheet = UIAlertController(title: "Draw Benefits", message: "Since you haven't received any resource, choose one!", preferredStyle: .alert)
+                    let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].brick += 1
+                    }
+                    actionSheet.addAction(brickResource)
+                    let goldResource = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].gold += 1
+                    }
+                    actionSheet.addAction(goldResource)
+                    let sheepResource = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].sheep += 1
+                    }
+                    actionSheet.addAction(sheepResource)
+                    let stoneResource = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].stone += 1
+                    }
+                    actionSheet.addAction(stoneResource)
+                    let wheatResource = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].wheat += 1
+                    }
+                    actionSheet.addAction(wheatResource)
+                    let woodResource = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].wood += 1
+                    }
+                    actionSheet.addAction(woodResource)
+                    self.present(actionSheet, animated: true, completion: nil)
+                }
             default:
                 print("Unknown message")
         }
     }
     
-    @IBAction func didInteractWithAdditionalButtonA(_ sender: Any) {
+    @IBAction func didInteractWithAdditionalButtonA(_ sender: Any) {    //  metropolis build button
     }
     
-    @IBAction func didInteractWithAdditionalButtonB(_ sender: Any) {
+    @IBAction func didInteractWithAdditionalButtonB(_ sender: Any) {        //   not used
     }
     
     @IBAction func toggleMusicPlayback(_ sender: Any) {

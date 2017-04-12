@@ -77,6 +77,7 @@ class InGameCardsDeckViewController: UIViewController {
     }   }
     
     @IBAction func didInteractWithLeftCard(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > 0 {
             let cardIndex = currentDisplayIndex % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
             if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
@@ -84,6 +85,7 @@ class InGameCardsDeckViewController: UIViewController {
     }   }   }
     
     @IBAction func didInteractWithMiddleCard(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > 0 {
             let cardIndex = (currentDisplayIndex + 1) % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
             if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {
@@ -91,6 +93,7 @@ class InGameCardsDeckViewController: UIViewController {
     }   }   }
     
     @IBAction func didInteractWithRightCard(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > 0 {
             let cardIndex = (currentDisplayIndex + 2) % gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count
             if gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].progressCards.count > cardIndex {

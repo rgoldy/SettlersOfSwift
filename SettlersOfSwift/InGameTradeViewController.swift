@@ -93,6 +93,7 @@ class InGameTradeViewController: UIViewController {
     }
     
     @IBAction func performTrade(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         let myPlayerIndex = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         if segmentSelector.selectedSegmentIndex == 0 {
             if selectedSource != .None, selectedTarget != .None {
@@ -129,6 +130,189 @@ class InGameTradeViewController: UIViewController {
             if selectedSource != .None, selectedTarget != .None {
                 let myIndex = gameDataReference.scenePort.myPlayerIndex
                 let otherPlayerIndex = (gameDataReference.scenePort.myPlayerIndex + (segmentSelector.selectedSegmentIndex == 1 ? 2 : 1)) % 3
+                switch selectedTarget {
+                    case .Brick:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].brick == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                        }
+                    case .Gold:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].gold == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .Sheep:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].sheep == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case.Stone:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].stone == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .Wheat:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].wheat == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .Wood:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].wood == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .Coin:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].coin == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .Paper:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].paper == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .Cloth:
+                        if gameDataReference.scenePort.players[otherPlayerIndex].cloth == 0 {
+                            didChangeSegment(self)
+                            let notificationBanner = UIView(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationBanner.isOpaque = false
+                            notificationBanner.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.05, alpha: 0.6)
+                            let notificationContent = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: self.view!.bounds.width, height: self.view!.bounds.height / 8))
+                            notificationContent.isOpaque = false
+                            notificationContent.font = UIFont(name: "Avenir-Roman", size: 14)
+                            notificationContent.textColor = UIColor.lightGray
+                            notificationContent.textAlignment = .center
+                            notificationContent.text = "The other player has refused your request for a trade..."
+                            self.view?.addSubview(notificationBanner)
+                            self.view?.addSubview(notificationContent)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                                notificationContent.removeFromSuperview()
+                                notificationBanner.removeFromSuperview()
+                            })
+                            return
+                    }
+                    case .None: break;
+                }
                 myPlayerIndex.tradeAccepted = nil
                 let message = "playerTradeRequest.\(otherPlayerIndex).\(myIndex).\(currentRatio).\(selectedSource.rawValue).\(selectedTarget.rawValue)"
                 let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
@@ -195,7 +379,7 @@ class InGameTradeViewController: UIViewController {
                         notificationBanner.removeFromSuperview()
                     })
         }   }   }
-        updateOptions()
+        didChangeSegment(self)
     }
     
     @IBAction func selectedSourceAsBrick(_ sender: Any) {
@@ -377,6 +561,15 @@ class InGameTradeViewController: UIViewController {
             if myPlayerIndex.coin < (myPlayerIndex.merchantFleetSelect == .Coin ? 2 : myPlayerIndex.coinTradeRatio) { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
             if myPlayerIndex.paper < (myPlayerIndex.merchantFleetSelect == .Paper ? 2 : myPlayerIndex.paperTradeRatio) { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
             if myPlayerIndex.cloth < (myPlayerIndex.merchantFleetSelect == .Cloth ? 2 : myPlayerIndex.clothTradeRatio) { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
+            targetBrick.isEnabled = true
+            targetGold.isEnabled = true
+            targetSheep.isEnabled = true
+            targetStone.isEnabled = true
+            targetWheat.isEnabled = true
+            targetWood.isEnabled = true
+            targetCoin.isEnabled = true
+            targetPaper.isEnabled = true
+            targetCloth.isEnabled = true
             ratioSelector.setTitle("* : 1", for: UIControlState.disabled)
             ratioSelector.isEnabled = false
         } else {
@@ -397,15 +590,24 @@ class InGameTradeViewController: UIViewController {
             if myPlayerIndex.coin < currentRatio { sourceCoin.isEnabled = false } else { sourceCoin.isEnabled = true }
             if myPlayerIndex.paper < currentRatio { sourcePaper.isEnabled = false } else { sourcePaper.isEnabled = true }
             if myPlayerIndex.cloth < currentRatio { sourceCloth.isEnabled = false } else { sourceCloth.isEnabled = true }
-            if otherPlayer.brick == 0 { targetBrick.isEnabled = false } else { targetBrick.isEnabled = true }
-            if otherPlayer.gold == 0 { targetGold.isEnabled = false } else { targetGold.isEnabled = true }
-            if otherPlayer.sheep == 0 { targetSheep.isEnabled = false } else { targetSheep.isEnabled = true }
-            if otherPlayer.stone == 0 { targetStone.isEnabled = false } else { targetStone.isEnabled = true }
-            if otherPlayer.wheat == 0 { targetWheat.isEnabled = false } else { targetWheat.isEnabled = true }
-            if otherPlayer.wood == 0 { targetWood.isEnabled = false } else { targetWood.isEnabled = true }
-            if otherPlayer.coin == 0 { targetCoin.isEnabled = false } else { targetCoin.isEnabled = true }
-            if otherPlayer.paper == 0 { targetPaper.isEnabled = false } else { targetPaper.isEnabled = true }
-            if otherPlayer.cloth == 0 { targetCloth.isEnabled = false } else { targetCloth.isEnabled = true }
+            targetBrick.isEnabled = true
+            targetGold.isEnabled = true
+            targetSheep.isEnabled = true
+            targetStone.isEnabled = true
+            targetWheat.isEnabled = true
+            targetWood.isEnabled = true
+            targetCoin.isEnabled = true
+            targetPaper.isEnabled = true
+            targetCloth.isEnabled = true
+//            if otherPlayer.brick == 0 { targetBrick.isEnabled = false } else { targetBrick.isEnabled = true }
+//            if otherPlayer.gold == 0 { targetGold.isEnabled = false } else { targetGold.isEnabled = true }
+//            if otherPlayer.sheep == 0 { targetSheep.isEnabled = false } else { targetSheep.isEnabled = true }
+//            if otherPlayer.stone == 0 { targetStone.isEnabled = false } else { targetStone.isEnabled = true }
+//            if otherPlayer.wheat == 0 { targetWheat.isEnabled = false } else { targetWheat.isEnabled = true }
+//            if otherPlayer.wood == 0 { targetWood.isEnabled = false } else { targetWood.isEnabled = true }
+//            if otherPlayer.coin == 0 { targetCoin.isEnabled = false } else { targetCoin.isEnabled = true }
+//            if otherPlayer.paper == 0 { targetPaper.isEnabled = false } else { targetPaper.isEnabled = true }
+//            if otherPlayer.cloth == 0 { targetCloth.isEnabled = false } else { targetCloth.isEnabled = true }
     }   }
     
     @IBAction func didChangeSegment(_ sender: Any) {

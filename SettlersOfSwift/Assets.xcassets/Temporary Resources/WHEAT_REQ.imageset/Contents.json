@@ -2,17 +2,16 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "WHEAT_REQ.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "WHEAT_REQ@2x.png",
+      "filename" : "WHEAT@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "WHEAT_REQ@3x.png",
+      "filename" : "WHEAT@3x.png",
       "scale" : "3x"
     }
   ],

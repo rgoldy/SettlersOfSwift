@@ -366,6 +366,7 @@ class InGameFlipChartsViewController: UIViewController {
     }
     
     @IBAction func buildItemA(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         switch chartsSceneIndex {
             case 0: playerReference.nextAction = .WillBuildCity
@@ -377,6 +378,7 @@ class InGameFlipChartsViewController: UIViewController {
     }
     
     @IBAction func buildItemB(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         switch chartsSceneIndex {
             case 0: playerReference.nextAction = .WillBuildWall
@@ -388,6 +390,7 @@ class InGameFlipChartsViewController: UIViewController {
     }
     
     @IBAction func buildItemC(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         switch chartsSceneIndex {
             case 1: playerReference.nextAction = .WillActivateKnight
@@ -400,6 +403,7 @@ class InGameFlipChartsViewController: UIViewController {
     //  DO METROPOLIS CHECKS
     
     @IBAction func improveCurrentChart(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         let playerReference = gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex]
         if playerReference.progressCards.contains(.Crane) {
             let announcement = "Looks like you have The Crane card...would you like to use it?"

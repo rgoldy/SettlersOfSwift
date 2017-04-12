@@ -61,15 +61,55 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithTopLeftButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         if !gameDataReference.scenePort.pirateRemoved || !gameDataReference.scenePort.robberRemoved {
-            gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillRemoveOutlaw
-            gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 2
             
+            
+            if gameDataReference.scenePort.currentPlayer != gameDataReference.scenePort.myPlayerIndex { return }
+            let alert = UIAlertController(title: "Removal", message: "Pick an outlaw to remove", preferredStyle: .actionSheet)
+            let robber = UIAlertAction(title: "Robber", style: .default, handler: { action -> Void in
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].fish -= 2
+                let oldHex = self.gameDataReference.scenePort.handler.landHexArray.first(where: {$0.center?.hasRobber == true})
+                oldHex?.center?.hasRobber = false
+                self.gameDataReference.scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+                self.gameDataReference.scenePort.robberRemoved = true
+                
+                let message = "removeOutlaw.Robber"
+                let sent = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
+                if !sent { print("unable to remove Robber") }
+                
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].nextAction = .WillDoNothing
+            })
+            let pirate = UIAlertAction(title: "Pirate", style: .default, handler: { action -> Void in
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].fish -= 2
+                let oldHex = self.gameDataReference.scenePort.handler.landHexArray.first(where: {$0.center?.hasPirate == true})
+                oldHex?.center?.hasPirate = false
+                self.gameDataReference.scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+                self.gameDataReference.scenePort.pirateRemoved = true
+                
+                let message = "removeOutlaw.Pirate"
+                let sent = self.gameDataReference.appDelegate.networkManager.sendData(data: message)
+                if !sent { print("unable to remove Pirate") }
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].nextAction = .WillDoNothing
+            })
+            let nothing = UIAlertAction(title: "Nothing", style: .default, handler: { action -> Void in
+                self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].nextAction = .WillDoNothing
+            })
+            
+            if !gameDataReference.scenePort.robberRemoved {
+                alert.addAction(robber)
+            }
+            if !gameDataReference.scenePort.pirateRemoved {
+                alert.addAction(pirate)
+            }
+            alert.addAction(nothing)
+            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
         }
         self.tabBarController?.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func didInteractWithMiddleLeftButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 3
         let actionSheet = UIAlertController(title: "Opponent Steal", message: "Who would you like to steal randomly from?", preferredStyle: .alert)
         let previousPlayer = UIAlertAction(title: "Previous Player", style: .default) { action -> Void in
@@ -240,6 +280,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithBottomLeftButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 4
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
@@ -281,6 +322,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithTopRightButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 5
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillBuildRoadForFree
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].comingFromFishes = true
@@ -288,6 +330,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithMiddleRightButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 5
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillBuildShipForFree
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].comingFromFishes = true
@@ -295,6 +338,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithBottomRightButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 7
         var deckCopy = [ProgressCardsType?]()
         for item in gameDataReference.scenePort.gameDeck { deckCopy.append(item) }
@@ -313,6 +357,9 @@ class InGameMiscellaneousViewController: UIViewController {
                         if self.gameDataReference.scenePort.gameDeck[index] == item {
                             let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "removeProgressCardAtIndex.\(index)")
                             self.gameDataReference.scenePort.gameDeck[index] = nil
+                            if item == .Constitution || item == .Printer {
+                                self.gameDataReference.scenePort.give(victoryPoints: 1, to: self.gameDataReference.scenePort.myPlayerIndex)
+                            } else { self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.append(item!) }
                     }   }
                     self.wireButtonFunctionalities()
                 })
