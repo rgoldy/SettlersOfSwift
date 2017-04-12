@@ -2743,7 +2743,7 @@ class GameScene: SKScene {
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
                                 else {
-                                    players[player].coin += 1; print("\(players[player].name) mined sheep")
+                                    players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                 }
                             case .brick:
                                 resourcesReceived[player] = true
@@ -2761,16 +2761,16 @@ class GameScene: SKScene {
                                 }
                                 else {
                                     players[player].fish += newFish
-                                    if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
-                                        newFish = drawFishCard()
-                                        if (newFish == -1) { /* Deck is empty */ }
-                                        else if (newFish == 0) {
-                                            receivedOldBoot(player: player)
-                                        }
-                                        else {
-                                            players[player].fish += newFish
-                                        }
-                                    }
+//                                    if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
+//                                        newFish = drawFishCard()
+//                                        if (newFish == -1) { /* Deck is empty */ }
+//                                        else if (newFish == 0) {
+//                                            receivedOldBoot(player: player)
+//                                        }
+//                                        else {
+//                                            players[player].fish += newFish
+//                                        }
+//                                    }
                                 }
                             default: break
                         }
@@ -2806,7 +2806,7 @@ class GameScene: SKScene {
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
                                 else {
-                                    players[player].coin += 1; print("\(players[player].name) mined sheep")
+                                    players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                 }
                             case .brick:
                                 resourcesReceived[player] = true
@@ -2824,16 +2824,16 @@ class GameScene: SKScene {
                              }
                              else {
                                 players[player].fish += newFish
-                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
-                                    newFish = drawFishCard()
-                                    if (newFish == -1) { /* Deck is empty */ }
-                                    else if (newFish == 0) {
-                                        receivedOldBoot(player: player)
-                                    }
-                                    else {
-                                        players[player].fish += newFish
-                                    }
-                                }
+//                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
+//                                    newFish = drawFishCard()
+//                                    if (newFish == -1) { /* Deck is empty */ }
+//                                    else if (newFish == 0) {
+//                                        receivedOldBoot(player: player)
+//                                    }
+//                                    else {
+//                                        players[player].fish += newFish
+//                                    }
+//                                }
                              }
                             default: break
                         }
@@ -2869,7 +2869,7 @@ class GameScene: SKScene {
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
                                 else {
-                                    players[player].coin += 1; print("\(players[player].name) mined sheep")
+                                    players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                 }
                             case .brick:
                                 resourcesReceived[player] = true
@@ -2887,16 +2887,16 @@ class GameScene: SKScene {
                              }
                              else {
                                 players[player].fish += newFish
-                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
-                                    newFish = drawFishCard()
-                                    if (newFish == -1) { /* Deck is empty */ }
-                                    else if (newFish  == 0) {
-                                        receivedOldBoot(player: player)
-                                    }
-                                    else {
-                                        players[player].fish += newFish
-                                    }
-                                }
+//                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
+//                                    newFish = drawFishCard()
+//                                    if (newFish == -1) { /* Deck is empty */ }
+//                                    else if (newFish  == 0) {
+//                                        receivedOldBoot(player: player)
+//                                    }
+//                                    else {
+//                                        players[player].fish += newFish
+//                                    }
+//                                }
                              }
                         default: break
                         }

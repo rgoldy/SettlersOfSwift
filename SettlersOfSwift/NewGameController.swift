@@ -133,6 +133,11 @@ class NewGameController: UITableViewController, NetworkDelegate {
         }
         else {
             appDelegate.networkManager.loadData = data
+            players = extractPlayerNames(data)
+            if (appDelegate.networkManager.session.connectedPeers.count + 1 == players.count)
+            {
+                startGame()
+            }
         }
     }
     
