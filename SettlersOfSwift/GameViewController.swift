@@ -215,7 +215,6 @@ class GameViewController: UIViewController, NetworkDelegate {
                 var deckUpdateMessage = "originalDeckUpdate"
                 for item in scenePort.gameDeck { deckUpdateMessage += "." + item!.rawValue }
                 let _ = appDelegate.networkManager.sendData(data: deckUpdateMessage)
-                menuButton.isEnabled = false
                 
                 // Create player objects and send to non-hosts
                 scenePort.initPlayers()
@@ -271,8 +270,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 scenePort.setNewGamePhase(info: message[1])
                 print("Updated currGamePhase")
             case "originalDeckUpdate":
-                for index in 1...54 { scenePort.gameDeck[index] = ProgressCardsType(rawValue: message[index])! }
-                menuButton.isEnabled = false
+                for index in 1...54 { scenePort.gameDeck[index - 1] = ProgressCardsType(rawValue: message[index])! }
             case "diceRoll":
                 let diceData = message[1].components(separatedBy: ",")
                 let redDie = Int(diceData[0])!
@@ -525,6 +523,7 @@ class GameViewController: UIViewController, NetworkDelegate {
                 if Int(message[2])! == scenePort.myPlayerIndex {
                     switch message[1] {
                         case "BRICK": scenePort.players[scenePort.myPlayerIndex].brick -= 1
+                        case "GOLD": scenePort.players[scenePort.myPlayerIndex].gold -= 1
                         case "SHEEP": scenePort.players[scenePort.myPlayerIndex].sheep -= 1
                         case "STONE": scenePort.players[scenePort.myPlayerIndex].stone -= 1
                         case "WHEAT": scenePort.players[scenePort.myPlayerIndex].wheat -= 1
@@ -807,117 +806,10 @@ class GameViewController: UIViewController, NetworkDelegate {
         }
     }
     
-    @IBAction func didInteractWithAdditionalButtonA(_ sender: Any) {
-        
-//                
-//        
-//        
-//        if(scenePort.currentPlayer == scenePort.myPlayerIndex) { //only accept taps if it's your turn
-//            switch scenePort.currGamePhase {
-//            case .p1Turn :
-//                if scenePort.players[scenePort.myPlayerIndex].nextAction != .WillBuildMetropolis {
-//                    if scenePort.players[scenePort.myPlayerIndex].nextAction == .WillRemoveOutlaw { scenePort.players[scenePort.myPlayerIndex].fish += 2 }
-//                    if scenePort.players[scenePort.myPlayerIndex].comingFromFishes {
-//                        scenePort.players[scenePort.myPlayerIndex].fish += 5
-//                        scenePort.players[scenePort.myPlayerIndex].comingFromFishes = false
-//                    }
-//                    if scenePort.players[scenePort.myPlayerIndex].nextAction == .WillBuildKnightForFree {
-//                        let corner = scenePort.handler.landHexVertexArray.first(where: {$0.row == scenePort.players[scenePort.myPlayerIndex].movingKnightFromRow && $0.column == scenePort.players[scenePort.myPlayerIndex].movingKnightFromCol})
-//                        
-//                        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: scenePort.myPlayerIndex)
-//                        corner!.cornerObject!.strength = scenePort.players[scenePort.myPlayerIndex].movingKnightStrength
-//                        corner!.cornerObject!.hasBeenUpgradedThisTurn = scenePort.players[scenePort.myPlayerIndex].movingKnightUpgraded
-//                        corner!.cornerObject!.isActive = true
-//                        corner!.cornerObject!.didActionThisTurn = false
-//                        scenePort.players[scenePort.myPlayerIndex].ownedKnights.append(corner!)
-//                        
-//                        let tileGroup = scenePort.handler.verticesTiles.tileGroups.first(where: {$0.name == "\(scenePort.players[scenePort.myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
-//                        scenePort.handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
-//                        
-//                        let cornerObjectInfo = "cornerData.\(scenePort.myPlayerIndex),\(corner!.column),\(corner!.row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
-//                        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
-//                        if (!sent) {
-//                            print ("failed to sync cornerObject")
-//                        }
-//                    }
-//                    scenePort.players[scenePort.myPlayerIndex].nextAction = .WillDoNothing
-//                }
-//            case .p2Turn :
-//                if (cancelButton.frame.contains(targetLocationView) && players[myPlayerIndex].nextAction != .WillBuildMetropolis) {
-//                    if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
-//                    if players[myPlayerIndex].comingFromFishes {
-//                        players[myPlayerIndex].fish += 5
-//                        players[myPlayerIndex].comingFromFishes = false
-//                    }
-//                    if players[myPlayerIndex].nextAction == .WillBuildKnightForFree {
-//                        let corner = handler.landHexVertexArray.first(where: {$0.row == players[myPlayerIndex].movingKnightFromRow && $0.column == players[myPlayerIndex].movingKnightFromCol})
-//                        
-//                        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
-//                        corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
-//                        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
-//                        corner!.cornerObject!.isActive = true
-//                        corner!.cornerObject!.didActionThisTurn = false
-//                        players[myPlayerIndex].ownedKnights.append(corner!)
-//                        
-//                        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
-//                        handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
-//                        
-//                        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(corner!.column),\(corner!.row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
-//                        
-//                        // Send player info to other players
-//                        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
-//                        if (!sent) {
-//                            print ("failed to sync cornerObject")
-//                        }
-//                    }
-//                    
-//                    players[myPlayerIndex].nextAction = .WillDoNothing
-//                    cancelButton.backgroundColor = UIColor.gray
-//                }
-//            case .p3Turn :
-//                if (cancelButton.frame.contains(targetLocationView) && players[myPlayerIndex].nextAction != .WillBuildMetropolis) {
-//                    if players[myPlayerIndex].nextAction == .WillRemoveOutlaw { players[myPlayerIndex].fish += 2 }
-//                    if players[myPlayerIndex].comingFromFishes {
-//                        players[myPlayerIndex].fish += 5
-//                        players[myPlayerIndex].comingFromFishes = false
-//                    }
-//                    if players[myPlayerIndex].nextAction == .WillBuildKnightForFree {
-//                        let corner = handler.landHexVertexArray.first(where: {$0.row == players[myPlayerIndex].movingKnightFromRow && $0.column == players[myPlayerIndex].movingKnightFromCol})
-//                        
-//                        corner!.cornerObject = cornerObject(cornerType : .Knight, owner: myPlayerIndex)
-//                        corner!.cornerObject!.strength = players[myPlayerIndex].movingKnightStrength
-//                        corner!.cornerObject!.hasBeenUpgradedThisTurn = players[myPlayerIndex].movingKnightUpgraded
-//                        corner!.cornerObject!.isActive = true
-//                        corner!.cornerObject!.didActionThisTurn = false
-//                        players[myPlayerIndex].ownedKnights.append(corner!)
-//                        
-//                        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(corner!.cornerObject!.type.rawValue)\(corner!.cornerObject!.strength)\(corner!.cornerObject!.isActive)"})
-//                        handler.Vertices.setTileGroup(tileGroup, forColumn: corner!.column, row: corner!.row)
-//                        
-//                        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(corner!.column),\(corner!.row),\(corner!.cornerObject!.type.rawValue),\(corner!.cornerObject!.strength),\(corner!.cornerObject!.isActive),\(corner!.cornerObject!.hasBeenUpgradedThisTurn),\(corner!.cornerObject!.didActionThisTurn)"
-//                        
-//                        // Send player info to other players
-//                        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
-//                        if (!sent) {
-//                            print ("failed to sync cornerObject")
-//                        }
-//                    }
-//                    players[myPlayerIndex].nextAction = .WillDoNothing
-//                    cancelButton.backgroundColor = UIColor.gray
-//                }
-//            default : break
-//            }
-//        }
-//        
-//        
-//        
-//        
-//        
-//        
-        
+    @IBAction func didInteractWithAdditionalButtonA(_ sender: Any) {    //  metropolis build button
     }
     
-    @IBAction func didInteractWithAdditionalButtonB(_ sender: Any) {
+    @IBAction func didInteractWithAdditionalButtonB(_ sender: Any) {        //   not used
     }
     
     @IBAction func toggleMusicPlayback(_ sender: Any) {

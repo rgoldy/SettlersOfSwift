@@ -61,6 +61,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithTopLeftButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         if !gameDataReference.scenePort.pirateRemoved || !gameDataReference.scenePort.robberRemoved {
             gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillRemoveOutlaw
             gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 2
@@ -70,6 +71,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithMiddleLeftButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 3
         let actionSheet = UIAlertController(title: "Opponent Steal", message: "Who would you like to steal randomly from?", preferredStyle: .alert)
         let previousPlayer = UIAlertAction(title: "Previous Player", style: .default) { action -> Void in
@@ -240,6 +242,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithBottomLeftButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 4
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
@@ -281,6 +284,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithTopRightButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 5
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillBuildRoadForFree
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].comingFromFishes = true
@@ -288,6 +292,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithMiddleRightButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 5
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].nextAction = .WillBuildShipForFree
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].comingFromFishes = true
@@ -295,6 +300,7 @@ class InGameMiscellaneousViewController: UIViewController {
     }
     
     @IBAction func didInteractWithBottomRightButton(_ sender: Any) {
+        if gameDataReference.scenePort.myPlayerIndex != gameDataReference.scenePort.currentPlayer || !gameDataReference.scenePort.rolled { return }
         gameDataReference.scenePort.players[gameDataReference.scenePort.myPlayerIndex].fish -= 7
         var deckCopy = [ProgressCardsType?]()
         for item in gameDataReference.scenePort.gameDeck { deckCopy.append(item) }
@@ -313,6 +319,9 @@ class InGameMiscellaneousViewController: UIViewController {
                         if self.gameDataReference.scenePort.gameDeck[index] == item {
                             let _ = self.gameDataReference.appDelegate.networkManager.sendData(data: "removeProgressCardAtIndex.\(index)")
                             self.gameDataReference.scenePort.gameDeck[index] = nil
+                            if item == .Constitution || item == .Printer {
+                                self.gameDataReference.scenePort.give(victoryPoints: 1, to: self.gameDataReference.scenePort.myPlayerIndex)
+                            } else { self.gameDataReference.scenePort.players[self.gameDataReference.scenePort.myPlayerIndex].progressCards.append(item!) }
                     }   }
                     self.wireButtonFunctionalities()
                 })
