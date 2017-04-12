@@ -793,6 +793,10 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "myVictoryPointsUpdate":
                 scenePort.players[Int(message[1])!].victoryPoints = Int(message[2])!
                 scenePort.players[scenePort.myPlayerIndex].victoryPointsRefreshed = true
+            case "longestRoad":
+                scenePort.players[Int(message[1])!].longestRoad = Int(message[2])!
+                scenePort.longestRoad = Int(message[2])!
+                scenePort.holdsLongestRoad = Int(message[1])!
             default:
                 print("Unknown message")
         }

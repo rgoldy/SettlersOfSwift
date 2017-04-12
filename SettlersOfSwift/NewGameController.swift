@@ -12,7 +12,7 @@ import MultipeerConnectivity
 class NewGameController: UITableViewController, NetworkDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    let numberOfPlayers = 3
+    let numberOfPlayers = 2
     var players : [String] = []
     
     @IBOutlet var tblView: UITableView!
@@ -30,7 +30,11 @@ class NewGameController: UITableViewController, NetworkDelegate {
         
         players = extractPlayerNames(appDelegate.networkManager.loadData)
         
-        if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
+        if (appDelegate.networkManager.loadData == "nil" && appDelegate.networkManager.session.connectedPeers.count + 1 == numberOfPlayers)
+        {
+            startGame()
+        }
+        else if (appDelegate.networkManager.session.connectedPeers.count + 1 == players.count)
         {
             startGame()
         }
@@ -80,7 +84,8 @@ class NewGameController: UITableViewController, NetworkDelegate {
     }
     
     func extractPlayerNames(_ data: String) -> [String] {
-        if data == "nil" { return []}
+        if data == "nil" { return [] }
+        var players : [String] = []
         let gameState = appDelegate.networkManager.loadData
         let unitData = gameState.components(separatedBy: ".")
         for unit in unitData {
@@ -105,7 +110,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
         }
         else {
             let _ = appDelegate.networkManager.sendData(data: appDelegate.networkManager.loadData)
-            if (appDelegate.networkManager.session.connectedPeers.count == players.count-1)
+            if (appDelegate.networkManager.session.connectedPeers.count == players.count - 1)
             {
                 startGame()
             }

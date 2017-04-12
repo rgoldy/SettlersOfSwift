@@ -20,6 +20,7 @@ enum GamePhase : String {
     case p1Turn
     case p2Turn
     case p3Turn
+    case gameOver
 }
 
 enum EventDieSides: Int {
@@ -94,6 +95,9 @@ class GameScene: SKScene {
     var robberRemoved = false
     
     var barbariansDistanceFromCatan = 7
+    
+    var longestRoad = 0
+    var holdsLongestRoad = -1
     
     override func didMove(to view: SKView) {
         //load tiles
@@ -796,6 +800,25 @@ class GameScene: SKScene {
         // Inform others of resource change
         sendPlayerData(player: myPlayerIndex)
         
+        var visited = [LandHexEdge]()
+        let length = calculateRoadLength(column: column, row: row, visited: &visited)
+        print ("Road Length = \(length)")
+        if length > longestRoad && length > 4 {
+            if (holdsLongestRoad != -1) {
+                give(victoryPoints: -2, to: holdsLongestRoad)
+            }
+            
+            players[myPlayerIndex].longestRoad = length
+            longestRoad = length
+            holdsLongestRoad = myPlayerIndex
+            
+            give(victoryPoints: 2, to: myPlayerIndex)
+            
+            let message = "longestRoad.\(myPlayerIndex).\(length)"
+            let _ = appDelegate.networkManager.sendData(data: message)
+            print("You have the longest road!")
+        }
+        
         return true
     }
     
@@ -832,6 +855,24 @@ class GameScene: SKScene {
         
         // Inform others of resource change
         sendPlayerData(player: myPlayerIndex)
+        
+        var visited = [LandHexEdge]()
+        let length = calculateRoadLength(column: column, row: row, visited: &visited)
+        if length > longestRoad && length > 4 {
+            if (holdsLongestRoad != -1) {
+                give(victoryPoints: -2, to: holdsLongestRoad)
+            }
+            
+            players[myPlayerIndex].longestRoad = length
+            longestRoad = length
+            holdsLongestRoad = myPlayerIndex
+            
+            give(victoryPoints: 2, to: myPlayerIndex)
+            
+            let message = "longestRoad.\(myPlayerIndex).\(length)"
+            let _ = appDelegate.networkManager.sendData(data: message)
+            print("You have the longest road!")
+        }
         
         return true
     }
@@ -1534,6 +1575,8 @@ class GameScene: SKScene {
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cornerType.Metropolis)\(corner!.cornerObject!.hasCityWall)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: col, row: row)
+        
+        give(victoryPoints: 2, to: myPlayerIndex)
     
         return true
     }
@@ -1579,7 +1622,10 @@ class GameScene: SKScene {
             let sent = appDelegate.networkManager.sendData(data: removeNotification)
             if !sent {print("failed to sync metropolis")}
             
+            give(victoryPoints: -2, to: from)
+            
             corner?.cornerObject?.type = .City
+
             
             let cornerObjectInfo = "cornerData.\(from),\(corner!.column),\(corner!.row),\(cornerType.City),\(corner!.cornerObject!.hasCityWall)"
             let sent2 = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -1614,6 +1660,7 @@ class GameScene: SKScene {
         let sent = appDelegate.networkManager.sendData(data: removeNotification)
         if !sent {print("failed to sync metropolis")}
         
+        give(victoryPoints: -2, to: myPlayerIndex)
         corner?.cornerObject?.type = .City
         
         let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City),\(corner!.cornerObject!.hasCityWall)"
@@ -1719,6 +1766,75 @@ class GameScene: SKScene {
         }
     }
     
+    func calculateRoadLength(column: Int, row: Int, visited: inout [LandHexEdge]) -> Int {
+        let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
+        if edge == nil { return 0 }
+        if edge!.edgeObject == nil { return 0 }
+        if edge!.edgeObject!.owner != myPlayerIndex { return 0 }
+        
+        visited.append(edge!)
+        
+        let v1 = edge!.neighbourVertex1
+        let v2 = edge!.neighbourVertex2
+        
+        
+        // Get length from left vertex
+        var leftLengths = [0, 0, 0]
+        if (v1.cornerObject == nil || v1.cornerObject?.owner == myPlayerIndex) {
+            var next = v1.neighbourEdges[0]
+            if next != nil && (next?.row != edge?.row || next?.column != edge?.column) {
+                let visit = visited.first(where: {$0.row == next?.row && $0.column == next?.column})
+                if (visit == nil) {
+                    leftLengths[0] = calculateRoadLength(column: (next?.column)!, row: (next?.row)!, visited: &visited)
+                }
+            }
+            next = v1.neighbourEdges[1]
+            if next != nil && (next?.row != edge?.row || next?.column != edge?.column) {
+                let visit = visited.first(where: {$0.row == next?.row && $0.column == next?.column})
+                if (visit == nil) {
+                    leftLengths[1] = calculateRoadLength(column: (next?.column)!, row: (next?.row)!, visited: &visited)
+                }
+            }
+            next = v1.neighbourEdges[2]
+            if next != nil && (next?.row != edge?.row || next?.column != edge?.column) {
+                let visit = visited.first(where: {$0.row == next?.row && $0.column == next?.column})
+                if (visit == nil) {
+                    leftLengths[2] = calculateRoadLength(column: (next?.column)!, row: (next?.row)!, visited: &visited)
+                }
+            }
+        }
+        let leftLength = leftLengths.max()
+        
+        // Get length from right vertex
+        var rightLengths = [0, 0, 0]
+        if (v2.cornerObject == nil || v2.cornerObject?.owner == myPlayerIndex) {
+            var next = v2.neighbourEdges[0]
+            if next != nil && (next?.row != edge?.row || next?.column != edge?.column) {
+                let visit = visited.first(where: {$0.row == next?.row && $0.column == next?.column})
+                if (visit == nil) {
+                    rightLengths[0] = calculateRoadLength(column: (next?.column)!, row: (next?.row)!, visited: &visited)
+                }
+            }
+            next = v2.neighbourEdges[1]
+            if next != nil && (next?.row != edge?.row || next?.column != edge?.column) {
+                let visit = visited.first(where: {$0.row == next?.row && $0.column == next?.column})
+                if (visit == nil) {
+                    rightLengths[1] = calculateRoadLength(column: (next?.column)!, row: (next?.row)!, visited: &visited)
+                }
+            }
+            next = v2.neighbourEdges[2]
+            if next != nil && (next?.row != edge?.row || next?.column != edge?.column) {
+                let visit = visited.first(where: {$0.row == next?.row && $0.column == next?.column})
+                if (visit == nil) {
+                    rightLengths[2] = calculateRoadLength(column: (next?.column)!, row: (next?.row)!, visited: &visited)
+                }
+            }
+        }
+        let rightLength = rightLengths.max()
+        
+        return rightLength! + leftLength! + 1
+    }
+    
     //function that will place an edge object and set its owner then send info to other players
     func placeEdgeObject(column : Int, row : Int, type : edgeType) -> Bool {
         let edge = handler.landHexEdgeArray.first(where: {$0.column == column && $0.row == row})
@@ -1741,6 +1857,25 @@ class GameScene: SKScene {
         }
         else {
             print ("successful sync cornerObject")
+        }
+        
+        var visited = [LandHexEdge]()
+        let length = calculateRoadLength(column: column, row: row, visited: &visited)
+        if length > longestRoad && length > 4 {
+            if (holdsLongestRoad != -1) {
+                give(victoryPoints: -2, to: holdsLongestRoad)
+            }
+            
+            players[myPlayerIndex].longestRoad = length
+            longestRoad = length
+            holdsLongestRoad = myPlayerIndex
+            
+            give(victoryPoints: 2, to: myPlayerIndex)
+            
+            let message = "longestRoad.\(myPlayerIndex).\(length)"
+            let _ = appDelegate.networkManager.sendData(data: message)
+            
+            print("You have the longest road!")
         }
         
         return true
@@ -1947,8 +2082,9 @@ class GameScene: SKScene {
                     let politics = UIAlertAction(title: "Politics", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         let newCard = ProgressCardsType.getNextCardOfCategory(.Politics, fromDeck: &self.gameDeck)
                         if newCard == .Constitution {
-                            self.players[self.myPlayerIndex].victoryPoints += 1
-                            self.checkWinningConditions(who: self.myPlayerIndex)
+                            self.give(victoryPoints: 1, to: self.myPlayerIndex)
+                            //self.players[self.myPlayerIndex].victoryPoints += 1
+                            //self.checkWinningConditions(who: self.myPlayerIndex)
                         } else if newCard != nil { self.players[self.myPlayerIndex].progressCards.append(newCard!) }
                         let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.\(self.myPlayerIndex).POLITICS")
                         if !sent { print("failed to send draw progress card") }
@@ -1957,8 +2093,9 @@ class GameScene: SKScene {
                     let science = UIAlertAction(title: "Science", style: UIAlertActionStyle.default) { (alertAction) -> Void in
                         let newCard = ProgressCardsType.getNextCardOfCategory(.Sciences, fromDeck: &self.gameDeck)
                         if newCard == .Printer {
-                            self.players[self.myPlayerIndex].victoryPoints += 1
-                            self.checkWinningConditions(who: self.myPlayerIndex)
+                            self.give(victoryPoints: 1, to: self.myPlayerIndex)
+                            //self.players[self.myPlayerIndex].victoryPoints += 1
+                            //self.checkWinningConditions(who: self.myPlayerIndex)
                         } else if newCard != nil { self.players[self.myPlayerIndex].progressCards.append(newCard!) }
                         let sent = self.appDelegate.networkManager.sendData(data: "drewProgressCard.\(self.myPlayerIndex).SCIENCES")
                         if !sent { print("failed to send draw progress card") }
@@ -1985,7 +2122,6 @@ class GameScene: SKScene {
         
         cityCorner?.cornerObject?.type = .Settlement
         cityCorner?.cornerObject?.hasCityWall = false
-        players[myPlayerIndex].victoryPoints += 1
         
         let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[who].color.rawValue)\(cityCorner!.cornerObject!.type.rawValue)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: column, row: row)
@@ -1995,7 +2131,7 @@ class GameScene: SKScene {
         print("DestroyCity \(cornerObjectInfo)")
         if !sent { print ("Failed to update others on city destruction") }
         
-        give(victoryPoints: -2, to: who)
+        give(victoryPoints: -1, to: who)
         
         cornerObjectInfo = "cornerData.\(who),\(column),\(row),\(cornerType.Settlement)"
         sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
@@ -2483,8 +2619,9 @@ class GameScene: SKScene {
                             notificationBanner.removeFromSuperview()
                         })
                         if card == .Constitution {
-                            players[myPlayerIndex].victoryPoints += 1
-                            checkWinningConditions(who: myPlayerIndex)
+                            self.give(victoryPoints: 1, to: self.myPlayerIndex)
+                            //players[myPlayerIndex].victoryPoints += 1
+                            //checkWinningConditions(who: myPlayerIndex)
                         } else { players[myPlayerIndex].progressCards.append(card) }
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Politics Deck...hurry up and finish the game!"
@@ -2508,8 +2645,9 @@ class GameScene: SKScene {
                             notificationBanner.removeFromSuperview()
                         })
                         if card == .Printer {
-                            players[myPlayerIndex].victoryPoints += 1
-                            checkWinningConditions(who: myPlayerIndex)
+                            self.give(victoryPoints: 1, to: self.myPlayerIndex)
+                            //players[myPlayerIndex].victoryPoints += 1
+                            //checkWinningConditions(who: myPlayerIndex)
                         } else { players[myPlayerIndex].progressCards.append(card) }
                     } else {
                         notificationContent.text = "Unfortunately, there is no Progress Card remaining from the Sciences Deck...hurry up and finish the game!"
@@ -2560,7 +2698,7 @@ class GameScene: SKScene {
         for (col, row) in producingCoords! {
             for player in 0..<players.count { // for each player...
                 for vertex in players[player].ownedCorners { // distribute resources if vertex touches hex
-                    if (vertex.cornerObject?.type == cornerType.City) {
+                    if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                         numberResources = 2
                     } else {
                         numberResources = 1
@@ -2569,7 +2707,7 @@ class GameScene: SKScene {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
                             case .wood:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                     players[player].paper += 1; print("\(players[player].name) produced paper")
                                 }
@@ -2578,7 +2716,7 @@ class GameScene: SKScene {
                                 }
                             case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                     players[player].coin += 1; print("\(players[player].name) produced coin")
                                 }
@@ -2586,7 +2724,7 @@ class GameScene: SKScene {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
@@ -2605,7 +2743,7 @@ class GameScene: SKScene {
                                 }
                                 else {
                                     players[player].fish += newFish
-                                    if (vertex.cornerObject?.type == cornerType.City) {
+                                    if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                         newFish = drawFishCard()
                                         if (newFish == -1) { /* Deck is empty */ }
                                         else if (newFish == 0) {
@@ -2623,7 +2761,7 @@ class GameScene: SKScene {
                         // Distribute resources of type tile2.type
                         switch vertex.tile2!.type! {
                             case .wood:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                     players[player].paper += 1; print("\(players[player].name) produced paper")
                                 }
@@ -2632,7 +2770,7 @@ class GameScene: SKScene {
                                 }
                             case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                     players[player].coin += 1; print("\(players[player].name) produced coin")
                                 }
@@ -2640,7 +2778,7 @@ class GameScene: SKScene {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
@@ -2659,7 +2797,7 @@ class GameScene: SKScene {
                              }
                              else {
                                 players[player].fish += newFish
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     newFish = drawFishCard()
                                     if (newFish == -1) { /* Deck is empty */ }
                                     else if (newFish == 0) {
@@ -2677,7 +2815,7 @@ class GameScene: SKScene {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
                             case .wood:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                     players[player].paper += 1; print("\(players[player].name) produced paper")
                                 }
@@ -2686,7 +2824,7 @@ class GameScene: SKScene {
                                 }
                             case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                     players[player].coin += 1; print("\(players[player].name) produced coin")
                                 }
@@ -2694,7 +2832,7 @@ class GameScene: SKScene {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
                                 }
@@ -2713,7 +2851,7 @@ class GameScene: SKScene {
                              }
                              else {
                                 players[player].fish += newFish
-                                if (vertex.cornerObject?.type == cornerType.City) {
+                                if (vertex.cornerObject?.type == cornerType.City || vertex.cornerObject?.type == cornerType.Metropolis) {
                                     newFish = drawFishCard()
                                     if (newFish == -1) { /* Deck is empty */ }
                                     else if (newFish  == 0) {
@@ -3495,11 +3633,11 @@ class GameScene: SKScene {
         var reqVP = requiredVictoryPoints
         if (players[who].hasOldBoot) { reqVP += 1 }
         if reqVP <= players[who].victoryPoints {
-            let announcement = "\(players[who].name) (\(players[who].color.rawValue)) has conquered Catan!"
+            let announcement = "\(players[who].name) (\(players[who].color.rawValue) Player) has conquered Catan!"
             let alert = UIAlertController(title: "Game Over", message: announcement, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "CONTINUE", style: .default, handler: { (action) in
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
                 //  END GAME AND RETURN TO MAIN MENU
-
+                self.currGamePhase = .gameOver
             }))
             self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
         }
@@ -3585,7 +3723,7 @@ class GameScene: SKScene {
         for fish in fishDeck {
             gameState.append("|\(fish.value)")
         }
-        gameState.append(".GAMEDATA|\(currGamePhase.rawValue)|\(dice.redValue)|\(dice.yellowValue)|\(dice.eventValue)|\(currentPlayer)|\(rolled)|\(politicsMetropolisPlaced)|\(sciencesMetropolisPlaced)|\(tradesMetropolisPlaced)|\(maximaPoliticsImprovementReached)|\(maximaSciencesImprovementReached)|\(maximaTradesImprovementReached)|\(pirateRemoved)|\(robberRemoved)|\(barbariansDistanceFromCatan)")
+        gameState.append(".GAMEDATA|\(currGamePhase.rawValue)|\(dice.redValue)|\(dice.yellowValue)|\(dice.eventValue)|\(currentPlayer)|\(rolled)|\(politicsMetropolisPlaced)|\(sciencesMetropolisPlaced)|\(tradesMetropolisPlaced)|\(maximaPoliticsImprovementReached)|\(maximaSciencesImprovementReached)|\(maximaTradesImprovementReached)|\(pirateRemoved)|\(robberRemoved)|\(barbariansDistanceFromCatan)|\(longestRoad)|\(holdsLongestRoad)")
         
         
         // SAVE gameState to file
@@ -3795,6 +3933,8 @@ class GameScene: SKScene {
         pirateRemoved = Bool(data[13])!
         robberRemoved = Bool(data[14])!
         barbariansDistanceFromCatan = Int(data[15])!
+        longestRoad = Int(data[16])!
+        holdsLongestRoad = Int(data[17])!
         
         if (currentPlayer == myPlayerIndex) {
             DispatchQueue.main.async {
