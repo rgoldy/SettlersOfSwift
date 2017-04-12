@@ -2442,13 +2442,13 @@ class GameScene: SKScene {
                 let _ = appDelegate.networkManager.sendData(data: "robberDiscardScenario")
                 checkIfCardsNeedDiscard()
             }
-            if (!robberRemoved || !pirateRemoved) && currentPlayer == myPlayerIndex {
-                players[myPlayerIndex].canMoveOutlaw = true
-                let alert = UIAlertController(title: "Move Robber or Pirate", message: "Move either the robber, pirate, or choose to do nothing.", preferredStyle: .alert)
-                let alertAction = UIAlertAction(title: "Robber", style: .default, handler: nil)
-                alert.addAction(alertAction)
-                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
-            }
+//            if (!robberRemoved || !pirateRemoved) && currentPlayer == myPlayerIndex {
+//                players[myPlayerIndex].canMoveOutlaw = true
+//                let alert = UIAlertController(title: "Move Robber or Pirate", message: "Move either the robber, pirate, or choose to do nothing.", preferredStyle: .alert)
+//                let alertAction = UIAlertAction(title: "Robber", style: .default, handler: nil)
+//                alert.addAction(alertAction)
+//                self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+//            }
         }
         
         // distribute resources on other players' devices
@@ -2561,6 +2561,7 @@ class GameScene: SKScene {
     
     // function that will distribute resources to all players
     func distributeResources(dice: Int) {
+        var resourcesReceived = [false, false, false]
         print ("Dice = \(dice)")
         var numberResources : Int = 0
         let producingCoords = handler.landHexDictionary[dice]
@@ -2576,6 +2577,7 @@ class GameScene: SKScene {
                         // Distribute resources of type tile1.type
                         switch vertex.tile1.type! {
                             case .wood:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                     players[player].paper += 1; print("\(players[player].name) produced paper")
@@ -2583,8 +2585,11 @@ class GameScene: SKScene {
                                 else {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                 }
-                            case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
+                            case .wheat:
+                                resourcesReceived[player] = true
+                                players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                     players[player].coin += 1; print("\(players[player].name) produced coin")
@@ -2593,6 +2598,7 @@ class GameScene: SKScene {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
@@ -2600,8 +2606,12 @@ class GameScene: SKScene {
                                 else {
                                     players[player].coin += 1; print("\(players[player].name) mined sheep")
                                 }
-                            case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
-                            case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
+                            case .brick:
+                                resourcesReceived[player] = true
+                                players[player].brick += numberResources; print("\(players[player].name) mined brick")
+                            case .gold:
+                                resourcesReceived[player] = true
+                                players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
                                 if !vertex.isValidFish {break}
                                 var newFish = drawFishCard()
@@ -2630,6 +2640,7 @@ class GameScene: SKScene {
                         // Distribute resources of type tile2.type
                         switch vertex.tile2!.type! {
                             case .wood:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                     players[player].paper += 1; print("\(players[player].name) produced paper")
@@ -2637,8 +2648,11 @@ class GameScene: SKScene {
                                 else {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                 }
-                            case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
+                            case .wheat:
+                                resourcesReceived[player] = true
+                                players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                     players[player].coin += 1; print("\(players[player].name) produced coin")
@@ -2647,6 +2661,7 @@ class GameScene: SKScene {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
@@ -2654,8 +2669,12 @@ class GameScene: SKScene {
                                 else {
                                     players[player].coin += 1; print("\(players[player].name) mined sheep")
                                 }
-                            case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
-                            case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
+                            case .brick:
+                                resourcesReceived[player] = true
+                                players[player].brick += numberResources; print("\(players[player].name) mined brick")
+                            case .gold:
+                                resourcesReceived[player] = true
+                                players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
                              if !vertex.isValidFish {break}
                              var newFish = drawFishCard()
@@ -2684,6 +2703,7 @@ class GameScene: SKScene {
                         // Distribute resources of type tile1.type
                         switch vertex.tile3!.type! {
                             case .wood:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                     players[player].paper += 1; print("\(players[player].name) produced paper")
@@ -2691,8 +2711,11 @@ class GameScene: SKScene {
                                 else {
                                     players[player].wood += 1; print("\(players[player].name) mined wood")
                                 }
-                            case .wheat: players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
+                            case .wheat:
+                                resourcesReceived[player] = true
+                                players[player].wheat += numberResources; print("\(players[player].name) mined wheat")
                             case .stone:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                     players[player].coin += 1; print("\(players[player].name) produced coin")
@@ -2701,6 +2724,7 @@ class GameScene: SKScene {
                                     players[player].stone += 1; print("\(players[player].name) mined stone")
                                 }
                             case .sheep:
+                                resourcesReceived[player] = true
                                 if (vertex.cornerObject?.type == cornerType.City) {
                                     players[player].sheep += 1; print("\(players[player].name) mined sheep")
                                     players[player].cloth += 1; print("\(players[player].name) produced cloth")
@@ -2708,8 +2732,12 @@ class GameScene: SKScene {
                                 else {
                                     players[player].coin += 1; print("\(players[player].name) mined sheep")
                                 }
-                            case .brick: players[player].brick += numberResources; print("\(players[player].name) mined brick")
-                            case .gold: players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
+                            case .brick:
+                                resourcesReceived[player] = true
+                                players[player].brick += numberResources; print("\(players[player].name) mined brick")
+                            case .gold:
+                                resourcesReceived[player] = true
+                                players[player].gold += (numberResources*2); print("\(players[player].name) mined gold")
                             case .fish:
                              if !vertex.isValidFish {break}
                              var newFish = drawFishCard()
@@ -2738,6 +2766,40 @@ class GameScene: SKScene {
             }
         }
         print(players[myPlayerIndex].getPlayerText())
+        for index in 0..<players.count {
+            if !resourcesReceived[index] {
+                let _ = appDelegate.networkManager.sendData(data: "benefitsOfNoResourceDrawn.\(index)")
+            }
+        }
+        if !resourcesReceived[myPlayerIndex] && players[myPlayerIndex].sciencesImprovementLevel >= 2 {
+            
+                let actionSheet = UIAlertController(title: "Draw Benefits", message: "Since you haven't received any resource, choose one!", preferredStyle: .alert)
+                let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                    self.players[self.myPlayerIndex].brick += 1
+                }
+                actionSheet.addAction(brickResource)
+                let goldResource = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                    self.players[self.myPlayerIndex].gold += 1
+                }
+                actionSheet.addAction(goldResource)
+                let sheepResource = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                    self.players[self.myPlayerIndex].sheep += 1
+                }
+                actionSheet.addAction(sheepResource)
+                let stoneResource = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                    self.players[self.myPlayerIndex].stone += 1
+                }
+                actionSheet.addAction(stoneResource)
+                let wheatResource = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                    self.players[self.myPlayerIndex].wheat += 1
+                }
+                actionSheet.addAction(wheatResource)
+                let woodResource = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                    self.players[self.myPlayerIndex].wood += 1
+                }
+                actionSheet.addAction(woodResource)
+                self.view?.window?.rootViewController?.present(actionSheet, animated: true, completion: nil)
+        }
     }
     
     func receivedOldBoot(player: Int) {
@@ -4019,7 +4081,7 @@ class GameScene: SKScene {
     
     func checkIfCardsNeedDiscard() {
         let discardCount = players[myPlayerIndex].mustRemoveHalfOfHand()
-        if discardCount != 0 && false { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
+        if discardCount != 0 { robberCardDiscard(originalAmount: discardCount, amount: discardCount) }
         else { moveRobberOrPirate() }
         
     }

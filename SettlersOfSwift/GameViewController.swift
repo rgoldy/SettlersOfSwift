@@ -813,6 +813,35 @@ class GameViewController: UIViewController, NetworkDelegate {
                     scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
                     scenePort.robberRemoved = true
                 }
+            case "benefitsOfNoResourceDrawn":
+                if scenePort.myPlayerIndex == Int(message[1])! && scenePort.players[scenePort.myPlayerIndex].sciencesImprovementLevel >= 2 {
+                    let actionSheet = UIAlertController(title: "Draw Benefits", message: "Since you haven't received any resource, choose one!", preferredStyle: .alert)
+                    let brickResource = UIAlertAction(title: "Brick", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].brick += 1
+                    }
+                    actionSheet.addAction(brickResource)
+                    let goldResource = UIAlertAction(title: "Gold", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].gold += 1
+                    }
+                    actionSheet.addAction(goldResource)
+                    let sheepResource = UIAlertAction(title: "Sheep", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].sheep += 1
+                    }
+                    actionSheet.addAction(sheepResource)
+                    let stoneResource = UIAlertAction(title: "Stone", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].stone += 1
+                    }
+                    actionSheet.addAction(stoneResource)
+                    let wheatResource = UIAlertAction(title: "Wheat", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].wheat += 1
+                    }
+                    actionSheet.addAction(wheatResource)
+                    let woodResource = UIAlertAction(title: "Wood", style: .default) { action -> Void in
+                        self.scenePort.players[self.scenePort.myPlayerIndex].wood += 1
+                    }
+                    actionSheet.addAction(woodResource)
+                    self.present(actionSheet, animated: true, completion: nil)
+                }
             default:
                 print("Unknown message")
         }
