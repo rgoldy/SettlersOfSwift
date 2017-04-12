@@ -14,6 +14,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let numberOfPlayers = 3
     var players : [String] = []
+    var started = false
     
     @IBOutlet var tblView: UITableView!
     
@@ -31,12 +32,14 @@ class NewGameController: UITableViewController, NetworkDelegate {
         players = extractPlayerNames(appDelegate.networkManager.loadData)
         print ("\(players.count) player game")
         
-        if (appDelegate.networkManager.loadData == "nil" && appDelegate.networkManager.session.connectedPeers.count + 1 == numberOfPlayers)
+        if (appDelegate.networkManager.loadData == "nil" && appDelegate.networkManager.session.connectedPeers.count + 1 == numberOfPlayers && !started)
         {
+            started = true
             startGame()
         }
-        else if (appDelegate.networkManager.session.connectedPeers.count + 1 == players.count)
+        else if (appDelegate.networkManager.session.connectedPeers.count + 1 == players.count && started == false)
         {
+            started = true
             startGame()
         }
     }
@@ -108,15 +111,17 @@ class NewGameController: UITableViewController, NetworkDelegate {
         tblView.reloadData()
 
         if appDelegate.networkManager.loadData == "nil" {
-            if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1)
+            if (appDelegate.networkManager.session.connectedPeers.count == numberOfPlayers - 1 && !started)
             {
+                started = true
                 startGame()
             }
         }
         else {
             let _ = appDelegate.networkManager.sendData(data: appDelegate.networkManager.loadData)
-            if (appDelegate.networkManager.session.connectedPeers.count == players.count - 1)
+            if (appDelegate.networkManager.session.connectedPeers.count == players.count - 1 && !started)
             {
+                started = true
                 startGame()
             }
         }
@@ -134,8 +139,9 @@ class NewGameController: UITableViewController, NetworkDelegate {
         else {
             appDelegate.networkManager.loadData = data
             players = extractPlayerNames(data)
-            if (appDelegate.networkManager.session.connectedPeers.count + 1 == players.count)
+            if (appDelegate.networkManager.session.connectedPeers.count + 1 == players.count && !started)
             {
+                started = true
                 startGame()
             }
         }

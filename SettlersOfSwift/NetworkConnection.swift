@@ -130,6 +130,7 @@ class NetworkConnection : NSObject {
                 return false
             }
             
+
             try self.session.send(c_data! as Data, toPeers: self.session.connectedPeers, with: MCSessionSendDataMode.reliable)
         }
         catch {

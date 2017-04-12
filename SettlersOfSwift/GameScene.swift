@@ -3413,7 +3413,10 @@ class GameScene: SKScene {
                     }
 
                     players[myPlayerIndex].nextAction = .WillDoNothing
-                    cancelButton.backgroundColor = UIColor.gray
+                    DispatchQueue.main.async {
+                        self.cancelButton.backgroundColor = UIColor.gray
+                    }
+                    //cancelButton.backgroundColor = UIColor.gray
                 }
                 if (oldBootButton.frame.contains(targetLocationView)) {
                     if (!showingBootMenu && players[myPlayerIndex].hasOldBoot) {
@@ -3475,7 +3478,10 @@ class GameScene: SKScene {
                     }
 
                     players[myPlayerIndex].nextAction = .WillDoNothing
-                    cancelButton.backgroundColor = UIColor.gray
+                    //cancelButton.backgroundColor = UIColor.gray
+                    DispatchQueue.main.async {
+                        self.cancelButton.backgroundColor = UIColor.gray
+                    }
                 }
                 if (oldBootButton.frame.contains(targetLocationView)) {
                     if (!showingBootMenu && players[myPlayerIndex].hasOldBoot) {
