@@ -809,18 +809,27 @@ class GameScene: SKScene {
         var visited = [LandHexEdge]()
         let length = calculateRoadLength(column: column, row: row, visited: &visited)
         print ("Road Length = \(length)")
-        if length > longestRoad && length > 4 {
+        if length > longestRoad {
             if (holdsLongestRoad != -1) {
                 give(victoryPoints: -2, to: holdsLongestRoad)
             }
             
-            players[myPlayerIndex].longestRoad = length
+            players[currentPlayer].longestRoad = length
             longestRoad = length
             holdsLongestRoad = myPlayerIndex
             
-            give(victoryPoints: 2, to: myPlayerIndex)
+            if length > 4 {
+                give(victoryPoints: 2, to: myPlayerIndex)
+            }
             
-            let message = "longestRoad.\(myPlayerIndex).\(length)"
+            let message = "longestRoad.\(currentPlayer).\(length)"
+            let _ = appDelegate.networkManager.sendData(data: message)
+            print("You have the longest road!")
+        }
+        else if length > players[currentPlayer].longestRoad {
+            players[myPlayerIndex].longestRoad = length
+            
+            let message = "longestRoad.\(currentPlayer).\(length)"
             let _ = appDelegate.networkManager.sendData(data: message)
             print("You have the longest road!")
         }
@@ -855,27 +864,36 @@ class GameScene: SKScene {
         
         // Take resources from hand if not building ship for free
         if(players[currentPlayer].nextAction != .WillBuildShipForFree) {
-            players[myPlayerIndex].sheep -= 1
-            players[myPlayerIndex].wood -= 1
+            players[currentPlayer].sheep -= 1
+            players[currentPlayer].wood -= 1
         }
         
         // Inform others of resource change
-        sendPlayerData(player: myPlayerIndex)
+        sendPlayerData(player: currentPlayer)
         
         var visited = [LandHexEdge]()
         let length = calculateRoadLength(column: column, row: row, visited: &visited)
-        if length > longestRoad && length > 4 {
+        if length > longestRoad {
             if (holdsLongestRoad != -1) {
                 give(victoryPoints: -2, to: holdsLongestRoad)
             }
             
-            players[myPlayerIndex].longestRoad = length
+            players[currentPlayer].longestRoad = length
             longestRoad = length
-            holdsLongestRoad = myPlayerIndex
+            holdsLongestRoad = currentPlayer
             
-            give(victoryPoints: 2, to: myPlayerIndex)
+            if length > 4 {
+                give(victoryPoints: 2, to: currentPlayer)
+            }
             
-            let message = "longestRoad.\(myPlayerIndex).\(length)"
+            let message = "longestRoad.\(currentPlayer).\(length)"
+            let _ = appDelegate.networkManager.sendData(data: message)
+            print("You have the longest road!")
+        }
+        else if length > players[currentPlayer].longestRoad {
+            players[currentPlayer].longestRoad = length
+            
+            let message = "longestRoad.\(currentPlayer).\(length)"
             let _ = appDelegate.networkManager.sendData(data: message)
             print("You have the longest road!")
         }
@@ -1867,7 +1885,7 @@ class GameScene: SKScene {
         
         var visited = [LandHexEdge]()
         let length = calculateRoadLength(column: column, row: row, visited: &visited)
-        if length > longestRoad && length > 4 {
+        if length > longestRoad {
             if (holdsLongestRoad != -1) {
                 give(victoryPoints: -2, to: holdsLongestRoad)
             }
@@ -1876,11 +1894,20 @@ class GameScene: SKScene {
             longestRoad = length
             holdsLongestRoad = myPlayerIndex
             
-            give(victoryPoints: 2, to: myPlayerIndex)
+            if length > 4 {
+                give(victoryPoints: 2, to: myPlayerIndex)
+            }
             
-            let message = "longestRoad.\(myPlayerIndex).\(length)"
+            let message = "longestRoad.\(currentPlayer).\(length)"
             let _ = appDelegate.networkManager.sendData(data: message)
             
+            print("You have the longest road!")
+        }
+        else if length > players[currentPlayer].longestRoad {
+            players[myPlayerIndex].longestRoad = length
+            
+            let message = "longestRoad.\(currentPlayer).\(length)"
+            let _ = appDelegate.networkManager.sendData(data: message)
             print("You have the longest road!")
         }
         
@@ -4129,7 +4156,7 @@ class GameScene: SKScene {
     
     func moveRobberOrPirate() {
         if currentPlayer != myPlayerIndex { return }
-        let alert = UIAlertController(title: "Move Robber or Pirate", message: "change later", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Move Robber or Pirate", message: "Choose which outlaw you'd like to move", preferredStyle: .actionSheet)
         let robber = UIAlertAction(title: "Robber", style: .default, handler: { action -> Void in
             self.players[self.myPlayerIndex].nextAction = .WillMoveRobber
         })

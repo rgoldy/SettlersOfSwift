@@ -87,7 +87,15 @@ thirdPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0
         }
         description += "Number of Knights: \(numKnight)\n"
         description += "Active Knight Strength: \(activeStrength)\n"
-        description += "Total Knight Strength: \(totalStrength)\n"
+        description += "Total Knight Strength: \(totalStrength)\n\n"
+        
+        description += "Longest Road: \(somePlayer.longestRoad)\n\n"
+        
+        description += "Politics Improvement Level: \(somePlayer.politicsImprovementLevel + 1)\n"
+        description += "Sciences Improvement Level: \(somePlayer.sciencesImprovementLevel + 1)\n"
+        description += "Trades Improvement Level: \(somePlayer.tradesImprovementLevel + 1)\n\n"
+        
+        description += "Barbarian Distance: \(gameDataReference.scenePort.barbariansDistanceFromCatan)\n\n"
         
         return description
     }
