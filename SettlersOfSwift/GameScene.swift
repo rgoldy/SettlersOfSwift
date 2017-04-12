@@ -810,7 +810,7 @@ class GameScene: SKScene {
         let length = calculateRoadLength(column: column, row: row, visited: &visited)
         print ("Road Length = \(length)")
         if length > longestRoad {
-            if (holdsLongestRoad != -1) {
+            if (holdsLongestRoad != -1 && longestRoad > 4) {
                 give(victoryPoints: -2, to: holdsLongestRoad)
             }
             
@@ -874,7 +874,7 @@ class GameScene: SKScene {
         var visited = [LandHexEdge]()
         let length = calculateRoadLength(column: column, row: row, visited: &visited)
         if length > longestRoad {
-            if (holdsLongestRoad != -1) {
+            if (holdsLongestRoad != -1 && longestRoad > 4) {
                 give(victoryPoints: -2, to: holdsLongestRoad)
             }
             
@@ -985,10 +985,18 @@ class GameScene: SKScene {
         // Inform other players of resource change
         sendPlayerData(player: myPlayerIndex)
         
-        let cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City.rawValue),false"
+        var cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),nil"
         
         // Send object info to other players
-        let sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
+        if (!sent) {
+            print ("failed to sync cornerObject")
+        }
+        
+        cornerObjectInfo = "cornerData.\(myPlayerIndex),\(column),\(row),\(cornerType.City.rawValue),false"
+        
+        // Send object info to other players
+        sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         if (!sent) {
             print ("failed to sync cornerObject")
         }
@@ -1593,11 +1601,11 @@ class GameScene: SKScene {
         var sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         if !sent {print("failed to sync metropolis")}
         
-        cornerObjectInfo = "cornerData.\(currentPlayer),\(col),\(row),\(cornerType.Metropolis),\(corner!.cornerObject!.hasCityWall)"
+        cornerObjectInfo = "cornerData.\(currentPlayer),\(col),\(row),\(cornerType.Metropolis.rawValue),\(corner!.cornerObject!.hasCityWall)"
         sent = appDelegate.networkManager.sendData(data: cornerObjectInfo)
         if !sent {print("failed to sync metropolis")}
         
-        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cornerType.Metropolis)\(corner!.cornerObject!.hasCityWall)"})
+        let tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[myPlayerIndex].color.rawValue)\(cornerType.Metropolis.rawValue)\(corner!.cornerObject!.hasCityWall)"})
         handler.Vertices.setTileGroup(tileGroup, forColumn: col, row: row)
         
         give(victoryPoints: 2, to: myPlayerIndex)
@@ -1856,7 +1864,11 @@ class GameScene: SKScene {
         }
         let rightLength = rightLengths.max()
         
-        return rightLength! + leftLength! + 1
+        if rightLength! > leftLength! {
+            return rightLength! + 1
+        }
+        
+        return leftLength! + 1
     }
     
     //function that will place an edge object and set its owner then send info to other players
@@ -1886,7 +1898,7 @@ class GameScene: SKScene {
         var visited = [LandHexEdge]()
         let length = calculateRoadLength(column: column, row: row, visited: &visited)
         if length > longestRoad {
-            if (holdsLongestRoad != -1) {
+            if (holdsLongestRoad != -1 && longestRoad > 4) {
                 give(victoryPoints: -2, to: holdsLongestRoad)
             }
             
@@ -3962,6 +3974,7 @@ class GameScene: SKScene {
             corner?.harbourType = harborType
             corner!.cornerObject = cornerObject(cornerType : type, owner: player)
             corner!.cornerObject?.hasCityWall = hasCityWall
+            corner!.cornerObject?.type = type
             players[player].ownedCorners.append(corner!)
             
             var tileGroup = handler.verticesTiles.tileGroups.first(where: {$0.name == "\(players[player].color.rawValue)\(corner!.cornerObject!.type.rawValue)"})

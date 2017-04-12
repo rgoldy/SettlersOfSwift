@@ -32,17 +32,17 @@ class InGameStatisticsViewController: UIViewController {
         super.viewWillAppear(animated)
         self.view.backgroundColor = UIColor(patternImage: UIImage(named: "menuBackground")!)
         let playerIndex = gameDataReference.scenePort.myPlayerIndex
-        firstPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 14)
+        firstPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 12)
         firstPlayerDescription.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         firstPlayerDescription.textColor = UIColor(colorLiteralRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         firstPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0.85, blue: 0.85, alpha: 0.75)
         firstPlayerDescription.text = getPlayerDescription(playerIndex: playerIndex, isPlayer: true)
-        secondPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 14)
+        secondPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 12)
         secondPlayerDescription.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         secondPlayerDescription.textColor = UIColor(colorLiteralRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
 secondPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0.85, blue: 0.85, alpha: 0.75)
         secondPlayerDescription.text = getPlayerDescription(playerIndex: (playerIndex + 1) % 3, isPlayer: false)
-        thirdPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 14)
+        thirdPlayerDescription.font = UIFont(name: "Avenir-Roman", size: 12)
         thirdPlayerDescription.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         thirdPlayerDescription.textColor = UIColor(colorLiteralRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
 thirdPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0.85, blue: 0.85, alpha: 0.75)
@@ -54,7 +54,7 @@ thirdPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0
         
         //  COMPOSE STRING TO RETURN WITH DETAILED PLAYER DESCRIPTION
         var description = ""
-        description += somePlayer.name + "\n(" + somePlayer.color.rawValue + " Player)\n\n"
+        description += somePlayer.name + "\n(" + somePlayer.color.rawValue + " Player)\n"
         description += "Victory Points: \(somePlayer.victoryPoints)\n\n"
         
         var numSet = 0
@@ -73,7 +73,7 @@ thirdPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0
         }
         description += "Number of Settlements: \(numSet)\n"
         description += "Number of Cities: \(numCit)\n"
-        description += "Number of Metropolis: \(numMet)\n\n"
+        description += "Number of Metropolis: \(numMet)\n"
         
         var numKnight = 0
         var totalStrength = 0
@@ -87,7 +87,7 @@ thirdPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0
         }
         description += "Number of Knights: \(numKnight)\n"
         description += "Active Knight Strength: \(activeStrength)\n"
-        description += "Total Knight Strength: \(totalStrength)\n\n"
+        description += "Total Knight Strength: \(totalStrength)\n"
         
         description += "Longest Road: \(somePlayer.longestRoad)\n\n"
         
@@ -95,7 +95,7 @@ thirdPlayerDescription.backgroundColor = UIColor(colorLiteralRed: 0.85, green: 0
         description += "Sciences Improvement Level: \(somePlayer.sciencesImprovementLevel + 1)\n"
         description += "Trades Improvement Level: \(somePlayer.tradesImprovementLevel + 1)\n\n"
         
-        description += "Barbarian Distance: \(gameDataReference.scenePort.barbariansDistanceFromCatan)\n\n"
+        description += "Barbarian Distance: \(gameDataReference.scenePort.barbariansDistanceFromCatan)\n"
         
         return description
     }

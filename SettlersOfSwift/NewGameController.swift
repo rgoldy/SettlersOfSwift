@@ -210,6 +210,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
     
     func startGame()
     {
+        started = true
         OperationQueue.main.addOperation { () -> Void in
             self.performSegue(withIdentifier: "startGame", sender: self)
         }
