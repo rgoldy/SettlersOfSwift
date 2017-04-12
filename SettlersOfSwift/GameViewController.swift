@@ -801,6 +801,18 @@ class GameViewController: UIViewController, NetworkDelegate {
             case "myVictoryPointsUpdate":
                 scenePort.players[Int(message[1])!].victoryPoints = Int(message[2])!
                 scenePort.players[scenePort.myPlayerIndex].victoryPointsRefreshed = true
+            case "removeOutlaw":
+                if message[1] == "Pirate" {
+                    let oldHex = scenePort.handler.landHexArray.first(where: {$0.center?.hasPirate == true})
+                    oldHex?.center?.hasPirate = false
+                    scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+                    scenePort.pirateRemoved = true
+                } else if message[1] == "Robber" {
+                    let oldHex = scenePort.handler.landHexArray.first(where: {$0.center?.hasRobber == true})
+                    oldHex?.center?.hasRobber = false
+                    scenePort.handler.Vertices.setTileGroup(nil, forColumn: (oldHex?.center?.column)!, row: (oldHex?.center?.row)!)
+                    scenePort.robberRemoved = true
+                }
             default:
                 print("Unknown message")
         }

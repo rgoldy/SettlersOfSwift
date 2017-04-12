@@ -3423,7 +3423,7 @@ class GameScene: SKScene {
                 case .WillRemoveMetropolis:
                     let removed = reduceMetropolis(column: handler.Vertices.tileColumnIndex(fromPosition: targetLocation) - 2, row: handler.Vertices.tileRowIndex(fromPosition: targetLocation), valid:rolled)
                     if removed {players[myPlayerIndex].nextAction = .WillDoNothing}
-                case .WillRemoveOutlaw: return;   //  NOT IMPLEMENTED, FISHES ALREADY REMOVED BEFOREHAND
+                case .WillRemoveOutlaw: break
                 case .WillMoveShip: let movedShip = moveShip(column: handler.Edges.tileColumnIndex(fromPosition: targetLocation), row: handler.Edges.tileRowIndex(fromPosition: targetLocation), valid: rolled)
                 if !movedShip { players[myPlayerIndex].nextAction = .WillDoNothing }
                 case .WillMoveKnight:
