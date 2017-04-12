@@ -12,7 +12,7 @@ import MultipeerConnectivity
 class NewGameController: UITableViewController, NetworkDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    let numberOfPlayers = 2
+    let numberOfPlayers = 3
     var players : [String] = []
     
     @IBOutlet var tblView: UITableView!
@@ -29,6 +29,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
         tblView.delegate = self
         
         players = extractPlayerNames(appDelegate.networkManager.loadData)
+        print ("\(players.count) player game")
         
         if (appDelegate.networkManager.loadData == "nil" && appDelegate.networkManager.session.connectedPeers.count + 1 == numberOfPlayers)
         {
@@ -73,12 +74,15 @@ class NewGameController: UITableViewController, NetworkDelegate {
             }
         }
         else {
+            print ("Invitation from \(fromPeer.displayName)")
             for name in players {
                 if name == fromPeer.displayName {
+                    print ("found \(fromPeer.displayName) in save")
                     self.appDelegate.networkManager.invitationHandler(true, self.appDelegate.networkManager.session)
                     return
                 }
             }
+            print ("\(fromPeer.displayName) not in save")
             self.appDelegate.networkManager.invitationHandler(false, nil)
         }
     }
@@ -92,6 +96,7 @@ class NewGameController: UITableViewController, NetworkDelegate {
             let data = unit.components(separatedBy: "|")
             if (data[0] == "PLAYER") {
                 let name = data[1]
+                print ("\tplayer \(name) in game.")
                 players.append(name)
             }
         }
