@@ -107,6 +107,7 @@ class LoadGameViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let data = allFileContents[indexPath.row]
         appDelegate.networkManager.loadData = data
+        print ("\n\n\(data)\n\n")
         joinGame()
     }
     

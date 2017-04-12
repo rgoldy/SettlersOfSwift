@@ -1511,22 +1511,22 @@ class GameScene: SKScene {
         if !valid { return false }
         var hasEngineerCard = false
         var usingEngineerCard = false
-        for item in players[myPlayerIndex].progressCards { if item == .Engineer { hasEngineerCard = true } }
-        if hasEngineerCard {
-            var decisionMade = false
-            let alert = UIAlertController(title: "Progress Card", message: "Would you like to use the Engineer card instead to build this wall?", preferredStyle: .alert)
-            let alertActionA = UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
-                usingEngineerCard = true
-                decisionMade = true
-            })
-            alert.addAction(alertActionA)
-            let alertActionB = UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
-                decisionMade = true
-            })
-            alert.addAction(alertActionB)
-            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
-            while !decisionMade { }
-        }
+//        for item in players[myPlayerIndex].progressCards { if item == .Engineer { hasEngineerCard = true } }
+//        if hasEngineerCard {
+//            var decisionMade = false
+//            let alert = UIAlertController(title: "Progress Card", message: "Would you like to use the Engineer card instead to build this wall?", preferredStyle: .alert)
+//            let alertActionA = UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
+//                usingEngineerCard = true
+//                decisionMade = true
+//            })
+//            alert.addAction(alertActionA)
+//            let alertActionB = UIAlertAction(title: "YES", style: .default, handler: { action -> Void in
+//                decisionMade = true
+//            })
+//            alert.addAction(alertActionB)
+//            self.view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
+//            while !decisionMade { }
+//        }
         if !hasResourcesForCityWall() && !usingEngineerCard { return false }
         let corner = players[myPlayerIndex].ownedCorners.first(where: {$0.column == column && $0.row == row})
         if corner == nil { return false }
@@ -3846,6 +3846,7 @@ class GameScene: SKScene {
         
         // SAVE gameState to file
         print ("SAVING FILE - \(filename)")
+        print ("\n\n\(gameState)\n\n")
         let DocumentDirURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         //let fileURL = DocumentDirURL.appendingPathComponent("settlersofswift/\(filename)")
         let fileURL = DocumentDirURL.appendingPathComponent(filename)
